@@ -1,5 +1,20 @@
 # Heracles NLP<->DSG Experiments
 
+## Pipeline
+
+The evaluation pipeline assumes an initial scene graph has been loaded to
+heracles. The queries that get evaluated are defined in
+`evaluation_questions.yaml`. Each question is defined with an associated
+answer.  Then, the script `chatgpt_benchmark.py` is run to create a cypher
+query for answering each question. This results in intermediate answers
+including the output of the cypher query when run against the database.  There
+is still some ambiguity in comparing these cypher query results to the correct
+solution, so there is an "answer refinement" step run with `refine_answers.py`,
+which prompts chatgpt with the original question and the results of the cypher
+query. This script then compares the refined answer to the solution, using
+the SLDP equality language (see below) to evaluate equality. The final
+results can be summarized by running `results_table.py`.
+
 ## SLDP Equality Language
 
 In order to evaluate whether the LLM pipeline is correct, we need to define
@@ -17,8 +32,11 @@ containers.
 ### Syntax
 
 A `list` is written as `[element1, element2, ... elementN]`
+
 A `set` is written as `<element1, element2, ... elementN>`
+
 A `dict` is written as `{k1: v1, k2: v2}`
+
 A `point` is written as `POINT(x y z)` (note the lack of comma)
 
 ### Interface
