@@ -1,0 +1,80 @@
+import openai
+import os
+import yaml
+from heracles.prompt_schema import Prompt
+
+from heracles.query_interface import Neo4jWrapper
+
+
+from model_info import ModelInfo
+
+from dataclasses import asdict
+
+
+key = os.getenv("DSG_OPENAI_API_KEY")
+
+client = openai.OpenAI(
+    api_key=key,
+    timeout=10,
+)
+
+with open("single_query_full_info_prompt.yaml", "r") as fo:
+    prompt_yaml = yaml.safe_load(fo)
+
+prompt_obj = Prompt.from_dict(prompt_yaml)
+print("Base prompt: ", prompt_obj)
+
+with open("evaluation_questions.yaml", "r") as fo:
+    eval_questions = yaml.safe_load(fo)
+
+
+# IP / Port for database
+URI = "neo4j://127.0.0.1:7687"
+# Database name / password for database
+AUTH = ("neo4j", "neo4j_pw")
+
+# Assumes that the scene graph has already been loaded into the database
+with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
+    objects = db.query(
+        "MATCH (n: Object) RETURN DISTINCT n.class as class, COUNT(*) as count"
+    )
+    print("objects:")
+    print(objects)
+
+    model_info = ModelInfo(model="gpt-4.1-nano", temperature=0.2, seed=100)
+    # model="gpt-4o-mini",
+    # model="gpt-4o",
+    eval_questions["answer_model_metadata"] = asdict(model_info)
+
+    for q in eval_questions["questions"]:
+        print(f'\nAsking question called {q["name"]}...\n')
+
+        prompt = prompt_obj.to_openai_json(q["question"])
+        response = client.chat.completions.create(
+            model=model_info.model,
+            messages=prompt,
+            temperature=model_info.temperature,
+            seed=model_info.seed,
+            response_format={"type": "json_object"},
+        )
+        print("response: ", response)
+        cypher_text = response.choices[0].message.content
+        print("\n cypher query: ", cypher_text)
+        cypher_dict = eval(cypher_text)
+        cypher_query = cypher_dict["cypher"]
+
+        try:
+            query_result = str(db.query(cypher_query))
+            valid_cypher_query = True
+        except Exception as ex:
+            print(ex)
+            query_result = str(ex)
+            valid_cypher_query = False
+
+        q["cot"] = cypher_dict["chain of thought"]
+        q["cypher"] = cypher_query
+        q["valid_cypher"] = valid_cypher_query
+        q["answer"] = query_result
+
+with open("temp_out.yaml", "w") as fo:
+    fo.write(yaml.dump(eval_questions, sort_keys=False))
