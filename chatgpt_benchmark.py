@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import openai
 import os
 import yaml
@@ -9,6 +10,7 @@ from heracles.query_interface import Neo4jWrapper
 from model_info import ModelInfo
 
 from dataclasses import asdict
+from rich.progress import track
 
 
 key = os.getenv("DSG_OPENAI_API_KEY")
@@ -24,7 +26,14 @@ with open("single_query_full_info_prompt.yaml", "r") as fo:
 prompt_obj = Prompt.from_dict(prompt_yaml)
 print("Base prompt: ", prompt_obj)
 
-with open("evaluation_questions.yaml", "r") as fo:
+
+question_dir = "yaml_pipeline/question_sets"
+question_set_name = "nina_questions"
+question_set = f"{question_set_name}.yaml"
+
+question_path = os.path.join(question_dir, question_set)
+
+with open(question_path, "r") as fo:
     eval_questions = yaml.safe_load(fo)
 
 
@@ -41,12 +50,12 @@ with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
     print("objects:")
     print(objects)
 
-    model_info = ModelInfo(model="gpt-4.1-nano", temperature=0.2, seed=100)
+    model_info = ModelInfo(model="gpt-4.1-mini", temperature=0.2, seed=100)
     # model="gpt-4o-mini",
     # model="gpt-4o",
     eval_questions["answer_model_metadata"] = asdict(model_info)
 
-    for q in eval_questions["questions"]:
+    for q in track(eval_questions["questions"], description="Processing..."):
         print(f'\nAsking question called {q["name"]}...\n')
 
         prompt = prompt_obj.to_openai_json(q["question"])
@@ -76,5 +85,8 @@ with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
         q["valid_cypher"] = valid_cypher_query
         q["answer"] = query_result
 
-with open("temp_out.yaml", "w") as fo:
+output_eval_results = os.path.join(
+    "yaml_pipeline", "intermediate_answers", f"{question_set_name}_answers.yaml"
+)
+with open(output_eval_results, "w") as fo:
     fo.write(yaml.dump(eval_questions, sort_keys=False))

@@ -11,6 +11,18 @@ def convert_to_number(query_interface_fn, question, answer):
     response = query_interface_fn(prompt)
     return response
 
+def convert_to_string(query_interface_fn, question, answer):
+    prompt = f""" You are trying to answer the question: {question}.
+        You have the following data as an intermediate answer. Please
+        reformat the following data into a string, 
+        Your response should contain only the string
+        and no extraneous information.
+        """
+
+    prompt += answer
+
+    response = query_interface_fn(prompt)
+    return response
 
 def convert_to_list(query_interface_fn, question, answer):
     prompt = f""" You are trying to answer the question: {question}.

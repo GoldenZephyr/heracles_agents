@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 from rich.table import Table
 import yaml
+import os
 from rich.console import Console
 
 
@@ -61,7 +63,11 @@ column_data_map = {
 for c in column_data_map:
     table.add_column(c)
 
-with open("refined_out.yaml", "r") as fo:
+question_set_name = "nina_questions"
+refined_out_eval = os.path.join(
+    "yaml_pipeline", "final_answers", f"{question_set_name}_refined_out.yaml"
+)
+with open(refined_out_eval, "r") as fo:
     results = yaml.safe_load(fo)
 
 for q in results["questions"]:

@@ -11,6 +11,8 @@ def get_sldp_type(s: str):
             return "point"
     elif type(ast) is float:
         return "number"
+    elif type(ast) is str:
+        return "string"
 
     raise Exception(f"Unknown type for {s}")
 
@@ -46,7 +48,7 @@ def equals(a, b):
             return float_equals(a, b)
 
         if type(a) is str and type(b) is str:
-            return a.strip() == b.strip()
+            return a.strip().lower() == b.strip().lower()
 
     return False
 

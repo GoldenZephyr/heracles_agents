@@ -4,11 +4,11 @@ Labels in Database:
     - Object: a node representing an object in the world.
       Object Properties:
         - nodeSymbol: a unique string identifier
-        - class: a string identifying the object's semantic class
+        - class: a string identifying the object's semantic class or type
         - center: the 3D position of the object, as a POINT type
     - MeshPlace: a node representing a 2D segment of space the robot might be able to move to.
         - nodeSymbol: a unique string identifier
-        - class: a string identifying the place's semantic class
+        - class: a string identifying the place's semantic class or type
         - center: the 3D position of the mesh place, as a POINT type
     - Place: a node representing a 3D region of free space
         - nodeSymbol: a unique string identifier
@@ -23,7 +23,7 @@ Places and Mesh Places represent a higher level of the hierarchy compared to obj
 
 There are two kinds of existing edges. First is (a)-[:CONTAINS]->(b), which connects nodes between different layers and means that b is contained within a. Nodes in higher levels of the hierarchy may contain nodes in lower levels of the hierarchy, but nodes in the lower level of the hierarchy will not contain higher-level nodes. The other kind of edges represent connectivity within a layer: [:OBJECT_CONNECTED], [:PLACE_CONNECTED], [:MESH_PLACE_CONNECTED], [:ROOM_CONNECTED].
 
-Note that in the current version of cypher, `distance` has been replaced by `point.distance`
+Note that in the current version of cypher, `distance` has been replaced by `point.distance`. Also, do not use any apoc functions in your queries.
 "
 
 novel_instruction_preamble: 'Now, generate a cypher query for this natural language query:'
