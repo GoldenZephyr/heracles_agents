@@ -1,0 +1,131 @@
+questions:
+    - name: "Distinct Classes"
+      question: "What are the distinct object classes?"
+      solution: "<tree, fence, vehicle, seating, window, sign, pole, door, box, trash, rock, bag>"
+      refinement_type: "set"
+
+    - name: "Distinct Counts"
+      question: "How many of each object type are there?"
+      solution: "{tree: 163, fence: 17, vehicle: 26, seating: 9, window: 1, sign: 6, pole: 21, door: 3, box: 4, trash: 1, rock: 62, bag: 1}"
+      refinement_type: "dict"
+
+    - name: "Sign Locations"
+      question: "Give me the location of all signs in the scene graph"
+      solution: |
+               <POINT(-8.284313559532166 -14.206965416035754 1.9744174981370886),
+                POINT(-30.409549247386845 -15.735817166261894 1.419422089360481),
+                POINT(-29.527192555941067 -11.574765984828655 1.4839779872160692),
+                POINT(-29.246166506680574 -8.68991950641979 1.4494154886765913),
+                POINT(-29.16052139096144 -7.293464509452262 1.556024234469344),
+                POINT(-69.23055948529925 83.1722952524821 0.790333880555062)>
+      refinement_type: "set"
+
+    - name: "Objects Near Point"
+      question: "What object node symbols are within 10 meters of x:-100, y:16, z:0?"
+      solution: "<O370, O371, O372, O373>"
+      refinement_type: "set"
+
+    - name: "MeshPlaces within 5 hops"
+      question: "How many mesh places are within 5 hops of mesh place P1832 (not including the starting place)."
+      solution: "141"
+      refinement_type: "number"
+
+    - name: "Objects Types in a Room"
+      question: "What object types are in Room R91"
+      solution: "<tree, window, pole>"
+      refinement_type: "set"
+
+    - name: "Count the Objects in a Room"
+      question: "How many objects are in room R1?"
+      solution: "7"
+      refinement_type: "number"
+
+    - name: "Room with the Max Count of Unique Objects Types"
+      question: "Which room symbol has the most object types?"
+      solution: "R96"
+      refinement_type: "string"
+
+    - name: "Room with Highest Count of Objects"
+      question: "Which room symbol has the highest number of objects?"
+      solution: "R100"
+      refinement_type: "string"
+
+    - name: "Compare Object Counts in Rooms"
+      question: "Between tree and box, which is in the fewest rooms?"
+      solution: "box"
+      refinement_type: "string"
+
+    - name: "Common Object in a Room"
+      question: "What’s the least common object type in Room R100 that is not a rock?"
+      solution: "vehicle"
+      refinement_type: "string"
+
+    - name: "Empty Rooms Connected to Room"
+      question: "What are the empty room symbols (rooms containing no objects) that are connected to room R99?"
+      solution: "<R52, R6, R50>"
+      refinement_type: "set"
+
+    - name: "Rooms that Contain Object"
+      question: "List all the room symbols that have a rock in them."
+      solution: "<R30, R88, R86, R99, R112, R109, R87, R8, R11, R12, R121, R122, R65, R2, R16, R81, R100, R3, R73, R25, R70, R74, R28, R102>"
+      refinement_type: "set"
+
+    - name: "Rooms that Contain Only Object"
+      question: "List all the room symbols that have only rocks in them."
+      solution: "<R88, R109, R8, R11, R12, R121, R65, R73, R25>"
+      refinement_type: "set"
+
+    - name: "Location of Objects in a Subset of Rooms"
+      question: "Give me the point coordiantes of the rocks, either in Room R88 or Room R100?"
+      solution: "<POINT(-80.96216372785896 27.755121998403265 4.415851417629198), POINT(-0.7888006318588646 -2.903889067318975 0.0882817480941208), POINT(-0.825403584722887 -4.263898042210362 0.03717637520381495)>"
+      refinement_type: "set"
+
+    - name: "Distance of Objects in a Room"
+      question: "Find the distance of the rocks and trees in Room R100 that are within 3.0 meters of each other, ordered by shortest distance. Return only the distances."
+      solution: "[0.7490734671216159, 1.1143781476916492, 1.2333940296376114, 1.8810572358450335, 2.297507598063438, 2.940645758149497]"
+      refinement_type: "list"
+
+    - name: "Positions of Multiple Objects in a Room"
+      question: "Give me a list of position coordinates of all the rocks and vehicles in Room R100?"
+      solution: "<POINT(-0.7888006318588646 -2.903889067318975 0.0882817480941208), POINT(-0.825403584722887 -4.263898042210362 0.03717637520381495), POINT(-2.4370584895468164 2.587475128662892 -0.08760905527767454), POINT(-5.885951024601442 -10.49500067755397 -0.2860741552871627), POINT(-5.885951024601442 -10.49500067755397 -0.2860741552871627)>"
+      refinement_type: "set"
+
+    - name: "Places Have One Object, but Not Other Object"
+      question: "Give me all the place symbols that have boxes but no trees?"
+      solution: "<p12343, p12645, p906, p12659>"
+      refinement_type: "set"
+
+    - name: "Rooms with Higher than Average Objects"
+      question: "Give me all room symbols with an above-average number of trees?"
+      solution: "<R1,R2,R3,R5,R7,R9,R14,R15,R16,R17,R18,R20,R26,R30,R31,R32,R38,R68,R70,R75,R81,R84,R86,R89,R91,R93,R99,R100,R101,R102,R103>"
+      refinement_type: "set"
+
+    - name: "Rooms with Higher than Standard Deviation of Objects"
+      question: "Give me room symbols with a number of trees that's at least one standard deviation above the mean ordered by the most trees?"
+      solution: "[R100, R20, R2]"
+      refinement_type: "list"
+
+    - name: "Compare Object Count"
+      question: "Which object types have more than 30 instances?"
+      solution: "<tree, rock>"
+      refinement_type: "set"
+
+    - name: "Maximum Objects in a Place"
+      question: "What is the maxium number of trees in any place?"
+      solution: "3"
+      refinement_type: "number"
+
+    - name: "Objects Inside Bounding Box."
+      question: "What are the object point coordinates inside the bounding box with the following coordinates: x1:-0, y1:-0, z1:0, x2:10, y2:10, z2:5? Return only the coordinates."
+      solution: "<POINT(0.11896780423469352 6.619487872937831 0.22895595844744182), POINT(0.7478225974187459 5.342799944420383 0.49659509568998256), POINT(4.855817626186302 1.5613172245024654 0.8235663587714304)>"
+      refinement_type: "set"
+
+    - name: "Rooms with Same Object Types"
+      question: "What rooms have the same object types as R102?"
+      solution: "<R2, R70>"
+      refinement_type: "set"
+
+    - name: "Distance Between Places"
+      question: "What is the distance between mesh places P906 and P1985?"
+      solution: "1.588630981055123"
+      refinement_type: "number"
