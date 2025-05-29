@@ -1,0 +1,835 @@
+questions:
+- name: Distinct Classes
+  question: What are the distinct object classes?
+  solution: <tree, fence, vehicle, seating, window, sign, pole, door, box, trash,
+    rock, bag>
+  refinement_type: set
+  answer: '
+
+    < tree, rock, pole, vehicle, box, fence, seating, window, sign, door, trash, bag
+    >
+
+    '
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: What are the distinct\
+    \ object classes?\ndeveloper: Use a series of steps to formulate your final answer\
+    \ in a chain of thought style. When you are ready to give your final answer, put\
+    \ it between a beginning and ending answer tag: <answer> the answer here </answer>\n\
+    \        Please format your final answer into a set of the form <element1, element2,\
+    \ .... elementN>.\n        Elements within the set should not have quotations\
+    \ around them. \n        The set is denoted by angle brackets < >. If you need\
+    \ to represent a POINT, the syntax is POINT(x y z) (only for answering, not for\
+    \ writing cypher queries).\n        The final answer should look like\n      \
+    \  <answer>\n        < element1, ..., elementN >\n        </answer>\nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (n) RETURN DISTINCT labels(n)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'labels(n)': ['Object']}, {'labels(n)': ['Place']},\
+    \ {'labels(n)': ['MeshPlace']}, {'labels(n)': ['Room']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (o:Object) RETURN DISTINCT o.class\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'o.class': 'tree'}, {'o.class': 'rock'}, {'o.class':\
+    \ 'pole'}, {'o.class': 'vehicle'}, {'o.class': 'box'}, {'o.class': 'fence'}, {'o.class':\
+    \ 'seating'}, {'o.class': 'window'}, {'o.class': 'sign'}, {'o.class': 'door'},\
+    \ {'o.class': 'trash'}, {'o.class': 'bag'}]\nassistant: <answer>\n< tree, rock,\
+    \ pole, vehicle, box, fence, seating, window, sign, door, trash, bag >\n</answer>"
+  sldp_output: '
+
+    < tree, rock, pole, vehicle, box, fence, seating, window, sign, door, trash, bag
+    >
+
+    '
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: Distinct Counts
+  question: How many of each object type are there?
+  solution: '{tree: 163, fence: 17, vehicle: 26, seating: 9, window: 1, sign: 6, pole:
+    21, door: 3, box: 4, trash: 1, rock: 62, bag: 1}'
+  refinement_type: dict
+  answer: '
+
+    {tree: 163, rock: 62, vehicle: 26, pole: 21, fence: 17, seating: 9, sign: 6, box:
+    4, door: 3, window: 1, trash: 1, bag: 1}
+
+    '
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: How many of each object\
+    \ type are there?\ndeveloper: Use a series of steps to formulate your final answer\
+    \ in a chain of thought style. When you are ready to give your final answer, put\
+    \ it between a beginning and ending answer tag: <answer> the answer here </answer>\n\
+    \        Please format your final answer into a dictionary of the form {key1:\
+    \ value1, ..., keyN: valueN}\n        Keys and values should not have quotations\
+    \ around them.\n        The dictionary is denoted by curly braces { }.\n     \
+    \   If you need to represent a POINT, the syntax is POINT(x y z) (only for answering,\
+    \ not for writing cypher queries).\n        The final answer should look like\n\
+    \        <answer>\n        {key1: value1, ..., keyN: valueN}\n        </answer>\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (n) RETURN DISTINCT labels(n)\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'labels(n)': ['Object']},\
+    \ {'labels(n)': ['Place']}, {'labels(n)': ['MeshPlace']}, {'labels(n)': ['Room']}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (n:Object) RETURN DISTINCT n.type\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'n.type': None}]\n\
+    developer: [[{'title': 'The provided property key is not in the database', 'code':\
+    \ 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning', 'description':\
+    \ \"One of the property names in your query is not available in the database,\
+    \ make sure you didn't misspell it or that the label is available when you run\
+    \ this statement in your application (the missing property name is: type)\", 'severity':\
+    \ 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset': 35, 'line': 1,\
+    \ 'column': 36}}]]\nassistant: Function(arguments='{\"query\":\"MATCH (n:Object)\
+    \ RETURN DISTINCT keys(n)\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'keys(n)': ['center', 'nodeSymbol', 'class']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (n:Object) RETURN n.class AS objectType, count(*) AS count ORDER\
+    \ BY count DESC\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'objectType': 'tree', 'count': 163}, {'objectType': 'rock', 'count': 62},\
+    \ {'objectType': 'vehicle', 'count': 26}, {'objectType': 'pole', 'count': 21},\
+    \ {'objectType': 'fence', 'count': 17}, {'objectType': 'seating', 'count': 9},\
+    \ {'objectType': 'sign', 'count': 6}, {'objectType': 'box', 'count': 4}, {'objectType':\
+    \ 'door', 'count': 3}, {'objectType': 'window', 'count': 1}, {'objectType': 'trash',\
+    \ 'count': 1}, {'objectType': 'bag', 'count': 1}]\nassistant: <answer>\n{tree:\
+    \ 163, rock: 62, vehicle: 26, pole: 21, fence: 17, seating: 9, sign: 6, box: 4,\
+    \ door: 3, window: 1, trash: 1, bag: 1}\n</answer>"
+  sldp_output: '
+
+    {tree: 163, rock: 62, vehicle: 26, pole: 21, fence: 17, seating: 9, sign: 6, box:
+    4, door: 3, window: 1, trash: 1, bag: 1}
+
+    '
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: Sign Locations
+  question: Give me the location of all signs in the scene graph
+  solution: "<POINT(-8.284313559532166 -14.206965416035754 1.9744174981370886),\n\
+    \ POINT(-30.409549247386845 -15.735817166261894 1.419422089360481),\n POINT(-29.527192555941067\
+    \ -11.574765984828655 1.4839779872160692),\n POINT(-29.246166506680574 -8.68991950641979\
+    \ 1.4494154886765913),\n POINT(-29.16052139096144 -7.293464509452262 1.556024234469344),\n\
+    \ POINT(-69.23055948529925 83.1722952524821 0.790333880555062)>\n"
+  refinement_type: set
+  answer: '
+
+    < POINT(-8.284313559532166 -14.206965416035754 1.9744174981370886), POINT(-30.409549247386845
+    -15.735817166261894 1.419422089360481), POINT(-29.527192555941067 -11.574765984828655
+    1.4839779872160692), POINT(-29.246166506680574 -8.68991950641979 1.4494154886765913),
+    POINT(-29.16052139096144 -7.293464509452262 1.556024234469344), POINT(-69.23055948529925
+    83.1722952524821 0.790333880555062) >
+
+    '
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: Give me the location\
+    \ of all signs in the scene graph\ndeveloper: Use a series of steps to formulate\
+    \ your final answer in a chain of thought style. When you are ready to give your\
+    \ final answer, put it between a beginning and ending answer tag: <answer> the\
+    \ answer here </answer>\n        Please format your final answer into a set of\
+    \ the form <element1, element2, .... elementN>.\n        Elements within the set\
+    \ should not have quotations around them. \n        The set is denoted by angle\
+    \ brackets < >. If you need to represent a POINT, the syntax is POINT(x y z) (only\
+    \ for answering, not for writing cypher queries).\n        The final answer should\
+    \ look like\n        <answer>\n        < element1, ..., elementN >\n        </answer>\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (n) RETURN DISTINCT labels(n)\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'labels(n)': ['Object']},\
+    \ {'labels(n)': ['Place']}, {'labels(n)': ['MeshPlace']}, {'labels(n)': ['Room']}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (n:Object) RETURN DISTINCT keys(n)\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'keys(n)': ['center',\
+    \ 'nodeSymbol', 'class']}]\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (n:Object) WHERE toLower(n.class) CONTAINS \\'sign\\' RETURN n.center AS location\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'location': POINT(-8.284313559532166\
+    \ -14.206965416035754 1.9744174981370886)}, {'location': POINT(-30.409549247386845\
+    \ -15.735817166261894 1.419422089360481)}, {'location': POINT(-29.527192555941067\
+    \ -11.574765984828655 1.4839779872160692)}, {'location': POINT(-29.246166506680574\
+    \ -8.68991950641979 1.4494154886765913)}, {'location': POINT(-29.16052139096144\
+    \ -7.293464509452262 1.556024234469344)}, {'location': POINT(-69.23055948529925\
+    \ 83.1722952524821 0.790333880555062)}]\nassistant: <answer>\n< POINT(-8.284313559532166\
+    \ -14.206965416035754 1.9744174981370886), POINT(-30.409549247386845 -15.735817166261894\
+    \ 1.419422089360481), POINT(-29.527192555941067 -11.574765984828655 1.4839779872160692),\
+    \ POINT(-29.246166506680574 -8.68991950641979 1.4494154886765913), POINT(-29.16052139096144\
+    \ -7.293464509452262 1.556024234469344), POINT(-69.23055948529925 83.1722952524821\
+    \ 0.790333880555062) >\n</answer>"
+  sldp_output: '
+
+    < POINT(-8.284313559532166 -14.206965416035754 1.9744174981370886), POINT(-30.409549247386845
+    -15.735817166261894 1.419422089360481), POINT(-29.527192555941067 -11.574765984828655
+    1.4839779872160692), POINT(-29.246166506680574 -8.68991950641979 1.4494154886765913),
+    POINT(-29.16052139096144 -7.293464509452262 1.556024234469344), POINT(-69.23055948529925
+    83.1722952524821 0.790333880555062) >
+
+    '
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: Objects Near Point
+  question: What object node symbols are within 10 meters of x:-100, y:16, z:0?
+  solution: <O370, O371, O372, O373>
+  refinement_type: set
+  answer: '
+
+    < O370, O371, O372, O373 >
+
+    '
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: What object node symbols\
+    \ are within 10 meters of x:-100, y:16, z:0?\ndeveloper: Use a series of steps\
+    \ to formulate your final answer in a chain of thought style. When you are ready\
+    \ to give your final answer, put it between a beginning and ending answer tag:\
+    \ <answer> the answer here </answer>\n        Please format your final answer\
+    \ into a set of the form <element1, element2, .... elementN>.\n        Elements\
+    \ within the set should not have quotations around them. \n        The set is\
+    \ denoted by angle brackets < >. If you need to represent a POINT, the syntax\
+    \ is POINT(x y z) (only for answering, not for writing cypher queries).\n    \
+    \    The final answer should look like\n        <answer>\n        < element1,\
+    \ ..., elementN >\n        </answer>\nassistant: Function(arguments='{\"query\"\
+    :\"MATCH (n) RETURN DISTINCT labels(n) LIMIT 20\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'labels(n)': ['Object']}, {'labels(n)': ['Place']},\
+    \ {'labels(n)': ['MeshPlace']}, {'labels(n)': ['Room']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (o:Object) RETURN DISTINCT keys(o) LIMIT 20\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'keys(o)': ['center', 'nodeSymbol', 'class']}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (o:Object) WHERE o.center IS\
+    \ NOT NULL RETURN o.nodeSymbol, o.center LIMIT 5\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'o.nodeSymbol': 'O358', 'o.center': POINT(-83.98237547763559\
+    \ -22.77598485281301 6.452225851458173)}, {'o.nodeSymbol': 'O359', 'o.center':\
+    \ POINT(-83.9427542368571 -22.97833833694458 8.366516351699829)}, {'o.nodeSymbol':\
+    \ 'O360', 'o.center': POINT(-89.40313919730808 -26.84611403423807 6.752819792084072)},\
+    \ {'o.nodeSymbol': 'O361', 'o.center': POINT(-93.57123632906041 -8.677948971361037\
+    \ 9.993025425293437)}, {'o.nodeSymbol': 'O362', 'o.center': POINT(-95.14529435007196\
+    \ -6.861654984323602 7.932048516524466)}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (o:Object) WHERE o.center IS NOT NULL AND point.distance(o.center,\
+    \ point({x:-100, y:16, z:0})) <= 10 RETURN o.nodeSymbol\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'o.nodeSymbol': 'O370'}, {'o.nodeSymbol': 'O371'},\
+    \ {'o.nodeSymbol': 'O372'}, {'o.nodeSymbol': 'O373'}]\nassistant: <answer>\n<\
+    \ O370, O371, O372, O373 >\n</answer>"
+  sldp_output: '
+
+    < O370, O371, O372, O373 >
+
+    '
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: MeshPlaces within 5 hops
+  question: How many mesh places are within 5 hops of mesh place P1832 (not including
+    the starting place).
+  solution: '141'
+  refinement_type: number
+  answer: '141'
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: How many mesh places\
+    \ are within 5 hops of mesh place P1832 (not including the starting place).\n\
+    developer: Use a series of steps to formulate your final answer in a chain of\
+    \ thought style. When you are ready to give your final answer, put it between\
+    \ a beginning and ending answer tag: <answer> the answer here </answer> Please\
+    \ format your final answer into a number.\n        Your response should contain\
+    \ only the number, looking like\n        <answer>123</answer>. \nassistant: Function(arguments='{\"\
+    query\":\"MATCH (n) RETURN DISTINCT labels(n)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'labels(n)': ['Object']}, {'labels(n)': ['Place']},\
+    \ {'labels(n)': ['MeshPlace']}, {'labels(n)': ['Room']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (n:MeshPlace) RETURN DISTINCT keys(n)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'keys(n)': ['center', 'nodeSymbol', 'class']}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (n:MeshPlace {nodeSymbol: \\\
+    'P1832\\'}) RETURN n\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'n': {'center': POINT(-28.13370704650879 -8.175583839416504 -0.3800581395626068),\
+    \ 'class': 'road', 'nodeSymbol': 'P1832'}}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (start:MeshPlace {nodeSymbol: \\'P1832\\'})\\\\nMATCH path = (start)-[*1..5]-(other:MeshPlace)\\\
+    \\nWHERE other.nodeSymbol <> \\'P1832\\'\\\\nRETURN COUNT(DISTINCT other) AS mesh_places_within_5_hops\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'mesh_places_within_5_hops':\
+    \ 141}]\nassistant: <answer>141</answer>"
+  sldp_output: '141'
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: Objects Types in a Room
+  question: What object types are in Room R91
+  solution: <tree, window, pole>
+  refinement_type: set
+  answer: '
+
+    < indoor, parking >
+
+    '
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: What object types are\
+    \ in Room R91\ndeveloper: Use a series of steps to formulate your final answer\
+    \ in a chain of thought style. When you are ready to give your final answer, put\
+    \ it between a beginning and ending answer tag: <answer> the answer here </answer>\n\
+    \        Please format your final answer into a set of the form <element1, element2,\
+    \ .... elementN>.\n        Elements within the set should not have quotations\
+    \ around them. \n        The set is denoted by angle brackets < >. If you need\
+    \ to represent a POINT, the syntax is POINT(x y z) (only for answering, not for\
+    \ writing cypher queries).\n        The final answer should look like\n      \
+    \  <answer>\n        < element1, ..., elementN >\n        </answer>\nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (r:Room {name: \\'R91\\'}) RETURN r\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: []\ndeveloper: [[{'title':\
+    \ 'The provided property key is not in the database', 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning',\
+    \ 'description': \"One of the property names in your query is not available in\
+    \ the database, make sure you didn't misspell it or that the label is available\
+    \ when you run this statement in your application (the missing property name is:\
+    \ name)\", 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset':\
+    \ 15, 'line': 1, 'column': 16}}]]\nassistant: Function(arguments='{\"query\":\"\
+    MATCH (r:Room) RETURN properties(r) LIMIT 5\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'properties(r)': {'center': POINT(5.938091970980167\
+    \ -0.920784480511793 0.8434076374862343), 'nodeSymbol': 'R1', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(13.074167143106461 2.3521832370664923 1.5945468781209395),\
+    \ 'nodeSymbol': 'R2', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-2.624069601400859\
+    \ 3.609003002640971 1.6793939810333371), 'nodeSymbol': 'R3', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(-2.8146820979959823 -7.6476302707896515 1.828742772779044),\
+    \ 'nodeSymbol': 'R4', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-37.43573080698649\
+    \ -7.768647734324137 1.6680380744859575), 'nodeSymbol': 'R5', 'class': 'unknown'}}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (r:Room {nodeSymbol: \\'R91\\\
+    '}) RETURN r\"}', name='execute_cypher_query')\ntool: execute_cypher_query: [{'r':\
+    \ {'center': POINT(-15.129689085072485 2.276745875077001 1.230028751595267), 'class':\
+    \ 'sidewalk', 'nodeSymbol': 'R91'}}]\nassistant: Function(arguments='{\"query\"\
+    :\"MATCH (r:Room {nodeSymbol: \\'R91\\'})--(o) RETURN DISTINCT labels(o)\"}',\
+    \ name='execute_cypher_query')\ntool: execute_cypher_query: [{'labels(o)': ['Place']},\
+    \ {'labels(o)': ['Room']}]\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (r:Room {nodeSymbol: \\'R91\\'})--(o) RETURN DISTINCT o.class\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'o.class': None}, {'o.class': 'indoor'}, {'o.class':\
+    \ 'parking'}]\nassistant: <answer>\n< indoor, parking >\n</answer>"
+  sldp_output: '
+
+    < indoor, parking >
+
+    '
+  valid_cypher: false
+  valid_sldp: true
+  correct: false
+- name: Count the Objects in a Room
+  question: How many objects are in room R1?
+  solution: '7'
+  refinement_type: number
+  answer: '166'
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: How many objects are\
+    \ in room R1?\ndeveloper: Use a series of steps to formulate your final answer\
+    \ in a chain of thought style. When you are ready to give your final answer, put\
+    \ it between a beginning and ending answer tag: <answer> the answer here </answer>\
+    \ Please format your final answer into a number.\n        Your response should\
+    \ contain only the number, looking like\n        <answer>123</answer>. \nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (r:Room {name: \\'R1\\'}) RETURN r\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: []\ndeveloper: [[{'title':\
+    \ 'The provided property key is not in the database', 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning',\
+    \ 'description': \"One of the property names in your query is not available in\
+    \ the database, make sure you didn't misspell it or that the label is available\
+    \ when you run this statement in your application (the missing property name is:\
+    \ name)\", 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset':\
+    \ 15, 'line': 1, 'column': 16}}]]\nassistant: Function(arguments='{\"query\":\"\
+    MATCH (r:Room) RETURN properties(r) LIMIT 5\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'properties(r)': {'center': POINT(5.938091970980167\
+    \ -0.920784480511793 0.8434076374862343), 'nodeSymbol': 'R1', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(13.074167143106461 2.3521832370664923 1.5945468781209395),\
+    \ 'nodeSymbol': 'R2', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-2.624069601400859\
+    \ 3.609003002640971 1.6793939810333371), 'nodeSymbol': 'R3', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(-2.8146820979959823 -7.6476302707896515 1.828742772779044),\
+    \ 'nodeSymbol': 'R4', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-37.43573080698649\
+    \ -7.768647734324137 1.6680380744859575), 'nodeSymbol': 'R5', 'class': 'unknown'}}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (r:Room {nodeSymbol: \\'R1\\\
+    '})--(o) RETURN count(o)\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'count(o)': 166}]\nassistant: <answer>166</answer>"
+  sldp_output: '166'
+  valid_cypher: false
+  valid_sldp: true
+  correct: false
+- name: Room with the Max Count of Unique Objects Types
+  question: Which room symbol has the most object types?
+  solution: R96
+  refinement_type: string
+  answer: None
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: Which room symbol has\
+    \ the most object types?\ndeveloper: Use a series of steps to formulate your final\
+    \ answer in a chain of thought style. When you are ready to give your final answer,\
+    \ put it between a beginning and ending answer tag: <answer> the answer here </answer>\
+    \ Please format your final answer into a string, \n        Your final answer should\
+    \ contain only a *single* word, no quotation,\n        and no extraneous information,\
+    \ looking like \n        <answer>The answer string</answer>\n        \nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (r) RETURN DISTINCT labels(r)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'labels(r)': ['Object']}, {'labels(r)': ['Place']},\
+    \ {'labels(r)': ['MeshPlace']}, {'labels(r)': ['Room']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (r:Room) RETURN r.symbol LIMIT 5\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'r.symbol': None}, {'r.symbol': None}, {'r.symbol':\
+    \ None}, {'r.symbol': None}, {'r.symbol': None}]\ndeveloper: [[{'title': 'The\
+    \ provided property key is not in the database', 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning',\
+    \ 'description': \"One of the property names in your query is not available in\
+    \ the database, make sure you didn't misspell it or that the label is available\
+    \ when you run this statement in your application (the missing property name is:\
+    \ symbol)\", 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset':\
+    \ 24, 'line': 1, 'column': 25}}]]\nassistant: Function(arguments='{\"query\":\"\
+    MATCH (r:Room) RETURN properties(r) LIMIT 5\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'properties(r)': {'center': POINT(5.938091970980167\
+    \ -0.920784480511793 0.8434076374862343), 'nodeSymbol': 'R1', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(13.074167143106461 2.3521832370664923 1.5945468781209395),\
+    \ 'nodeSymbol': 'R2', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-2.624069601400859\
+    \ 3.609003002640971 1.6793939810333371), 'nodeSymbol': 'R3', 'class': 'unknown'}},\
+    \ {'properties(r)': {'center': POINT(-2.8146820979959823 -7.6476302707896515 1.828742772779044),\
+    \ 'nodeSymbol': 'R4', 'class': 'unknown'}}, {'properties(r)': {'center': POINT(-37.43573080698649\
+    \ -7.768647734324137 1.6680380744859575), 'nodeSymbol': 'R5', 'class': 'unknown'}}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (r:Room)<-[:INSIDE]-(o:Object)\
+    \ RETURN r.nodeSymbol AS room, count(DISTINCT o.class) AS objectTypeCount ORDER\
+    \ BY objectTypeCount DESC LIMIT 1\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ []\ndeveloper: [[{'title': 'The provided relationship type is not in the database.',\
+    \ 'code': 'Neo.ClientNotification.Statement.UnknownRelationshipTypeWarning', 'description':\
+    \ \"One of the relationship types in your query is not available in the database,\
+    \ make sure you didn't misspell it or that the label is available when you run\
+    \ this statement in your application (the missing relationship type is: INSIDE)\"\
+    , 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset': 18,\
+    \ 'line': 1, 'column': 19}}]]\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (r:Room)-[rel]->(o:Object) RETURN DISTINCT type(rel)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: []\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (r:Room)--(o:Object) RETURN r.nodeSymbol, count(DISTINCT o.class) AS objectTypeCount\
+    \ ORDER BY objectTypeCount DESC LIMIT 1\"}', name='execute_cypher_query')\ntool:\
+    \ execute_cypher_query: []\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (r:Room)--(o:Object) RETURN DISTINCT keys(o)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: []\nassistant: <answer>None</answer>"
+  sldp_output: None
+  valid_cypher: false
+  valid_sldp: true
+  correct: false
+- name: Room with Highest Count of Objects
+  question: Which room symbol has the highest number of objects?
+  solution: R100
+  refinement_type: string
+  answer: R100
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: Which room symbol has\
+    \ the highest number of objects?\ndeveloper: Use a series of steps to formulate\
+    \ your final answer in a chain of thought style. When you are ready to give your\
+    \ final answer, put it between a beginning and ending answer tag: <answer> the\
+    \ answer here </answer> Please format your final answer into a string, \n    \
+    \    Your final answer should contain only a *single* word, no quotation,\n  \
+    \      and no extraneous information, looking like \n        <answer>The answer\
+    \ string</answer>\n        \nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (r)-[:CONTAINS]->(o) RETURN DISTINCT labels(r)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'labels(r)': ['Place']}, {'labels(r)': ['Room']}]\n\
+    assistant: Function(arguments='{\"query\":\"MATCH (r:Room)-[:CONTAINS]->(o) RETURN\
+    \ DISTINCT keys(r)\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'keys(r)': ['center', 'nodeSymbol', 'class']}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (r:Room)-[:CONTAINS]->(o) RETURN r.nodeSymbol AS roomSymbol, count(o)\
+    \ AS objectCount ORDER BY objectCount DESC LIMIT 1\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'roomSymbol': 'R100', 'objectCount': 1168}]\nassistant:\
+    \ <answer>R100</answer>"
+  sldp_output: R100
+  valid_cypher: false
+  valid_sldp: true
+  correct: true
+- name: Compare Object Counts in Rooms
+  question: Between tree and box, which is in the fewest rooms?
+  solution: box
+  refinement_type: string
+  answer: tree
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: Between tree and box,\
+    \ which is in the fewest rooms?\ndeveloper: Use a series of steps to formulate\
+    \ your final answer in a chain of thought style. When you are ready to give your\
+    \ final answer, put it between a beginning and ending answer tag: <answer> the\
+    \ answer here </answer> Please format your final answer into a string, \n    \
+    \    Your final answer should contain only a *single* word, no quotation,\n  \
+    \      and no extraneous information, looking like \n        <answer>The answer\
+    \ string</answer>\n        \nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (n) RETURN DISTINCT labels(n)\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'labels(n)': ['Object']}, {'labels(n)': ['Place']}, {'labels(n)': ['MeshPlace']},\
+    \ {'labels(n)': ['Room']}]\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (o:Object)-[:IN]->(r:Room) WHERE o.name = \\'tree\\' RETURN COUNT(DISTINCT r)\
+    \ AS room_count\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ [{'room_count': 0}]\ndeveloper: [[{'title': 'The provided relationship type\
+    \ is not in the database.', 'code': 'Neo.ClientNotification.Statement.UnknownRelationshipTypeWarning',\
+    \ 'description': \"One of the relationship types in your query is not available\
+    \ in the database, make sure you didn't misspell it or that the label is available\
+    \ when you run this statement in your application (the missing relationship type\
+    \ is: IN)\", 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset':\
+    \ 19, 'line': 1, 'column': 20}}, {'title': 'The provided property key is not in\
+    \ the database', 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning',\
+    \ 'description': \"One of the property names in your query is not available in\
+    \ the database, make sure you didn't misspell it or that the label is available\
+    \ when you run this statement in your application (the missing property name is:\
+    \ name)\", 'severity': 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset':\
+    \ 41, 'line': 1, 'column': 42}}]]\nassistant: Function(arguments='{\"query\":\"\
+    MATCH (o:Object) RETURN DISTINCT keys(o)\"}', name='execute_cypher_query')\ntool:\
+    \ execute_cypher_query: [{'keys(o)': ['center', 'nodeSymbol', 'class']}]\nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (o:Object) RETURN DISTINCT o.class\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'o.class': 'tree'},\
+    \ {'o.class': 'rock'}, {'o.class': 'pole'}, {'o.class': 'vehicle'}, {'o.class':\
+    \ 'box'}, {'o.class': 'fence'}, {'o.class': 'seating'}, {'o.class': 'window'},\
+    \ {'o.class': 'sign'}, {'o.class': 'door'}, {'o.class': 'trash'}, {'o.class':\
+    \ 'bag'}]\nassistant: Function(arguments='{\"query\":\"MATCH (o:Object)-[rel]->(r:Room)\
+    \ WHERE o.class = \\'tree\\' RETURN DISTINCT type(rel)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: []\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (o:Object)-[rel]->(r:Room) WHERE o.class = \\'box\\' RETURN DISTINCT type(rel)\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: []\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (o:Object)-[rel]->(r:Room) RETURN DISTINCT type(rel)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: []\nassistant: Function(arguments='{\"query\":\"MATCH\
+    \ (o:Object)-[rel]->(r) RETURN DISTINCT labels(r), type(rel)\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: []\nassistant: <answer>tree</answer>"
+  sldp_output: tree
+  valid_cypher: false
+  valid_sldp: true
+  correct: false
+- name: Common Object in a Room
+  question: "What\u2019s the least common object type in Room R100 that is not a rock?"
+  solution: vehicle
+  refinement_type: string
+  answer: Place
+  messages: "developer:  You are a helpful assistant who is an expert at mapping from\
+    \ natural language queries to Cypher queries for a Neo4j graph database. You have\
+    \ access to a database representing a 3D scene graph, which stores spatial information\
+    \ that a robot can use to understand the world. Given a query, your task is to\
+    \ generate a Cypher query that retrieves the relevant information from the database.\n\
+    Note that in the current version of cypher, `distance` has been replaced by `point.distance`.\
+    \ Also, do not use any apoc functions in your queries.\nAgent Instructions: 1.\
+    \ Before attempting to generate the final Cypher query, run exploratory queries\
+    \ to verify available node labels, relationship types, and property keys if necessary.\
+    \ 2. If the query you generate is invalid, fails to run, or produces an error,\
+    \ retry by correcting the Cypher based on feedback or known schema rules. 3. You\
+    \ may break down the query into parts to iteratively refine the correct Cypher\
+    \ expression.\nYou can call the cypher query tool up to 8 times. If you try to\
+    \ execute more than 5 queries, your answer will be counted as wrong. \ndeveloper:\
+    \ Now, use cypher queries to answer this question:\nuser: What\u2019s the least\
+    \ common object type in Room R100 that is not a rock?\ndeveloper: Use a series\
+    \ of steps to formulate your final answer in a chain of thought style. When you\
+    \ are ready to give your final answer, put it between a beginning and ending answer\
+    \ tag: <answer> the answer here </answer> Please format your final answer into\
+    \ a string, \n        Your final answer should contain only a *single* word, no\
+    \ quotation,\n        and no extraneous information, looking like \n        <answer>The\
+    \ answer string</answer>\n        \nassistant: Function(arguments='{\"query\"\
+    :\"MATCH (r:Room {name: \\'R100\\'})-[:CONTAINS]->(o)\\\\nRETURN DISTINCT labels(o)\
+    \ as labels, o.type as type\\\\n\"}', name='execute_cypher_query')\ntool: execute_cypher_query:\
+    \ []\ndeveloper: [[{'title': 'The provided property key is not in the database',\
+    \ 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning', 'description':\
+    \ \"One of the property names in your query is not available in the database,\
+    \ make sure you didn't misspell it or that the label is available when you run\
+    \ this statement in your application (the missing property name is: name)\", 'severity':\
+    \ 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset': 15, 'line': 1,\
+    \ 'column': 16}}, {'title': 'The provided property key is not in the database',\
+    \ 'code': 'Neo.ClientNotification.Statement.UnknownPropertyKeyWarning', 'description':\
+    \ \"One of the property names in your query is not available in the database,\
+    \ make sure you didn't misspell it or that the label is available when you run\
+    \ this statement in your application (the missing property name is: type)\", 'severity':\
+    \ 'WARNING', 'category': 'UNRECOGNIZED', 'position': {'offset': 86, 'line': 2,\
+    \ 'column': 40}}]]\nassistant: Function(arguments='{\"query\":\"MATCH (r:Room)-[:CONTAINS]->(o)\\\
+    \\nRETURN DISTINCT r, labels(o) as labels, properties(o) as props\\\\nLIMIT 25\"\
+    }', name='execute_cypher_query')\ntool: execute_cypher_query: [{'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.094837188720703\
+    \ 4.024688243865967 -0.9112300276756287), 'nodeSymbol': 'p13841'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(5.2344465255737305\
+    \ -6.27842378616333 2.661299705505371), 'nodeSymbol': 'p13019'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.545216083526611\
+    \ -5.716424465179443 0.8376254439353943), 'nodeSymbol': 'p13053'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.900908946990967\
+    \ -2.0938565731048584 -0.1376231610774994), 'nodeSymbol': 'p13794'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.537464141845703\
+    \ -2.306943655014038 0.9616227746009827), 'nodeSymbol': 'p13062'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(4.165135383605957\
+    \ -5.368638038635254 1.4493666887283325), 'nodeSymbol': 'p13025'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(4.79764461517334\
+    \ 1.8462375402450562 0.5318424701690674), 'nodeSymbol': 'p6297'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.810932159423828\
+    \ -6.003159523010254 1.6420785188674927), 'nodeSymbol': 'p13026'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.522727966308594\
+    \ -4.391997814178467 2.8087761402130127), 'nodeSymbol': 'p13057'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(3.593384027481079\
+    \ -3.7391879558563232 2.417903184890747), 'nodeSymbol': 'p12911'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(5.75411319732666\
+    \ -3.5818018913269043 -0.03522967919707298), 'nodeSymbol': 'p13796'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(2.5127546787261963\
+    \ -3.079969882965088 2.61201810836792), 'nodeSymbol': 'p13061'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(4.750434875488281\
+    \ -1.7049260139465332 2.363068103790283), 'nodeSymbol': 'p13072'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(4.520197868347168\
+    \ -2.5051989555358887 1.0600656270980835), 'nodeSymbol': 'p6335'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(8.878602981567383\
+    \ 2.6918389797210693 -0.13314080238342285), 'nodeSymbol': 'p13833'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.53989315032959\
+    \ -0.6142656207084656 1.1832852363586426), 'nodeSymbol': 'p5283'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.668382167816162\
+    \ -6.105891227722168 2.845848798751831), 'nodeSymbol': 'p13038'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(8.002970695495605\
+    \ 2.88411545753479 0.37304654717445374), 'nodeSymbol': 'p13832'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.9178314208984375\
+    \ -3.8767566680908203 1.3902769088745117), 'nodeSymbol': 'p13770'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.352517604827881\
+    \ -4.570718288421631 0.6135653257369995), 'nodeSymbol': 'p13055'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(5.1951494216918945\
+    \ -1.3786373138427734 3.1314382553100586), 'nodeSymbol': 'p6312'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(6.2391815185546875\
+    \ -4.373709678649902 2.61061954498291), 'nodeSymbol': 'p13056'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(5.574954509735107\
+    \ -1.5960291624069214 -0.42726004123687744), 'nodeSymbol': 'p13789'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(4.584100723266602\
+    \ 0.8559113144874573 -0.17496618628501892), 'nodeSymbol': 'p13775'}}, {'r': {'center':\
+    \ POINT(5.938091970980167 -0.920784480511793 0.8434076374862343), 'class': 'unknown',\
+    \ 'nodeSymbol': 'R1'}, 'labels': ['Place'], 'props': {'center': POINT(2.6792654991149902\
+    \ -6.122753620147705 0.4780052900314331), 'nodeSymbol': 'p13032'}}]\nassistant:\
+    \ Function(arguments='{\"query\":\"MATCH (r:Room)-[:CONTAINS]->(o)\\\\nRETURN\
+    \ DISTINCT labels(r) as room_labels, r.nodeSymbol as room_symbol, labels(o) as\
+    \ object_labels, properties(o) as object_props\\\\nLIMIT 50\"}', name='execute_cypher_query')\n\
+    tool: execute_cypher_query: [{'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(6.094837188720703 4.024688243865967\
+    \ -0.9112300276756287), 'nodeSymbol': 'p13841'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(5.2344465255737305\
+    \ -6.27842378616333 2.661299705505371), 'nodeSymbol': 'p13019'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(6.545216083526611 -5.716424465179443 0.8376254439353943), 'nodeSymbol':\
+    \ 'p13053'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(6.900908946990967 -2.0938565731048584\
+    \ -0.1376231610774994), 'nodeSymbol': 'p13794'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(6.537464141845703\
+    \ -2.306943655014038 0.9616227746009827), 'nodeSymbol': 'p13062'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(4.165135383605957 -5.368638038635254 1.4493666887283325), 'nodeSymbol':\
+    \ 'p13025'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(4.79764461517334 1.8462375402450562\
+    \ 0.5318424701690674), 'nodeSymbol': 'p6297'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(6.810932159423828\
+    \ -6.003159523010254 1.6420785188674927), 'nodeSymbol': 'p13026'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(6.522727966308594 -4.391997814178467 2.8087761402130127), 'nodeSymbol':\
+    \ 'p13057'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(3.593384027481079 -3.7391879558563232\
+    \ 2.417903184890747), 'nodeSymbol': 'p12911'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(5.75411319732666\
+    \ -3.5818018913269043 -0.03522967919707298), 'nodeSymbol': 'p13796'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(2.5127546787261963 -3.079969882965088 2.61201810836792), 'nodeSymbol':\
+    \ 'p13061'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(4.750434875488281 -1.7049260139465332\
+    \ 2.363068103790283), 'nodeSymbol': 'p13072'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(4.520197868347168\
+    \ -2.5051989555358887 1.0600656270980835), 'nodeSymbol': 'p6335'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(8.878602981567383 2.6918389797210693 -0.13314080238342285), 'nodeSymbol':\
+    \ 'p13833'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(6.53989315032959 -0.6142656207084656\
+    \ 1.1832852363586426), 'nodeSymbol': 'p5283'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(6.668382167816162\
+    \ -6.105891227722168 2.845848798751831), 'nodeSymbol': 'p13038'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(8.002970695495605 2.88411545753479 0.37304654717445374), 'nodeSymbol':\
+    \ 'p13832'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(6.9178314208984375 -3.8767566680908203\
+    \ 1.3902769088745117), 'nodeSymbol': 'p13770'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(6.352517604827881\
+    \ -4.570718288421631 0.6135653257369995), 'nodeSymbol': 'p13055'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(5.1951494216918945 -1.3786373138427734 3.1314382553100586), 'nodeSymbol':\
+    \ 'p6312'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'],\
+    \ 'object_props': {'center': POINT(6.2391815185546875 -4.373709678649902 2.61061954498291),\
+    \ 'nodeSymbol': 'p13056'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(5.574954509735107 -1.5960291624069214\
+    \ -0.42726004123687744), 'nodeSymbol': 'p13789'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(4.584100723266602\
+    \ 0.8559113144874573 -0.17496618628501892), 'nodeSymbol': 'p13775'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(2.6792654991149902 -6.122753620147705 0.4780052900314331), 'nodeSymbol':\
+    \ 'p13032'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(5.95720100402832 -4.131680488586426\
+    \ -0.19323593378067017), 'nodeSymbol': 'p13030'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(5.2767510414123535\
+    \ 2.5409107208251953 0.7752421498298645), 'nodeSymbol': 'p53'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(8.79190444946289 6.50172233581543 -0.920177698135376), 'nodeSymbol': 'p13857'}},\
+    \ {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props':\
+    \ {'center': POINT(8.91359806060791 1.4549540281295776 -0.037400003522634506),\
+    \ 'nodeSymbol': 'p13835'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(5.485035419464111 3.136198043823242\
+    \ 0.9812516570091248), 'nodeSymbol': 'p52'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(4.761765003204346\
+    \ -1.4543745517730713 0.9570099115371704), 'nodeSymbol': 'p13074'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(7.224083423614502 -6.173756122589111 1.8425815105438232), 'nodeSymbol':\
+    \ 'p13049'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(4.4000043869018555 -5.959576606750488\
+    \ 1.260593056678772), 'nodeSymbol': 'p12918'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(4.574051856994629\
+    \ 1.286675214767456 -0.21054993569850922), 'nodeSymbol': 'p13896'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(6.093801975250244 -2.045430898666382 0.6019569635391235), 'nodeSymbol':\
+    \ 'p13784'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(8.329313278198242 3.941182851791382\
+    \ -0.9256331920623779), 'nodeSymbol': 'p13865'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(5.205600738525391\
+    \ -3.1463088989257812 2.991720199584961), 'nodeSymbol': 'p13066'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(3.636319398880005 0.17475526034832 1.9481641054153442), 'nodeSymbol':\
+    \ 'p6'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'],\
+    \ 'object_props': {'center': POINT(2.4249391555786133 -5.8047332763671875 1.0731357336044312),\
+    \ 'nodeSymbol': 'p13051'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(5.0670881271362305 3.53406023979187\
+    \ -0.6063162684440613), 'nodeSymbol': 'p13829'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(8.98073673248291\
+    \ 2.667893171310425 0.5661814212799072), 'nodeSymbol': 'p13834'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(4.814489841461182 -1.2428324222564697 1.5482734441757202), 'nodeSymbol':\
+    \ 'p4'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'],\
+    \ 'object_props': {'center': POINT(4.419840335845947 -2.2548210620880127 1.977932333946228),\
+    \ 'nodeSymbol': 'p13071'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(2.4200572967529297 -5.818140029907227\
+    \ 0.4733145236968994), 'nodeSymbol': 'p13033'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(2.2829160690307617\
+    \ -0.6500533223152161 2.559601068496704), 'nodeSymbol': 'p13086'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(10.834198951721191 1.3380253314971924 0.050132546573877335), 'nodeSymbol':\
+    \ 'p13853'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(9.609084129333496 2.734221935272217\
+    \ 0.4624292850494385), 'nodeSymbol': 'p13837'}}, {'room_labels': ['Room'], 'room_symbol':\
+    \ 'R1', 'object_labels': ['Place'], 'object_props': {'center': POINT(2.1590664386749268\
+    \ -7.3435540199279785 1.1096305847167969), 'nodeSymbol': 'p13041'}}, {'room_labels':\
+    \ ['Room'], 'room_symbol': 'R1', 'object_labels': ['Place'], 'object_props': {'center':\
+    \ POINT(6.8143439292907715 -4.168664932250977 1.2009961605072021), 'nodeSymbol':\
+    \ 'p13054'}}, {'room_labels': ['Room'], 'room_symbol': 'R1', 'object_labels':\
+    \ ['Place'], 'object_props': {'center': POINT(9.906637191772461 0.8244368433952332\
+    \ 0.7543472647666931), 'nodeSymbol': 'p13849'}}]\nassistant: Function(arguments='{\"\
+    query\":\"MATCH (r:Room {nodeSymbol: \\'R100\\'})-[:CONTAINS]->(o)\\\\nRETURN\
+    \ labels(o) as object_labels, count(*) as count\\\\nORDER BY count ASC\\\\nLIMIT\
+    \ 5\"}', name='execute_cypher_query')\ntool: execute_cypher_query: [{'object_labels':\
+    \ ['Place'], 'count': 1168}]\nassistant: <answer>Place</answer>"
+  sldp_output: Place
+  valid_cypher: false
+  valid_sldp: true
+  correct: false

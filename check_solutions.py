@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import openai
-import os
 import yaml
 
 from sldp_lang import sldp_equals, get_sldp_type, parse_sldp
@@ -8,14 +6,6 @@ from sldp_lang import sldp_equals, get_sldp_type, parse_sldp
 
 from rich.progress import track
 import sys
-
-key = os.getenv("DSG_OPENAI_API_KEY")
-
-client = openai.OpenAI(
-    api_key=key,
-    timeout=10,
-)
-
 
 if len(sys.argv) < 2:
     print("Usage: ./check_solutions.py yaml_path")
