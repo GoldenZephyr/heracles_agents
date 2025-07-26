@@ -1,0 +1,8 @@
+dsg_interface:
+  an_example_field: 3
+  dsg_interface_type: cypher
+llm_client_config:
+  auth_key: !!python/object:pydantic.types.SecretStr
+    _secret_value: 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
+  client_type: openai
+  timeout: 20
