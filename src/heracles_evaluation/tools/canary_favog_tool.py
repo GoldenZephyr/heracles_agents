@@ -1,4 +1,4 @@
-from heracles_evaluation.llm_interface import ToolDescription, FunctionParameter
+from heracles_evaluation.tool_interface import ToolDescription, FunctionParameter
 from heracles_evaluation.tool_registry import register_tool, ToolRegistry
 
 

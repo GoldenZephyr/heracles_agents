@@ -1,0 +1,23 @@
+dsg_interface:
+    dsg_interface_type: cypher
+    an_example_field: 3
+
+llm_agent:
+
+    client:
+        client_type: openai
+        # auth key is supplied by HERACLES_OPENAI_API_KEY
+        timeout: 20
+
+    model_info:
+        model: gpt-4.1-nano
+        temperature: 0.2
+        seed: 123
+
+    agent_info:
+        tools:
+            - ask_favog
+        tool_interface: "openai"
+        max_iterations: 5
+
+questions: /home/aaron/dsgdb/heracles_evaluation/src/heracles_evaluation/questions/canary/canary_questions.yaml

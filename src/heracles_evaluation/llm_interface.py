@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field, field_validator, field_serializer
-from typing import Optional, Literal, Union, Any, Callable
-from model_client_interfaces import ModelInterfaceConfigType
+from typing import Optional, Literal, Union
+from heracles_evaluation.model_client_interfaces import ModelInterfaceConfigType
 from heracles_evaluation.tool_registry import ToolRegistry
 import json
-from dataclasses import dataclass
 import logging
 import re
 from openai.types.responses.response_output_message import ResponseOutputMessage
+from heracles_evaluation.tool_interface import ToolDescription
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +40,60 @@ class EvalQuestion(BaseModel):
     correctness_comparator: ComparisonType = Field(descriminator="comparison_type")
 
 
+class AgentResponse(BaseModel):
+    # "full" response from the LLM (what format?)
+    raw_response: str
+    # interpretable response from the LLM (e.g., tool call, parsed final answer)
+    parsed_response: Optional[str]
+
+
+# TODO: seems like this could be useful at some point,
+# but currently it's not actually clear that we have
+# anything that we want to track per-response.
+# Maybe whether a tool call succeeded or something?
+# class ResponseAnalysis(BaseModel):
+#    # Information that might be relevant for individual LLM responses in the
+#    # context of a longer agent interaction.
+#
+#    # Eventually we might want different types for each "kind" of analysis, but for
+#    # now we will accumulate all possible metrics here and default them to false.
+#    # It's the job of whatever processes this analysis to decide which of these
+#    # flags is meaningful.
+#    valid_sldp: bool = False
+#    valid_cypher: bool = False
+
+# class AnalyzedResponse(BaseModel):
+#    agent_response: AgentResponse
+#    response_analysis: ResponseAnalysis
+
+
+class AgentSequence(BaseModel):
+    # What the "purpose" of this agent sequence is. Eventually should be more
+    # structured/dispatchable than string?
+    description: str
+
+    responses: list[AgentResponse]
+
+
+class QuestionAnalysis(BaseModel):
+    # Information that is relevant about evaluating the response quality of the
+    # "whole question"
+
+    valid_answer_format: bool
+    correct: bool
+
+
+class AnalyzedQuestion(BaseModel):
+    # TODO: do we need to deal with partially-completed response lists?
+    question: EvalQuestion
+    sequences: list[AgentSequence]
+    analysis: Optional[QuestionAnalysis]
+
+
+class AnalyzedQuestions(BaseModel):
+    analyzed_questions: list[AnalyzedQuestion]
+
+
 class ModelInfo(BaseModel):
     """Settings that affect fundamental model performance.
 
@@ -50,88 +104,6 @@ class ModelInfo(BaseModel):
     model: str
     temperature: float
     seed: Optional[int] = None
-
-
-def type_to_string(typ):
-    match typ():
-        case str():
-            return "string"
-        case float():
-            return "float"
-        case int():
-            return "int"
-        case dict():
-            return "dict"
-        case set():
-            return "set"
-        case list():
-            return "list"
-
-
-@dataclass
-class FunctionParameter:
-    """Description of a single parameter for a tool/function call"""
-
-    name: str
-    param_type: type
-    param_description: str
-    required: bool = True
-    enum_values: Optional[Any] = None
-
-    def to_openai_responses(self):
-        d = {
-            self.name: {
-                "type": type_to_string(self.param_type),
-                "description": self.param_description,
-            }
-        }
-        if self.enum_values is not None:
-            d[self.name]["enum"] = self.enum_values
-        return d
-
-
-@dataclass
-class ToolDescription:
-    """Description of a tool / function"""
-
-    name: str
-    description: str
-    parameters: list[FunctionParameter]
-    function: Callable
-
-    def get_tool_function(self):
-        try:
-            fn = ToolRegistry.lookup(self.name)
-        except IndexError as ex:
-            print(ex)
-            print(
-                f"Tool {self.name} not registered in ToolRegistry! Registered tools are {ToolRegistry.registered_tool_summary()}"
-            )
-        return fn
-
-    def to_openai_responses(self):
-        parameter_properties = {}
-        for p in self.parameters:
-            parameter_properties |= p.to_openai_responses()
-
-        required = [p.name for p in self.parameters if p.required]
-
-        parameter_descriptions = {
-            "type": "object",
-            "properties": parameter_properties,
-            "required": required,
-            "additionalProperties": False,
-        }
-
-        t = {
-            "type": "function",
-            "name": self.name,
-            "description": self.description,
-            "parameters": parameter_descriptions,
-        }
-        print("tool formatted: ")
-        print(t)
-        return t
 
 
 class AgentInfo(BaseModel):
@@ -185,7 +157,10 @@ class AgentContext:
 
         # TODO: what's a reasonable way to set the response format in general?
         # Needs to align with prompt, most likely
-        return self.agent.client.call(model_info, explicit_tools, "text", history)
+        response_format = "text"
+        return self.agent.client.call(
+            model_info, explicit_tools, response_format, history
+        )
 
     def handle_response(self, response):
         executed_tool_calls = []
@@ -231,6 +206,14 @@ class AgentContext:
     def extract_answer(self, message):
         # TODO: eventually this should be generalized to support different answer formats (e.g., structured output?)
         return extract_answer_tag(message.content[0].text)
+
+    def get_agent_responses(self):
+        # TODO: parse the LLM responses into a more useful representation in "parsed_response"
+        responses = [
+            AgentResponse(raw_response=str(resp), parsed_response="TODO")
+            for resp in self.history
+        ]
+        return responses
 
     def run(self):
         for i in range(self.agent.agent_info.max_iterations):
