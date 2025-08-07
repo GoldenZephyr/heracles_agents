@@ -1,6 +1,10 @@
-from heracles.prompt_schema import Prompt
+# from heracles.prompt_schema import Prompt
+import copy
+
 import yaml
 
+
+from heracles_evaluation.prompt import get_sldp_format_description
 from heracles_evaluation.experiment_definition import ExperimentDefinition
 from heracles_evaluation.llm_interface import (
     AgentContext,
@@ -8,6 +12,8 @@ from heracles_evaluation.llm_interface import (
     AnalyzedQuestions,
     QuestionAnalysis,
     AgentSequence,
+    EvalQuestion,
+    LlmAgent,
 )
 
 from heracles_evaluation.summarize_results import (
@@ -18,47 +24,114 @@ from heracles_evaluation.summarize_results import (
 
 import logging
 
-from sldp.sldp_lang import parse_sldp, sldp_equals
+from sldp.sldp_lang import parse_sldp, sldp_equals, get_sldp_type
 
+from heracles.query_interface import Neo4jWrapper
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-with open("dsg_feedforward_prompt.yaml", "r") as fo:
-    prompt_yaml = yaml.safe_load(fo)
+# TODO: probably make this dynamic dispatched?
+def generate_prompt(
+    question: EvalQuestion, agent_config: LlmAgent, task_state_context: dict[str] = {}
+):
+    prompt = copy.deepcopy(agent_config.agent_info.prompt_settings.base_prompt)
+    if agent_config.agent_info.tool_interface == "custom":
+        prompt.tool_description = "\n".join(
+            [t.to_custom() for t in agent_config.agent_info.tools]
+        )
 
-logger.debug(f"Loaded prompt yaml: {prompt_yaml}")
+    try:
+        prompt.novel_instruction = prompt.novel_instruction_template.format(
+            question=question.question, **task_state_context
+        )
+    except KeyError as ex:
+        logger.error("Novel instruction template has unfilled parameter!")
+        print(ex)
+        raise ex
 
-with open("dsg_experiment.yaml", "r") as fo:
+    prompt.answer_semantic_guidance = "Make you answer as concise as possible"
+
+    match agent_config.agent_info.prompt_settings.output_type:
+        case "SLDP":
+            prompt.answer_formatting_guidance = get_sldp_format_description()
+            if agent_config.agent_info.prompt_settings.sldp_answer_type_hint:
+                sldp_type = get_sldp_type(question.solution)
+                prompt.answer_formatting_guidance += (
+                    f"\n Your answer should be an SLDP {sldp_type}"
+                )
+        case None:
+            # The "default". Presumably the description of the output format is
+            # in the base prompt.
+            pass
+        case _:
+            raise ValueError(
+                f"Unknown output type: {agent_config.prompt_settings.output_type}"
+            )
+
+    print("prompt: ")
+    print(prompt)
+    return prompt
+
+
+def query_db(dsgdb_conf, cypher_string):
+    with Neo4jWrapper(
+        dsgdb_conf.uri,
+        (
+            dsgdb_conf.username.get_secret_value(),
+            dsgdb_conf.password.get_secret_value(),
+        ),
+        atomic_queries=True,
+        print_profiles=False,
+    ) as db:
+        try:
+            query_result = str(db.query(cypher_string))
+            return True, query_result
+        except Exception as ex:
+            print(ex)
+            query_result = str(ex)
+            return False, query_result
+
+
+with open("dsg_feedforward_experiment.yaml", "r") as fo:
     yml = yaml.safe_load(fo)
 
 exp = ExperimentDefinition(**yml)
 logger.debug(f"Loaded experiment: {exp}")
 
 
+# TODO: wrap this in a function.
+# The interface to the function should declare which
+# "phase" tags are necessary to run the function
+# The defined experiment will specify this function and the
+# tagged phases, and then at "validation time" we can
+# check if the specified experiment has the correct phases defined.
 analyzed_questions = []
 for question in exp.questions:
-    cxt = AgentContext(exp.llm_agent)
-    # TODO: prompt text is a function of the experiment config(?)
-    prompt_obj = Prompt.from_dict(prompt_yaml)
-    prompt_obj.novel_instruction = question.question
-    cxt.initialize_agent(prompt_obj)
+    cxt = AgentContext(exp.phases["generate-cypher"])
+
+    prompt = generate_prompt(question, exp.phases["generate-cypher"])
+
+    cxt.initialize_agent(prompt)
     success, answer = cxt.run()
     logger.info(f"\nLLM Intermediate Answer: {answer}\n")
 
-    # In this case, there is only one agent sequence. But in the cypher-then-refine
-    # case, there are two sequences
     cypher_generation_sequence = AgentSequence(
         description="cypher-producing-agent", responses=cxt.get_agent_responses()
     )
-    # TODO: run query
 
-    # TODO: could be different llm_agent?
-    cxt2 = AgentContext(exp.llm_agent)
-    # TODO: load refinement prompt
-    cxt2.initialize_agent(X)
-    success, answer = cxt.run()
+    query_result = query_db(exp.dsg_interface, answer)
+
+    cxt2 = AgentContext(exp.phases["refine"])
+    refinement_prompt = generate_prompt(
+        question,
+        exp.phases["refine"],
+        {"cypher_results": query_result, "cypher_query": answer},
+    )
+
+    cxt2.initialize_agent(refinement_prompt)
+    success, answer = cxt2.run()
     logger.info(f"LLM Final Answer: {answer}")
 
     try:
@@ -86,6 +159,8 @@ for question in exp.questions:
 
 aqs = AnalyzedQuestions(analyzed_questions=analyzed_questions)
 
+
+# TODO: lump the result printing stuff into a function
 column_data_map = {
     "Name": "name",
     "Question": "question",

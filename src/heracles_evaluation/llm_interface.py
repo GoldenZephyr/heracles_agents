@@ -7,6 +7,7 @@ import logging
 import re
 from openai.types.responses.response_output_message import ResponseOutputMessage
 from heracles_evaluation.tool_interface import ToolDescription
+from heracles_evaluation.prompt import PromptSettings
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +110,7 @@ class ModelInfo(BaseModel):
 class AgentInfo(BaseModel):
     """Configuration for "agentic" behaviors, e.g., tool calling"""
 
+    prompt_settings: PromptSettings
     tools: list[ToolDescription]
     tool_interface: str  # Openai vs. custom vs. ???
     max_iterations: int

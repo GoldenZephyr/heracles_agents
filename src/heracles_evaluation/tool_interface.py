@@ -83,3 +83,6 @@ class ToolDescription:
         print("tool formatted: ")
         print(t)
         return t
+
+    def to_custom(self):
+        raise NotImplementedError()

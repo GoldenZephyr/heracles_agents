@@ -1,6 +1,6 @@
-from heracles.prompt_schema import Prompt
 import yaml
 
+from heracles_evaluation.prompt import get_sldp_format_description
 from heracles_evaluation.experiment_definition import ExperimentDefinition
 from heracles_evaluation.llm_interface import (
     AgentContext,
@@ -40,12 +40,14 @@ exp = ExperimentDefinition(**yml)
 logger.debug(f"Loaded experiment: {exp}")
 
 
-cxt = AgentContext(exp.llm_agent)
+cxt = AgentContext(exp.phases["main"])
 
 analyzed_questions = []
 for question in exp.questions:
-    prompt_obj = Prompt.from_dict(prompt_yaml)
+    prompt_obj = exp.phases["main"].agent_info.prompt_settings.base_prompt
+    # Prompt.from_dict(prompt_yaml)
     prompt_obj.novel_instruction = question.question
+    prompt_obj.answer_formatting_guidance = get_sldp_format_description()
     cxt.initialize_agent(prompt_obj)
     success, answer = cxt.run()
     logger.info(f"\nLLM Answer: {answer}\n")

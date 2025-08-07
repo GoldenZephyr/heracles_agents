@@ -5,6 +5,7 @@ from heracles_evaluation.dsg_interfaces import DsgInterfaceConfigType
 from heracles_evaluation.llm_interface import LlmAgent, EvalQuestion
 
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -16,15 +17,15 @@ class ExperimentDefinition(BaseModel):
     # where different parts of the pipeline need
     # different model sizes or behaviors, this gives
     # more flexibility
-    llm_agent: LlmAgent
+    phases: dict[str, LlmAgent]
     dsg_interface: DsgInterfaceConfigType = Field(discriminator="dsg_interface_type")
     questions: list[EvalQuestion]
 
     @field_validator("questions", mode="before")
     @classmethod
     def load_questions(cls, question_path):
+        question_path = os.path.expandvars(question_path)
         logger.debug(f"Loading questions from: {question_path}")
-        # TODO: resolve environment variables in this path
         with open(question_path, "r") as fo:
             yml = yaml.safe_load(fo)
 
