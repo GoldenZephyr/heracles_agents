@@ -52,7 +52,7 @@ class ToolDescription:
 
     def get_tool_function(self):
         try:
-            fn = ToolRegistry.lookup(self.name)
+            fn = ToolRegistry.tools[self.name]
         except IndexError as ex:
             print(ex)
             print(

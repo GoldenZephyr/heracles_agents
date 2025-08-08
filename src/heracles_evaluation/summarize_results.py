@@ -91,6 +91,21 @@ def display_table(title, row_data, column_data_map={}):
     console.print(table)
 
 
+def display_experiment_results(aqs):
+    column_data_map = {
+        "Name": "name",
+        "Question": "question",
+    }
+    display_analyzed_question_table("Test Table", aqs, column_data_map)
+
+    summary_column_data_map = {
+        "# Questions": "questions",
+    }
+    result_dicts = [q.analysis.model_dump(mode="json") for q in aqs.analyzed_questions]
+    summary_data = [summarize_results(result_dicts)]
+    display_table("Summary", summary_data, column_data_map=summary_column_data_map)
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: ./summarize_results.py yaml_path")

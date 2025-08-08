@@ -95,6 +95,10 @@ class AnalyzedQuestions(BaseModel):
     analyzed_questions: list[AnalyzedQuestion]
 
 
+class AnalyzedExperiment(BaseModel):
+    experiment_configurations: dict[str, AnalyzedQuestions]
+
+
 class ModelInfo(BaseModel):
     """Settings that affect fundamental model performance.
 

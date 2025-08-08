@@ -1,7 +1,7 @@
 dsg_interface:
     dsg_interface_type: heracles
     uri: "neo4j://127.0.0.1:7687"
-
+pipeline: feedforward_cypher_qa
 phases:
     generate-cypher:
         client:

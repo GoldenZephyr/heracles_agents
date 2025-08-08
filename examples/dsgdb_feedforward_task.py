@@ -1,11 +1,12 @@
-# from heracles.prompt_schema import Prompt
 import copy
-
-import yaml
 
 
 from heracles_evaluation.prompt import get_sldp_format_description
-from heracles_evaluation.experiment_definition import ExperimentDefinition
+from heracles_evaluation.experiment_definition import (
+    PipelinePhase,
+    PipelineDescription,
+    register_pipeline,
+)
 from heracles_evaluation.llm_interface import (
     AgentContext,
     AnalyzedQuestion,
@@ -16,11 +17,6 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
 )
 
-from heracles_evaluation.summarize_results import (
-    display_analyzed_question_table,
-    summarize_results,
-    display_table,
-)
 
 import logging
 
@@ -32,7 +28,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-# TODO: probably make this dynamic dispatched?
 def generate_prompt(
     question: EvalQuestion, agent_config: LlmAgent, task_state_context: dict[str] = {}
 ):
@@ -94,87 +89,92 @@ def query_db(dsgdb_conf, cypher_string):
             return False, query_result
 
 
-with open("dsg_feedforward_experiment.yaml", "r") as fo:
-    yml = yaml.safe_load(fo)
+def feedforward_cypher_qa(exp):
+    analyzed_questions = []
+    for question in exp.questions:
+        cxt = AgentContext(exp.phases["generate-cypher"])
 
-exp = ExperimentDefinition(**yml)
-logger.debug(f"Loaded experiment: {exp}")
+        prompt = generate_prompt(question, exp.phases["generate-cypher"])
 
+        cxt.initialize_agent(prompt)
+        success, answer = cxt.run()
+        logger.info(f"\nLLM Intermediate Answer: {answer}\n")
 
-# TODO: wrap this in a function.
-# The interface to the function should declare which
-# "phase" tags are necessary to run the function
-# The defined experiment will specify this function and the
-# tagged phases, and then at "validation time" we can
-# check if the specified experiment has the correct phases defined.
-analyzed_questions = []
-for question in exp.questions:
-    cxt = AgentContext(exp.phases["generate-cypher"])
+        cypher_generation_sequence = AgentSequence(
+            description="cypher-producing-agent", responses=cxt.get_agent_responses()
+        )
 
-    prompt = generate_prompt(question, exp.phases["generate-cypher"])
+        query_result = query_db(exp.dsg_interface, answer)
 
-    cxt.initialize_agent(prompt)
-    success, answer = cxt.run()
-    logger.info(f"\nLLM Intermediate Answer: {answer}\n")
+        cxt2 = AgentContext(exp.phases["refine"])
+        refinement_prompt = generate_prompt(
+            question,
+            exp.phases["refine"],
+            {"cypher_results": query_result, "cypher_query": answer},
+        )
 
-    cypher_generation_sequence = AgentSequence(
-        description="cypher-producing-agent", responses=cxt.get_agent_responses()
-    )
+        cxt2.initialize_agent(refinement_prompt)
+        success, answer = cxt2.run()
+        logger.info(f"LLM Final Answer: {answer}")
 
-    query_result = query_db(exp.dsg_interface, answer)
+        # TODO: In theory, I think the analysis of the correct answer can be
+        # handled automatically (i.e., little of the below code here) using the
+        # answer comparator that has been defined.
 
-    cxt2 = AgentContext(exp.phases["refine"])
-    refinement_prompt = generate_prompt(
-        question,
-        exp.phases["refine"],
-        {"cypher_results": query_result, "cypher_query": answer},
-    )
+        try:
+            parse_sldp(answer)
+            valid_sldp = True
+        except Exception:
+            logger.warning("Invalid SLDP")
+            valid_sldp = False
 
-    cxt2.initialize_agent(refinement_prompt)
-    success, answer = cxt2.run()
-    logger.info(f"LLM Final Answer: {answer}")
+        if valid_sldp:
+            correct = sldp_equals(question.solution, answer)
+        else:
+            correct = False
+        logger.info(f"\n\nCorrect? {correct}\n\n")
 
-    try:
-        parse_sldp(answer)
-        valid_sldp = True
-    except Exception:
-        logger.warning("Invalid SLDP")
-        valid_sldp = False
+        refinement_sequence = AgentSequence(
+            description="refinement-agent", responses=cxt2.get_agent_responses()
+        )
 
-    if valid_sldp:
-        correct = sldp_equals(question.solution, answer)
-    else:
-        correct = False
-    logger.info(f"\n\nCorrect? {correct}\n\n")
+        sequences = [cypher_generation_sequence, refinement_sequence]
 
-    refinement_sequence = AgentSequence(
-        description="refinement-agent", responses=cxt2.get_agent_responses()
-    )
+        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
+        aq = AnalyzedQuestion(question=question, sequences=sequences, analysis=analysis)
+        analyzed_questions.append(aq)
 
-    sequences = [cypher_generation_sequence, refinement_sequence]
-
-    analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
-    aq = AnalyzedQuestion(question=question, sequences=sequences, analysis=analysis)
-    analyzed_questions.append(aq)
-
-aqs = AnalyzedQuestions(analyzed_questions=analyzed_questions)
+    aqs = AnalyzedQuestions(analyzed_questions=analyzed_questions)
+    return aqs
 
 
-# TODO: lump the result printing stuff into a function
-column_data_map = {
-    "Name": "name",
-    "Question": "question",
-}
-display_analyzed_question_table("Test Table", aqs, column_data_map)
+cypher_phase = PipelinePhase(
+    name="generate-cypher", description="Map question to Cypher query"
+)
+refine_phase = PipelinePhase(
+    name="refine", description="Map result of cypher query to final answer"
+)
+d = PipelineDescription(
+    name="feedforward_cypher_qa",
+    description="Single cypher query, then refinement",
+    phases=[cypher_phase, refine_phase],
+    function=feedforward_cypher_qa,
+)
 
+register_pipeline(d)
 
-summary_column_data_map = {
-    "# Questions": "questions",
-}
-result_dicts = [q.analysis.model_dump(mode="json") for q in aqs.analyzed_questions]
-summary_data = [summarize_results(result_dicts)]
-display_table("Summary", summary_data, column_data_map=summary_column_data_map)
+if __name__ == "__main__":
+    import yaml
+    from heracles_evaluation.experiment_definition import ExperimentConfiguration
+    from heracles_evaluation.summarize_results import display_experiment_results
 
+    with open("dsg_feedforward_experiment.yaml", "r") as fo:
+        yml = yaml.safe_load(fo)
+    experiment = ExperimentConfiguration(**yml)
+    logger.debug(f"Loaded experiment configuration: {experiment}")
 
-with open("dsgdb_feedforward_out.yaml", "w") as fo:
-    fo.write(yaml.dump(aqs.model_dump()))
+    aqs = feedforward_cypher_qa(experiment)
+    with open("dsgdb_feedforward_out.yaml", "w") as fo:
+        fo.write(yaml.dump(aqs.model_dump()))
+
+    display_experiment_results(aqs)
