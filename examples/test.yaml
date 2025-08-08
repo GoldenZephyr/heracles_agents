@@ -1,7 +1,0 @@
-llm_client_config:
-    client_type: openai
-    timeout: 20
-
-dsg_interface:
-    dsg_interface_type: cypher
-    an_example_field: 3
