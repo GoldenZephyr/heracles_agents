@@ -1,5 +1,5 @@
-from heracles_evaluation.tool_interface import ToolDescription, FunctionParameter
-from heracles_evaluation.tool_registry import register_tool, ToolRegistry
+from heracles_evaluation.tool_interface import FunctionParameter, ToolDescription
+from heracles_evaluation.tool_registry import ToolRegistry, register_tool
 
 
 def the_mighty_favog(query: str, category) -> int:

@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-import openai
 import os
+import sys
+from dataclasses import asdict
+
+import openai
 import yaml
 from heracles.prompt_schema import Prompt
-
 from heracles.query_interface import Neo4jWrapper
-
-
-from model_info import ModelInfo
-
-from dataclasses import asdict
 from rich.progress import track
 
-import sys
+from model_info import ModelInfo
 
 key = os.getenv("DSG_OPENAI_API_KEY")
 
@@ -64,7 +61,7 @@ with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
     eval_questions["answer_model_metadata"] = asdict(model_info)
 
     for q in track(eval_questions["questions"], description="Processing..."):
-        print(f'\nAsking question called {q["name"]}...\n')
+        print(f"\nAsking question called {q['name']}...\n")
 
         prompt = prompt_obj.to_openai_json(q["question"])
         response = client.chat.completions.create(

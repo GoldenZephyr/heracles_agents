@@ -1,28 +1,24 @@
 import copy
+import logging
 
+from heracles.query_interface import Neo4jWrapper
 
-from heracles_evaluation.prompt import get_sldp_format_description
 from heracles_evaluation.experiment_definition import (
-    PipelinePhase,
     PipelineDescription,
+    PipelinePhase,
     register_pipeline,
 )
 from heracles_evaluation.llm_interface import (
     AgentContext,
+    AgentSequence,
     AnalyzedQuestion,
     AnalyzedQuestions,
-    QuestionAnalysis,
-    AgentSequence,
     EvalQuestion,
     LlmAgent,
+    QuestionAnalysis,
 )
-
-
-import logging
-
-from sldp.sldp_lang import parse_sldp, sldp_equals, get_sldp_type
-
-from heracles.query_interface import Neo4jWrapper
+from heracles_evaluation.prompt import get_sldp_format_description
+from sldp.sldp_lang import get_sldp_type, parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -165,6 +161,7 @@ register_pipeline(d)
 
 if __name__ == "__main__":
     import yaml
+
     from heracles_evaluation.experiment_definition import ExperimentConfiguration
     from heracles_evaluation.summarize_results import display_experiment_results
 

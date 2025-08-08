@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Optional, Any, Callable
+from typing import Any, Callable, Optional
+
 from heracles_evaluation.tool_registry import ToolRegistry
 
 

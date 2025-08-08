@@ -1,29 +1,25 @@
+import logging
+
 import yaml
 
-from heracles_evaluation.prompt import get_sldp_format_description
+# TODO: I think if the tool gets exported to the __init__.py we can get rid of this
+import heracles_evaluation.tools.canary_favog_tool  # NOQA
 from heracles_evaluation.experiment_definition import (
     ExperimentDescription,
-    PipelinePhase,
     PipelineDescription,
+    PipelinePhase,
     register_pipeline,
 )
 from heracles_evaluation.llm_interface import (
     AgentContext,
+    AgentSequence,
     AnalyzedQuestion,
     AnalyzedQuestions,
     QuestionAnalysis,
-    AgentSequence,
 )
-
+from heracles_evaluation.prompt import get_sldp_format_description
 from heracles_evaluation.summarize_results import display_experiment_results
-
-# TODO: I think if the tool gets exported to the __init__.py we can get rid of this
-import heracles_evaluation.tools.canary_favog_tool  # NOQA
-
-import logging
-
 from sldp.sldp_lang import parse_sldp, sldp_equals
-
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

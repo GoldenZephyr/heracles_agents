@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
-import openai
 import os
-import yaml
-
-from sldp_lang import extract_uniform_keys, sldp_equals, get_sldp_type, parse_sldp
-
-from answer_comparators import (
-    convert_to_set,
-    convert_to_number,
-    convert_to_string,
-    convert_to_list,
-    convert_to_dict,
-    convert_to_set_of_dicts,
-)
-from model_info import ModelInfo
+import sys
 from dataclasses import asdict
 
+import openai
+import yaml
 from rich.progress import track
-import sys
+from sldp_lang import extract_uniform_keys, get_sldp_type, parse_sldp, sldp_equals
+
+from answer_comparators import (
+    convert_to_dict,
+    convert_to_list,
+    convert_to_number,
+    convert_to_set,
+    convert_to_set_of_dicts,
+    convert_to_string,
+)
+from model_info import ModelInfo
 
 key = os.getenv("DSG_OPENAI_API_KEY")
 
@@ -36,7 +35,7 @@ if len(sys.argv) >= 3:
 else:
     output_suffix = ""
 
-#question_set_name = "nina_questions"
+# question_set_name = "nina_questions"
 
 input_intermediate_answers = os.path.join(
     "yaml_pipeline", "intermediate_answers", f"{question_set_name}.yaml"
@@ -45,7 +44,7 @@ with open(input_intermediate_answers, "r") as fo:
     result_yaml = yaml.safe_load(fo)
 
 for problem in track(result_yaml["questions"], description="Refining..."):
-    print(f'\Post-processing question called {problem["name"]}...\n')
+    print(f"\Post-processing question called {problem['name']}...\n")
 
     model_info = ModelInfo(model="gpt-4.1", temperature=0.01, seed=100)
 
@@ -111,7 +110,9 @@ for problem in track(result_yaml["questions"], description="Refining..."):
     problem["correct"] = correct
 
 refined_out_eval = os.path.join(
-    "yaml_pipeline", "final_answers", f"{question_set_name}_refined_out" + output_suffix + ".yaml"
+    "yaml_pipeline",
+    "final_answers",
+    f"{question_set_name}_refined_out" + output_suffix + ".yaml",
 )
 with open(refined_out_eval, "w") as fo:
     fo.write(yaml.dump(result_yaml, sort_keys=False))

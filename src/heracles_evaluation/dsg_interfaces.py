@@ -1,6 +1,7 @@
+from typing import Literal, Union
+
 from pydantic import BaseModel, Field, SecretStr
 from pydantic_settings import BaseSettings
-from typing import Literal, Union
 
 
 class HeraclesDsgInterface(BaseSettings):

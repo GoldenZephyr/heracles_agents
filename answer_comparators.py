@@ -1,7 +1,7 @@
 def convert_to_number(query_interface_fn, question, answer):
     prompt = f""" You are trying to answer the question: {question}.
         You have the following data as an intermediate answer. Please
-        reformat the following data into a number, 
+        reformat the following data into a number,
         Your response should contain only the number
         and no extraneous information.
         """
@@ -15,7 +15,7 @@ def convert_to_number(query_interface_fn, question, answer):
 def convert_to_string(query_interface_fn, question, answer):
     prompt = f""" You are trying to answer the question: {question}.
         You have the following data as an intermediate answer. Please
-        reformat the following data into a string, 
+        reformat the following data into a string,
         Your response should contain only a *single* word, no quotation,
         and no extraneous information.
         """
@@ -29,10 +29,10 @@ def convert_to_string(query_interface_fn, question, answer):
 def convert_to_list(query_interface_fn, question, answer):
     prompt = f""" You are trying to answer the question: {question}.
         You have the following data as an intermediate answer. Please
-        reformat the following data into a list of the form [element1, element2, .... elementN], 
+        reformat the following data into a list of the form [element1, element2, .... elementN],
         maintaining the order implied by the intermediate data.
-        The list is denoted by square brackets [ ]. 
-        Elements within the list should not have quotations around them. 
+        The list is denoted by square brackets [ ].
+        Elements within the list should not have quotations around them.
         If you need to represent a POINT in the list, the syntax is POINT(x y z).
         Your response should contain only the list and no extraneous information.
 
@@ -80,10 +80,10 @@ def convert_to_set(query_interface_fn, question, answer):
     prompt = f""" You are trying to answer the question: {question}.
         You have the following data as an intermediate answer. Please
         reformat the following data into a set of the form <element1, element2, .... elementN>.
-        Elements within the set should not have quotations around them. 
+        Elements within the set should not have quotations around them.
         The set is denoted by angle brackets < >.
         If you need to represent a POINT, the syntax is POINT(x y z).
-        Your response should contain only the set <element1, ..., elementN>, 
+        Your response should contain only the set <element1, ..., elementN>,
         and no extraneous information.
 
         """
@@ -130,7 +130,7 @@ def convert_to_set(query_interface_fn, question, answer):
 
 agent_set_answer_ps = """
         Please format your final answer into a set of the form <element1, element2, .... elementN>.
-        Elements within the set should not have quotations around them. 
+        Elements within the set should not have quotations around them.
         The set is denoted by angle brackets < >. If you need to represent a POINT, the syntax is POINT(x y z) (only for answering, not for writing cypher queries).
         The final answer should look like
         <answer>
@@ -152,16 +152,16 @@ agent_number_answer_ps = """ Please format your final answer into a number.
         Your response should contain only the number, looking like
         <answer>123</answer>. """
 
-agent_string_answer_ps = """ Please format your final answer into a string, 
+agent_string_answer_ps = """ Please format your final answer into a string,
         Your final answer should contain only a *single* word, no quotation,
-        and no extraneous information, looking like 
+        and no extraneous information, looking like
         <answer>The answer string</answer>
         """
 
-agent_list_answer_ps = """ Please format your final answer into a list of the form [element1, element2, .... elementN], 
+agent_list_answer_ps = """ Please format your final answer into a list of the form [element1, element2, .... elementN],
         maintaining the order implied by the intermediate data.
-        The list is denoted by square brackets [ ]. 
-        Elements within the list should not have quotations around them. 
+        The list is denoted by square brackets [ ].
+        Elements within the list should not have quotations around them.
         If you need to represent a POINT in the list, the syntax is POINT(x y z) (only for answering, not for writing cypher queries).
         The final answer should look like
         <answer>

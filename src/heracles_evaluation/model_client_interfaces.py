@@ -1,7 +1,8 @@
-from pydantic_settings import BaseSettings
-from pydantic import Field, SecretStr, PrivateAttr, BaseModel
 from typing import Literal, Union
+
 import openai
+from pydantic import BaseModel, Field, PrivateAttr, SecretStr
+from pydantic_settings import BaseSettings
 
 
 class OpenaiClientConfig(BaseSettings):

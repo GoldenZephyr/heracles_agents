@@ -1,29 +1,27 @@
 #!/usr/bin/env python3
-import openai
-from openai.types.chat.chat_completion_message import ChatCompletionMessage
-import os
-import yaml
 import json
-from heracles.prompt_schema import Prompt
-
-from heracles.query_interface import Neo4jWrapper
-from model_info import ModelInfo
-
-from dataclasses import asdict
-from rich.progress import track
+import os
+import re
 import sys
+import time
+from dataclasses import asdict
 
+import openai
+import yaml
+from heracles.prompt_schema import Prompt
+from heracles.query_interface import Neo4jWrapper
+from openai.types.chat.chat_completion_message import ChatCompletionMessage
+from rich.progress import track
 from sldp_lang import get_sldp_type
 
 from answer_comparators import (
-    agent_set_answer_ps,
     agent_dict_answer_ps,
-    agent_number_answer_ps,
-    agent_string_answer_ps,
     agent_list_answer_ps,
+    agent_number_answer_ps,
+    agent_set_answer_ps,
+    agent_string_answer_ps,
 )
-import re
-import time
+from model_info import ModelInfo
 
 
 def extract_answer(string):
@@ -131,7 +129,7 @@ with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
     for q in track(
         eval_questions["questions"][start_index:], description="Processing..."
     ):
-        print(f'\nAsking question called {q["name"]}...\n')
+        print(f"\nAsking question called {q['name']}...\n")
 
         solution_type = get_sldp_type(q["solution"])
         refinement_type = q["refinement_type"]
@@ -160,7 +158,7 @@ with Neo4jWrapper(URI, AUTH, atomic_queries=True, print_profiles=False) as db:
         # TODO: for now, so the agent doesn't take over the world
         max_iterations = 10
         for i in range(max_iterations):
-            print(f"Iteration {i+1} of {max_iterations}")
+            print(f"Iteration {i + 1} of {max_iterations}")
             print("messages: ", messages)
 
             got_response = False

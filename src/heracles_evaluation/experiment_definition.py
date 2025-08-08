@@ -1,20 +1,20 @@
 from __future__ import annotations
-from pydantic import (
-    Field,
-    BaseModel,
-    field_validator,
-    ValidationError,
-    field_serializer,
-)
-
-import yaml
-from heracles_evaluation.dsg_interfaces import DsgInterfaceConfigType
-from heracles_evaluation.llm_interface import LlmAgent, EvalQuestion, AnalyzedQuestions
 
 import logging
 import os
-
 from typing import Callable
+
+import yaml
+from pydantic import (
+    BaseModel,
+    Field,
+    ValidationError,
+    field_serializer,
+    field_validator,
+)
+
+from heracles_evaluation.dsg_interfaces import DsgInterfaceConfigType
+from heracles_evaluation.llm_interface import AnalyzedQuestions, EvalQuestion, LlmAgent
 
 logger = logging.getLogger(__name__)
 

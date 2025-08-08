@@ -1,12 +1,13 @@
-from heracles_evaluation.experiment_definition import ExperimentDescription
-from heracles_evaluation.summarize_results import display_experiment_results
-from heracles_evaluation.llm_interface import AnalyzedExperiment
-import heracles_evaluation.tools.canary_favog_tool  # NOQA
-import yaml
 import logging
 
 import dsgdb_feedforward_task  # NOQA
 import test_task  # NOQA
+import yaml
+
+import heracles_evaluation.tools.canary_favog_tool  # NOQA
+from heracles_evaluation.experiment_definition import ExperimentDescription
+from heracles_evaluation.llm_interface import AnalyzedExperiment
+from heracles_evaluation.summarize_results import display_experiment_results
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

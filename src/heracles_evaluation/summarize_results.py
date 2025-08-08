@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-from rich.table import Table
+import sys
+
 import yaml
 from rich.console import Console
-import sys
+from rich.table import Table
 
 from heracles_evaluation.llm_interface import AnalyzedQuestions
 

@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-import yaml
-
-from sldp_lang import sldp_equals, get_sldp_type, parse_sldp
-
-
-from rich.progress import track
 import sys
+
+import yaml
+from rich.progress import track
+from sldp_lang import get_sldp_type, parse_sldp, sldp_equals
 
 if len(sys.argv) < 2:
     print("Usage: ./check_solutions.py yaml_path")
@@ -18,7 +16,7 @@ with open(yaml_path, "r") as fo:
     result_yaml = yaml.safe_load(fo)
 
 for problem in track(result_yaml["questions"], description="Refining..."):
-    print(f'\nChecking question called {problem["name"]}...\n')
+    print(f"\nChecking question called {problem['name']}...\n")
 
     solution_type = get_sldp_type(problem["solution"])
 
