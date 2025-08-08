@@ -76,7 +76,7 @@ d = PipelineDescription(
 register_pipeline(d)
 
 if __name__ == "__main__":
-    with open("canary_experiment.yaml", "r") as fo:
+    with open("experiments/canary_experiment.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
 
     exp = ExperimentDescription(**yml)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     aqs = canary_pipeline(exp)
 
-    with open("test_out.yaml", "w") as fo:
+    with open("output/test_out.yaml", "w") as fo:
         fo.write(yaml.dump(aqs.model_dump()))
 
     display_experiment_results(aqs)

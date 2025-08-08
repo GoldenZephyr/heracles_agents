@@ -12,7 +12,7 @@ from heracles_evaluation.summarize_results import display_experiment_results
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-with open("master_experiment_anchors.yaml", "r") as fo:
+with open("experiments/master_experiment_anchors.yaml", "r") as fo:
     yml = yaml.safe_load(fo)
 
 experiment = ExperimentDescription(**yml)
@@ -31,5 +31,5 @@ for configuration_name, experiment_config in experiment.configurations.items():
 
 ae = AnalyzedExperiment(experiment_configurations=results)
 
-with open("master_experiment_out.yaml", "w") as fo:
+with open("output/master_experiment_out.yaml", "w") as fo:
     fo.write(yaml.dump(ae.model_dump()))

@@ -165,13 +165,13 @@ if __name__ == "__main__":
     from heracles_evaluation.experiment_definition import ExperimentConfiguration
     from heracles_evaluation.summarize_results import display_experiment_results
 
-    with open("dsg_feedforward_experiment.yaml", "r") as fo:
+    with open("experiments/dsg_feedforward_experiment.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
     experiment = ExperimentConfiguration(**yml)
     logger.debug(f"Loaded experiment configuration: {experiment}")
 
     aqs = feedforward_cypher_qa(experiment)
-    with open("dsgdb_feedforward_out.yaml", "w") as fo:
+    with open("output/dsgdb_feedforward_out.yaml", "w") as fo:
         fo.write(yaml.dump(aqs.model_dump()))
 
     display_experiment_results(aqs)
