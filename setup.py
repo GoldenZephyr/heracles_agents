@@ -9,7 +9,7 @@ setup(
     description="Experimental evaluation framework for investigating interfaces between 3D scene graphs and LLMs.",
     package_dir={"": "src"},
     packages=find_packages("src"),
-    package_data={"": ["*.yaml", "*.pddl"]},
+    package_data={"": ["*.yaml", "*.pddl", "*.lark"]},
     install_requires=[
         "openai",
     ],

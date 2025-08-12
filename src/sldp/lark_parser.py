@@ -1,7 +1,13 @@
 from lark import Lark, Transformer
+import sldp
+from importlib.resources import as_file, files
 
 
 class SldpTransformer(Transformer):
+    """Transforms a raw SLDP Lark parse tree into
+    the Lisp-inspired SLDP representation we use
+    for equality checking"""
+
     def float(self, items):
         return float(items[0])
 
@@ -25,26 +31,18 @@ class SldpTransformer(Transformer):
         return ("set", *items)
 
 
-def lark_parse_sldp(string):
-    sldp_parser = Lark(
-        r"""
-    ?expression: float | string | set | list | dict | point
-    string: CNAME
-    float: FLOAT | INT
-    set: "<" [expression ("," expression)*] ">"
-    list: "[" [expression ("," expression)*] "]"
-    kv_pair: string ":" expression
-    dict: "{" [kv_pair] ("," kv_pair)* "}"
-    point: "POINT(" float float float ")"
+def get_sldp_lark_grammar():
+    with as_file(files(sldp).joinpath("sldp.lark")) as path:
+        with open(str(path), "r") as fo:
+            sldp_grammar = fo.read()
+    return sldp_grammar
 
-    %import common.FLOAT
-    %import common.LETTER
-    %import common.INT
-    %import common.WS
-    %import common.CNAME
-    %ignore WS
-    """,
-        start="expression",
+
+def lark_parse_sldp(string):
+    sldp_grammar = get_sldp_lark_grammar()
+
+    sldp_parser = Lark(
+        sldp_grammar,
     )
 
     T = SldpTransformer()
@@ -54,5 +52,4 @@ def lark_parse_sldp(string):
 
 
 if __name__ == "__main__":
-
     a = lark_parse_sldp("<1, 2, 3>")

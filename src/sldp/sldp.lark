@@ -1,0 +1,16 @@
+?start: expression
+?expression: float | string | set | list | dict | point
+string: CNAME
+float: FLOAT | INT
+set: "<" [expression ("," expression)*] ">"
+list: "[" [expression ("," expression)*] "]"
+kv_pair: string ":" expression
+dict: "{" [kv_pair] ("," kv_pair)* "}"
+point: "POINT(" float float float ")"
+
+%import common.FLOAT
+%import common.LETTER
+%import common.INT
+%import common.WS
+%import common.CNAME
+%ignore WS
