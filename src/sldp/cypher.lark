@@ -1,0 +1,178 @@
+
+// ----------------------
+// QUERIES
+// ----------------------
+
+query: match_clause return_clause (order_clause)? (limit_clause)? (union_clause)?
+union_clause: UNION ALL? query
+
+// ----------------------
+// QUERY PARTS (stubs for now)
+// ----------------------
+
+in_query_call: CALL procedure_invocation (YIELD yield_items)? (WHERE where)? (RETURN return_items)?   // placeholder
+
+
+single_query: clause+   // placeholder — in BNF, this is a chain of clauses
+
+clause: reading_clause
+      | updating_clause
+      | return_clause
+      | in_query_call
+      // add other clause types as needed
+
+reading_clause: match_clause
+              | unwind_clause
+              | call_subquery_clause   // placeholder
+
+updating_clause: create_clause
+               | merge_clause
+               | delete_clause
+               | set_clause
+               | remove_clause
+
+
+match_clause: MATCH pattern (WHERE expression)?
+
+return_clause: RETURN return_item ("," return_item)*
+return_item: (NAME | field_access) (AS NAME)?
+
+order_clause: ORDER BY order_item ("," order_item)*
+order_item: (NAME | field_access) ("ASC" | "DESC")?
+
+limit_clause: LIMIT NUMBER
+
+unwind_clause: UNWIND expression AS variable  // placeholder
+
+call_subquery_clause: CALL "..." // placeholder for now
+
+create_clause: CREATE pattern
+
+merge_clause: MERGE pattern merge_actions?  // placeholder
+
+delete_clause: (DETACH DELETE | DELETE) expression_list
+
+set_clause: SET set_item ("," set_item)*
+
+remove_clause: REMOVE remove_item ("," remove_item)*
+
+// ----------------------
+// EXPRESSIONS & ITEMS (placeholders)
+// ----------------------
+?value: ESCAPED_STRING
+      | NUMBER
+      | "true"      -> true
+      | "false"     -> false
+      | "null"      -> null
+
+// expression: NAME
+?expression: or_expr
+
+?or_expr: and_expr
+        | or_expr OR and_expr
+
+?and_expr: not_expr
+         | and_expr AND not_expr
+
+?not_expr: NOT not_expr
+         | comparison
+
+?comparison: arith_expr
+           | arith_expr comp_op arith_expr
+
+comp_op: "=" | "<>" | "!=" | "<" | "<=" | ">" | ">="
+
+?arith_expr: term
+           | arith_expr "+" term
+           | arith_expr "-" term
+
+?term: factor
+     | term "*" factor
+     | term "/" factor
+
+?factor: value | NAME | field_access | "(" expression ")"
+?field_access: NAME "." NAME
+
+
+
+return_items: "*" | return_item ("," return_item)*
+// return_item: expression (AS variable)?
+
+expression_list: expression ("," expression)*
+
+
+set_item: variable "=" expression
+        | variable "+=" expression
+        | variable ":" label_expression
+
+remove_item: variable ":" label_expression
+
+pattern: node_pattern (relationship_pattern node_pattern)*
+node_pattern: "(" [variable] [labels] [properties] ")"
+relationship_pattern: "-" "[" [variable] [types] [properties] "]" "->"
+labels: ":" NAME (":" NAME)*
+types: ":" NAME ( "|" ":" NAME )*
+properties: "{" [property_list] "}"
+property_list: property ("," property)*
+property: NAME ":" value
+
+merge_actions: (ON MATCH set_clause)? (ON CREATE set_clause)?
+
+sort_item: expression (ASC | DESC)?
+
+where: expression
+
+yield_items: yield_item ("," yield_item)*
+
+yield_item: NAME (AS variable)?
+
+procedure_invocation: NAME (LPAREN (expression ("," expression)*)? RPAREN)?
+
+variable: NAME
+
+label_expression: NAME
+
+// ----------------------
+// TOKENS
+// ----------------------
+
+%import common.CNAME -> NAME
+%import common.WS
+%import common.ESCAPED_STRING
+%ignore WS
+
+LPAREN: "("
+RPAREN: ")"
+COMMA: ","
+NUMBER: /[0-9]+(\.[0-9]+)?/
+
+// Keywords
+
+UNION: "UNION"
+MATCH: "MATCH"
+OPTIONAL: "OPTIONAL"
+WHERE: "WHERE"
+RETURN: "RETURN"
+ORDER: "ORDER"
+BY: "BY"
+SKIP: "SKIP"
+LIMIT: "LIMIT"
+UNWIND: "UNWIND"
+AS: "AS"
+OR: "OR"
+AND: "AND"
+NOT: "NOT"
+CALL: "CALL"
+CREATE: "CREATE"
+MERGE: "MERGE"
+DETACH: "DETACH"
+DELETE: "DELETE"
+SET: "SET"
+REMOVE: "REMOVE"
+ON: "ON"
+MATCH_KW: "MATCH"
+MERGE_KW: "MERGE"
+ASC: "ASC"
+DESC: "DESC"
+ALL: "ALL"
+YIELD: "YIELD"
