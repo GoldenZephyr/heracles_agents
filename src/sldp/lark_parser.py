@@ -1,6 +1,8 @@
-from lark import Lark, Transformer
-import sldp
 from importlib.resources import as_file, files
+
+from lark import Lark, Transformer
+
+import sldp
 
 
 class SldpTransformer(Transformer):
