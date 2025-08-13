@@ -2,9 +2,14 @@ from heracles.query_interface import Neo4jWrapper
 
 from heracles_evaluation.tool_interface import FunctionParameter, ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry, register_tool
+from heracles_evaluation.dsg_interfaces import HeraclesDsgInterface
 
 
-def query_db(dsgdb_conf, cypher_string):
+def query_db(cypher_string, dsgdb_conf: HeraclesDsgInterface = None):
+    if dsgdb_conf is None:
+        raise ValueError(
+            "query_db called with dsgdb_conf=None. Did you forget to bind the config to the tool?"
+        )
     with Neo4jWrapper(
         dsgdb_conf.uri,
         (

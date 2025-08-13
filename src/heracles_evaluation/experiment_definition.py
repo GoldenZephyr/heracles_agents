@@ -33,16 +33,6 @@ class PipelineDescription(BaseModel):
     phases: list[PipelinePhase]
     function: Callable[[ExperimentConfiguration], AnalyzedQuestions]
 
-    def get_pipeline_function(self):
-        try:
-            fn = PipelineRegistry.pipelines[self.name]
-        except IndexError as ex:
-            print(ex)
-            print(
-                f"Tool {self.name} not registered in ToolRegistry! Registered tools are {PipelineRegistry.registered_pipeline_summary()}"
-            )
-        return fn
-
     def validate_agent_phases(self, experiment_configuration):
         phases_in_pipeline = [p.name for p in self.phases]
         for p in phases_in_pipeline:

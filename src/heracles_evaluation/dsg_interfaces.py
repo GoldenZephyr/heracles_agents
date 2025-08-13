@@ -16,4 +16,10 @@ class InContextDsgInterfaceConfig(BaseModel):
     an_example_field: int = 2
 
 
-DsgInterfaceConfigType = Union[HeraclesDsgInterface, InContextDsgInterfaceConfig]
+class NoDsgInterface(BaseModel):
+    dsg_interface_type: Literal["none"]
+
+
+DsgInterfaceConfigType = Union[
+    HeraclesDsgInterface, InContextDsgInterfaceConfig, NoDsgInterface
+]

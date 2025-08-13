@@ -10,6 +10,8 @@ from heracles_evaluation.model_client_interfaces import ModelInterfaceConfigType
 from heracles_evaluation.prompt import PromptSettings
 from heracles_evaluation.tool_interface import ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry
+from functools import partial
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -113,24 +115,43 @@ class ModelInfo(BaseModel):
     seed: Optional[int] = None
 
 
+def apply_bound_args(tool_name, bound_args):
+    args_to_bind = {}
+    for arg_name, fields in bound_args.items():
+        arg_type = ToolRegistry.get_arg_type(tool_name, arg_name)
+        arg_instance = arg_type(**fields)
+        args_to_bind[arg_name] = arg_instance
+    function = partial(ToolRegistry.tools[tool_name].function, **args_to_bind)
+    return function
+
+
 class AgentInfo(BaseModel):
     """Configuration for "agentic" behaviors, e.g., tool calling"""
 
     prompt_settings: PromptSettings
-    tools: list[ToolDescription]
+    tools: dict[str, ToolDescription]
     tool_interface: str  # Openai vs. custom vs. ???
     max_iterations: int
 
     @field_validator("tools", mode="before")
     @classmethod
-    def lookup_tools(cls, tool_names):
-        for name in tool_names:
-            if name not in ToolRegistry.tools:
+    def lookup_tools(cls, tools):
+        tool_descriptions = {}
+        for t in tools:
+            tool_name = t["name"]
+            if tool_name not in ToolRegistry.tools:
                 raise ValueError(
-                    f"Unknown tool {name}. Known tools: {list(ToolRegistry.tools.keys())}"
+                    f"Unknown tool {tool_name}. Known tools: {list(ToolRegistry.tools.keys())}"
                 )
-        tools = [ToolRegistry.tools[name] for name in tool_names]
-        return tools
+            if "bound_args" in t:
+                function = apply_bound_args(tool_name, t["bound_args"])
+                resolved_tool = copy.deepcopy(ToolRegistry.tools[tool_name])
+                resolved_tool.function = function
+            else:
+                resolved_tool = ToolRegistry.tools[tool_name]
+            tool_descriptions[tool_name] = resolved_tool
+
+        return tool_descriptions
 
     @field_serializer("tools")
     def serialize_tools(self, tools):
@@ -163,7 +184,8 @@ class AgentContext:
         # 2. the prompt text may be conditioned on the agent/model info
         if self.agent.agent_info.tool_interface == "openai":
             explicit_tools = [
-                tool.to_openai_responses() for tool in self.agent.agent_info.tools
+                tool.to_openai_responses()
+                for tool in self.agent.agent_info.tools.values()
             ]
         else:
             explicit_tools = None
@@ -184,7 +206,8 @@ class AgentContext:
             name = message.name
             args = json.loads(message.arguments)
             # TODO: verify legal tool name
-            result = ToolRegistry.tools[name].function(**args)
+            # result = ToolRegistry.tools[name].function(**args)
+            result = self.agent.agent_info.tools[name].function(**args)
             executed_tool_calls.append(
                 {
                     "type": "function_call_output",
