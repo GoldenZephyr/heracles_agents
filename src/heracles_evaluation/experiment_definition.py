@@ -11,6 +11,7 @@ from pydantic import (
     ValidationError,
     field_serializer,
     field_validator,
+    model_validator,
 )
 
 from heracles_evaluation.dsg_interfaces import DsgInterfaceConfigType
@@ -50,6 +51,7 @@ class PipelineDescription(BaseModel):
                 raise ValueError(
                     f"Pipeline {self.name} requires agent phase {p}, but {p} is not specified in the experiment configuration. Only {phases_in_experiment} have been specified."
                 )
+        return True
 
 
 class PipelineRegistry:
@@ -109,6 +111,14 @@ class ExperimentConfiguration(BaseModel):
             raise ValueError(
                 f"Requested pipeline name {pipeline_name} not found. Registered pipelines are: {list(PipelineRegistry.pipelines.keys())}"
             )
+
+    @model_validator(mode="after")
+    def verify_pipeline_phases(self):
+        try:
+            self.pipeline.validate_agent_phases(self)
+        except ValueError as ve:
+            raise ve
+        return self
 
     @field_serializer("pipeline")
     def serialize_pipeline(self, pipeline: PipelineDescription):

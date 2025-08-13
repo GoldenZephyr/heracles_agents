@@ -12,7 +12,7 @@ from heracles_evaluation.summarize_results import display_experiment_results
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-with open("experiments/master_experiment_anchors.yaml", "r") as fo:
+with open("experiments/master_experiment.yaml", "r") as fo:
     yml = yaml.safe_load(fo)
 
 experiment = ExperimentDescription(**yml)
@@ -21,9 +21,6 @@ logger.debug(f"Loaded experiment: {experiment}")
 results = {}
 for configuration_name, experiment_config in experiment.configurations.items():
     logger.info(f"Testing configuration {configuration_name}")
-    experiment_config.pipeline.validate_agent_phases(
-        experiment_config
-    )  # TODO: eventually this check should be handled automatically in the construction of the ExperimentConfiguration
     analyzed_questions = experiment_config.pipeline.function(experiment_config)
 
     display_experiment_results(analyzed_questions)
