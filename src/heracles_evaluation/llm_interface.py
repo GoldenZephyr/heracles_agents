@@ -124,6 +124,11 @@ class AgentInfo(BaseModel):
     @field_validator("tools", mode="before")
     @classmethod
     def lookup_tools(cls, tool_names):
+        for name in tool_names:
+            if name not in ToolRegistry.tools:
+                raise ValueError(
+                    f"Unknown tool {name}. Known tools: {list(ToolRegistry.tools.keys())}"
+                )
         tools = [ToolRegistry.tools[name] for name in tool_names]
         return tools
 
@@ -178,6 +183,7 @@ class AgentContext:
             self.n_tool_calls += 1
             name = message.name
             args = json.loads(message.arguments)
+            # TODO: verify legal tool name
             result = ToolRegistry.tools[name].function(**args)
             executed_tool_calls.append(
                 {

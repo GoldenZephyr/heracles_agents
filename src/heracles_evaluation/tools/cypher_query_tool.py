@@ -1,7 +1,7 @@
+from heracles.query_interface import Neo4jWrapper
+
 from heracles_evaluation.tool_interface import FunctionParameter, ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry, register_tool
-
-from heracles.query_interface import Neo4jWrapper
 
 
 def query_db(dsgdb_conf, cypher_string):
@@ -29,11 +29,11 @@ cypher_tool = ToolDescription(
     name="run_cypher_query",
     description="An interface for running Cypher queries on a Neo4j database containing a 3D Scene Graph.",
     parameters=[
-        FunctionParameter("query", str, "Your Cypher query"),
+        FunctionParameter("cypher_string", str, "Your Cypher query"),
     ],
     function=query_db,
 )
 
-register_tool(query_db)
+register_tool(cypher_tool)
 print("Registered tools: ")
 print(ToolRegistry.registered_tool_summary())

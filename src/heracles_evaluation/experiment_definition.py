@@ -124,8 +124,6 @@ class ExperimentConfiguration(BaseModel):
     def serialize_pipeline(self, pipeline: PipelineDescription):
         return pipeline.name
 
-    # TODO: need a custom "after" validator for `pipeline` that ensures the necessary phases have been specified
-
 
 class ExperimentDescription(BaseModel):
     metadata: dict

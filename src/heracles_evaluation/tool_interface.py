@@ -1,5 +1,8 @@
+import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
+
+from pydantic import BaseModel, model_validator
 
 from heracles_evaluation.tool_registry import ToolRegistry
 
@@ -42,8 +45,7 @@ class FunctionParameter:
         return d
 
 
-@dataclass
-class ToolDescription:
+class ToolDescription(BaseModel):
     """Description of a tool / function"""
 
     name: str
@@ -60,6 +62,32 @@ class ToolDescription:
                 f"Tool {self.name} not registered in ToolRegistry! Registered tools are {ToolRegistry.registered_tool_summary()}"
             )
         return fn
+
+    @model_validator(mode="after")
+    def verify_param_names(self):
+        function_required_params = set()
+        function_optional_params = set()
+        for k, v in inspect.signature(self.function).parameters.items():
+            if v.default == inspect._empty:
+                function_required_params.add(k)
+            else:
+                function_optional_params.add(k)
+
+        given_param_names = set(p.name for p in self.parameters)
+
+        for gp in given_param_names:
+            if gp not in function_optional_params.union(function_required_params):
+                raise ValueError(
+                    f"Declared parameter {gp} is not an optional or required keyword in defined function"
+                )
+
+        if not function_required_params <= given_param_names:
+            missing_params = function_required_params - given_param_names
+            raise ValueError(
+                f"Function requires parameters that are not declared by tool: {missing_params}"
+            )
+
+        return self
 
     def to_openai_responses(self):
         parameter_properties = {}
@@ -81,8 +109,6 @@ class ToolDescription:
             "description": self.description,
             "parameters": parameter_descriptions,
         }
-        print("tool formatted: ")
-        print(t)
         return t
 
     def to_custom(self):
