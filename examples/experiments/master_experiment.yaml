@@ -106,3 +106,24 @@ configurations:
                     max_iterations: 5
                     tool_interface: "openai"
         questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+    canary-anthropic:
+        dsg_interface:
+            dsg_interface_type: none
+        pipeline: canary
+        phases:
+            main:
+                client:
+                    client_type: anthropic
+
+                model_info:
+                    model: claude-3-5-haiku-latest
+                    temperature: 0.2
+
+                agent_info:
+                    prompt_settings:
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
+                    tools:
+                        - name: ask_favog
+                    max_iterations: 5
+                    tool_interface: "anthropic"
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml

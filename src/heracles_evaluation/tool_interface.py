@@ -44,6 +44,8 @@ class FunctionParameter:
             d[self.name]["enum"] = self.enum_values
         return d
 
+    def to_anthropic(self):
+        return self.to_openai_responses()
 
 class ToolDescription(BaseModel):
     """Description of a tool / function"""
@@ -108,6 +110,24 @@ class ToolDescription(BaseModel):
             "name": self.name,
             "description": self.description,
             "parameters": parameter_descriptions,
+        }
+        return t
+
+    def to_anthropic(self):
+        parameter_properties = {}
+        for p in self.parameters:
+            parameter_properties |= p.to_anthropic()
+
+        required = [p.name for p in self.parameters if p.required]
+        parameter_descriptions = {
+            "type": "object",
+            "properties": parameter_properties,
+            "required": required,
+        }
+        t = {
+            "name": self.name,
+            "description": self.description,
+            "input_schema": parameter_descriptions,
         }
         return t
 

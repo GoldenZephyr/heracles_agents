@@ -40,6 +40,14 @@ class Prompt(BaseModel):
     answer_formatting_guidance: Optional[str] = None
 
     def to_openai_json(self, novel_instruction=None):
+        # NOTE: Currently for openai we set a bunch of things as `developer`.
+        # Anthropic doesn't quite have the same notion of developer.
+        # They have a system prompt, but it's set in a different places from
+        # the normal messages, and seems meant for pretty short descriptions
+        # of what the model should be doing.
+        # For consistency, we may want to turn these `developer` roles into
+        # `user` ? This would at least make it more consistent with the Anthropic interface.
+        # I think we shouldn't worry too much about this until after we implement a third provider.
         if self.novel_instruction is None and novel_instruction is None:
             raise ValueError(
                 "novel_instruction must be set either at Prompt initialization or as an argument to `to_openai_json`"
@@ -86,6 +94,50 @@ class Prompt(BaseModel):
             )
 
         return prompt
+
+    def to_anthropic_json(self, novel_instruction=None):
+        if self.novel_instruction is None and novel_instruction is None:
+            raise ValueError(
+                "novel_instruction must be set either at Prompt initialization or as an argument to `to_anthropic_json`"
+            )
+        prompt = [{"role": "user", "content": self.system}]
+
+        if self.tool_description:
+            prompt.append({"role": "user", "content": self.tool_description})
+
+        if self.in_context_examples_preamble:
+            prompt.append(
+                {
+                    "role": "user",
+                    "content": self.in_context_examples_preamble,
+                }
+            )
+
+        if self.in_context_examples:
+            for e in self.in_context_examples:
+                prompt += e.to_openai_json()
+
+        if self.novel_instruction_preamble:
+            prompt.append({"role": "user", "content": self.novel_instruction_preamble})
+
+        if novel_instruction:
+            if self.novel_instruction:
+                logger.warning(
+                    f"Overriding default novel instruction `{self.novel_instruction}` with new instruction `{novel_instruction}`"
+                )
+            prompt.append({"role": "user", "content": novel_instruction})
+        elif self.novel_instruction:
+            prompt.append({"role": "user", "content": self.novel_instruction})
+
+        if self.answer_semantic_guidance:
+            prompt.append({"role": "user", "content": self.answer_semantic_guidance})
+
+        if self.answer_formatting_guidance:
+            prompt.append({"role": "user", "content": self.answer_formatting_guidance})
+
+        return prompt
+
+        pass
 
     def __repr__(self):
         return repr(self.to_openai_json("<Question>"))

@@ -3,15 +3,21 @@ import logging
 import re
 from typing import Literal, Optional, Union
 
-from openai.types.responses.response_output_message import ResponseOutputMessage
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
 from heracles_evaluation.model_client_interfaces import ModelInterfaceConfigType
 from heracles_evaluation.prompt import PromptSettings
 from heracles_evaluation.tool_interface import ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry
+from heracles_evaluation.prompt import Prompt
+from heracles_evaluation.model_client_interfaces import (
+    OpenaiClientConfig,
+    AnthropicClientConfig,
+)
 from functools import partial
 import copy
+from anthropic import types as anthropic_types
+
 
 logger = logging.getLogger(__name__)
 
@@ -164,6 +170,35 @@ class LlmAgent(BaseModel):
     client: ModelInterfaceConfigType = Field(discriminator="client_type")
 
 
+def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent):
+    match agent.client:
+        case OpenaiClientConfig():
+            return prompt.to_openai_json()
+        case AnthropicClientConfig():
+            return prompt.to_anthropic_json()
+        case _:
+            raise NotImplementedError(
+                f"Cannot generate prompt for client of type {type(agent.client)}."
+            )
+
+
+def generate_tools_for_agent(agent_info):
+    match agent_info.tool_interface:
+        case "openai":
+            explicit_tools = [
+                tool.to_openai_responses() for tool in agent_info.tools.values()
+            ]
+        case "anthropic":
+            explicit_tools = [tool.to_anthropic() for tool in agent_info.tools.values()]
+        case "custom":
+            explicit_tools = [tool.to_custom() for tool in agent_info.tools.values()]
+        case _:
+            raise NotImplementedError(
+                f"Unknown tool interface: {agent_info.tool_interface}"
+            )
+    return explicit_tools
+
+
 class AgentContext:
     def __init__(self, agent: LlmAgent):
         self.agent = agent
@@ -171,24 +206,12 @@ class AgentContext:
         self.n_tool_calls = 0
 
     def initialize_agent(self, prompt):
-        # NOTE: the prompt probably needs to have been constructed with some of
-        # the details of the LlmAgent in mind (e.g., tool calling style, max
-        # tool calls, etc)
-        self.history = prompt.to_openai_json()
+        self.history = generate_prompt_for_agent(prompt, self.agent)
 
     def call_llm(self, history):
         model_info = self.agent.model_info
 
-        # TODO: Notes:
-        # 1. this probably isn't where the branching logic on tool type should go?
-        # 2. the prompt text may be conditioned on the agent/model info
-        if self.agent.agent_info.tool_interface == "openai":
-            explicit_tools = [
-                tool.to_openai_responses()
-                for tool in self.agent.agent_info.tools.values()
-            ]
-        else:
-            explicit_tools = None
+        explicit_tools = generate_tools_for_agent(self.agent.agent_info)
 
         # TODO: what's a reasonable way to set the response format in general?
         # Needs to align with prompt, most likely
@@ -197,52 +220,118 @@ class AgentContext:
             model_info, explicit_tools, response_format, history
         )
 
-    def handle_response(self, response):
-        executed_tool_calls = []
-        for message in response.output:
-            if message.type != "function_call":
-                continue
-            self.n_tool_calls += 1
-            name = message.name
-            args = json.loads(message.arguments)
-            # TODO: verify legal tool name
-            # result = ToolRegistry.tools[name].function(**args)
-            result = self.agent.agent_info.tools[name].function(**args)
-            executed_tool_calls.append(
-                {
+    def iterate_messages(self, messages):
+        match self.agent.client:
+            case OpenaiClientConfig():
+                for message in messages.output:
+                    yield message
+            case AnthropicClientConfig():
+                for message in messages.content:
+                    yield message
+
+    def is_function_call(self, message):
+        match self.agent.client:
+            case OpenaiClientConfig():
+                return message.type == "function_call"
+            case AnthropicClientConfig():
+                return message.type == "tool_use"
+
+    def call_function(self, available_tools, tool_message):
+        match self.agent.client:
+            case OpenaiClientConfig():
+                name = tool_message.name
+                args = json.loads(tool_message.arguments)
+            case AnthropicClientConfig():
+                name = tool_message.name
+                args = tool_message.input
+
+        # TODO: verify legal tool name
+        return available_tools[name].function(**args)
+
+    def make_tool_response(self, tool_call_message, result):
+        match self.agent.client:
+            case OpenaiClientConfig():
+                m = {
                     "type": "function_call_output",
-                    "call_id": message.call_id,
+                    "call_id": tool_call_message.call_id,
                     "output": str(result),
                 }
-            )
+                return m
+            case AnthropicClientConfig():
+                m = {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "tool_result",
+                            "tool_use_id": tool_call_message.id,
+                            "content": str(result),
+                        }
+                    ],
+                }
+                return m
+
+    def handle_response(self, response):
+        executed_tool_calls = []
+        for message in self.iterate_messages(response):
+            if not self.is_function_call(message):
+                continue
+            self.n_tool_calls += 1
+
+            result = self.call_function(self.agent.agent_info.tools, message)
+
+            tool_response = self.make_tool_response(message, result)
+            executed_tool_calls.append(tool_response)
+
         return executed_tool_calls
 
-    def update_history(self, update: list):
-        self.history += update
+    def update_history(self, response):
+        if isinstance(response, list):
+            self.history += response
+            return
+        match self.agent.client:
+            case OpenaiClientConfig():
+                update = response.output
+                self.history += update
+            case AnthropicClientConfig():
+                # update = response.content
 
-    def check_if_done(self, history):
-        # If the last message in the history doesn't have tool calls, we are done
+                self.history += [
+                    anthropic_types.MessageParam(
+                        role="assistant", content=response.content
+                    )
+                ]
 
-        match history[-1]:
-            case ResponseOutputMessage():
-                return True
-            case _:
-                return False
+    # def check_if_done(self, history):
+    #    # If the last message in the history doesn't have tool calls, we are done
+    #    return self.done
 
     def step(self):
         logger.info("Agent stepping")
         # TODO: Handle timeout and RateLimit errors
+        print("calling with history: ", self.history)
         response = self.call_llm(self.history)
-        logger.info(f"Got response: {response.output}")
+        logger.info(f"Got response: {response}")
         update = self.handle_response(response)
-        self.update_history(response.output)
+        self.update_history(response)
         self.update_history(update)
-        done = self.check_if_done(self.history)
+        done = len(update) == 0
+        # done = self.check_if_done(self.history)
         return done
 
     def extract_answer(self, message):
         # TODO: eventually this should be generalized to support different answer formats (e.g., structured output?)
-        return extract_answer_tag(message.content[0].text)
+        match self.agent.client:
+            case OpenaiClientConfig():
+                return extract_answer_tag(message.content[0].text)
+            case AnthropicClientConfig():
+                print(message)
+                return extract_answer_tag(
+                    message["content"][0].text
+                )  # I hate Anthropic's API so much...
+            case _:
+                raise NotImplementedError(
+                    f"extract_answer not implemented for client {type(self.agent.client)}"
+                )
 
     def get_agent_responses(self):
         # TODO: parse the LLM responses into a more useful representation in "parsed_response"

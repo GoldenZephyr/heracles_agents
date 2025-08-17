@@ -9,7 +9,7 @@ key = os.getenv("DSG_OPENAI_API_KEY")
 
 client = openai.OpenAI(
     api_key=key,
-    timeout=10,
+    timeout=60,
 )
 
 sldp_description = get_sldp_format_description()
@@ -19,7 +19,7 @@ test_input = f"I have a collection of an apple, an orange and a pear. Call the l
 lark_grammar = get_sldp_lark_grammar()
 
 response = client.responses.create(
-    model="gpt-5-nano",
+    model="gpt-5-mini",
     input=test_input,
     text={"format": {"type": "text"}},
     tools=[
@@ -31,7 +31,7 @@ response = client.responses.create(
         }
     ],
     parallel_tool_calls=False,
-    max_output_tokens=1000,
+    max_output_tokens=3000,
 )
 
 print("Response:\n\n")
