@@ -1,27 +1,17 @@
-import json
 import logging
 import re
 from typing import Literal, Optional, Union, Any
 
-from pydantic import BaseModel, Field, field_serializer, field_validator
+from pydantic import BaseModel, Field
 
-from heracles_evaluation.model_client_interfaces import ModelInterfaceConfigType
-from heracles_evaluation.prompt import PromptSettings
-from heracles_evaluation.tool_interface import ToolDescription
-from heracles_evaluation.tool_registry import ToolRegistry
+from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
-from heracles_evaluation.model_client_interfaces import (
-    OpenaiClientConfig,
-    AnthropicClientConfig,
-)
-from functools import partial
-import copy
-from anthropic import types as anthropic_types
 
-from plum import dispatch, parametric  # NOQA
-from heracles_evaluation.pydantic_discriminated_dispatch import (
-    discriminated_union_dispatch,
-)
+from plum import dispatch
+
+# TODO: these should probably get discovered elsewhere
+import heracles_evaluation.provider_integrations.openai.openai_agent_integration  # NOQA
+import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
 
 logger = logging.getLogger(__name__)
 
@@ -113,79 +103,6 @@ class AnalyzedExperiment(BaseModel):
     experiment_configurations: dict[str, AnalyzedQuestions]
 
 
-class ModelInfo(BaseModel):
-    """Settings that affect fundamental model performance.
-
-    e.g., model size, temperature, seed.
-    Tool calling details are handled elsewhere
-    """
-
-    model: str
-    temperature: float
-    seed: Optional[int] = None
-
-
-def apply_bound_args(tool_name, bound_args):
-    args_to_bind = {}
-    for arg_name, fields in bound_args.items():
-        arg_type = ToolRegistry.get_arg_type(tool_name, arg_name)
-        arg_instance = arg_type(**fields)
-        args_to_bind[arg_name] = arg_instance
-    function = partial(ToolRegistry.tools[tool_name].function, **args_to_bind)
-    return function
-
-
-class AgentInfo(BaseModel):
-    """Configuration for "agentic" behaviors, e.g., tool calling"""
-
-    prompt_settings: PromptSettings
-    tools: dict[str, ToolDescription]
-    tool_interface: str  # Openai vs. custom vs. ???
-    max_iterations: int
-
-    @field_validator("tools", mode="before")
-    @classmethod
-    def lookup_tools(cls, tools):
-        tool_descriptions = {}
-        for t in tools:
-            tool_name = t["name"]
-            if tool_name not in ToolRegistry.tools:
-                raise ValueError(
-                    f"Unknown tool {tool_name}. Known tools: {list(ToolRegistry.tools.keys())}"
-                )
-            if "bound_args" in t:
-                function = apply_bound_args(tool_name, t["bound_args"])
-                resolved_tool = copy.deepcopy(ToolRegistry.tools[tool_name])
-                resolved_tool.function = function
-            else:
-                resolved_tool = ToolRegistry.tools[tool_name]
-            tool_descriptions[tool_name] = resolved_tool
-
-        return tool_descriptions
-
-    @field_serializer("tools")
-    def serialize_tools(self, tools):
-        return [tool.name for tool in tools]
-
-
-@parametric
-@discriminated_union_dispatch("client")
-class LlmAgent[T](BaseModel):
-    agent_info: AgentInfo
-    model_info: ModelInfo
-    client: ModelInterfaceConfigType = Field(discriminator="client_type")
-
-
-@dispatch
-def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[AnthropicClientConfig]):
-    return prompt.to_anthropic_json()
-
-
-@dispatch
-def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OpenaiClientConfig]):
-    return prompt.to_openai_json()
-
-
 @dispatch
 def generate_prompt_for_agent(prompt: Prompt, agent: object):
     raise NotImplementedError(
@@ -213,98 +130,44 @@ def generate_tools_for_agent(agent_info):
 
 
 @dispatch
-def is_function_call(agent: LlmAgent[AnthropicClientConfig], message):
-    return message.type == "tool_use"
+def is_function_call(agent, message):
+    raise NotImplementedError(
+        f"is_function_call not implemented for agent type {type(agent)}, message type {type(message)}."
+    )
 
 
 @dispatch
-def is_function_call(agent: LlmAgent[OpenaiClientConfig], message):
-    return message.type == "function_call"
+def iterate_messages(agent, messages):
+    raise NotImplementedError(
+        f"iterate_messages not implemented for agent type {type(agent)}, messages type {type(messages)}"
+    )
 
 
 @dispatch
-def iterate_messages(agent: LlmAgent[AnthropicClientConfig], messages):
-    for m in messages.content:
-        yield m
+def call_function(agent, tool_message):
+    raise NotImplementedError(
+        f"call_function not implemented for agent type {type(agent)}, tool_message type {type(tool_message)}"
+    )
 
 
 @dispatch
-def iterate_messages(agent: LlmAgent[OpenaiClientConfig], messages):
-    for m in messages.output:
-        yield m
+def make_tool_response(agent, tool_call_message, result):
+    raise NotImplementedError(
+        f"make_tool_response not implemented for agent type {type(agent)}, tool_call_message type {type(tool_call_message)}, result type {type(result)}."
+    )
 
 
-@dispatch
-def call_function(agent: LlmAgent[AnthropicClientConfig], tool_message):
-    available_tools = agent.agent_info.tools
-    name = tool_message.name
-    args = tool_message.input
-    # TODO: verify legal tool name
-    return available_tools[name].function(**args)
-
-
-@dispatch
-def call_function(agent: LlmAgent[OpenaiClientConfig], tool_message):
-    available_tools = agent.agent_info.tools
-    name = tool_message.name
-    args = json.loads(tool_message.arguments)
-    # TODO: verify legal tool name
-    return available_tools[name].function(**args)
-
-
-@dispatch
-def make_tool_response(
-    agent: LlmAgent[AnthropicClientConfig], tool_call_message, result
-):
-    m = {
-        "role": "user",
-        "content": [
-            {
-                "type": "tool_result",
-                "tool_use_id": tool_call_message.id,
-                "content": str(result),
-            }
-        ],
-    }
-    return m
-
-
-@dispatch
-def make_tool_response(agent: LlmAgent[OpenaiClientConfig], tool_call_message, result):
-    m = {
-        "type": "function_call_output",
-        "call_id": tool_call_message.call_id,
-        "output": str(result),
-    }
-    return m
-
-
-@dispatch
-def generate_update_for_history(
-    agent: LlmAgent[AnthropicClientConfig], response
-) -> list:
-    m = anthropic_types.MessageParam(role="assistant", content=response.content)
-    return [m]
-
-
-@dispatch
-def generate_update_for_history(agent: LlmAgent[OpenaiClientConfig], response) -> list:
-    return response.output
-
-
+# if response is a `list`, then we run this for *any* agent type
 @dispatch(precedence=1)
 def generate_update_for_history(agent: Any, response: list) -> list:
     return response
 
 
 @dispatch
-def extract_answer(agent: LlmAgent[AnthropicClientConfig], extractor, message):
-    return extractor(message["content"][0].text)
-
-
-@dispatch
-def extract_answer(agent: LlmAgent[OpenaiClientConfig], extractor, message):
-    return extractor(message.content[0].text)
+def extract_answer(agent, extractor, message):
+    raise NotImplementedError(
+        f"extract_answer not implemented for agent type {type(agent)}, message type {type(message)}"
+    )
 
 
 class AgentContext:
@@ -353,7 +216,7 @@ class AgentContext:
     def step(self):
         logger.info("Agent stepping")
         # TODO: Handle timeout and RateLimit errors
-        print("calling with history: ", self.history)
+        # print("calling with history: ", self.history)
         response = self.call_llm(self.history)
         logger.info(f"Got response: {response}")
         update = self.handle_response(response)

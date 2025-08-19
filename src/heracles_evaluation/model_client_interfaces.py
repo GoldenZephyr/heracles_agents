@@ -1,73 +1,18 @@
-from typing import Literal, Union
-
-import openai
-import anthropic
-from pydantic import BaseModel, Field, PrivateAttr, SecretStr
-from pydantic_settings import BaseSettings
+from typing import Union
 
 
-class OpenaiClientConfig(BaseSettings):
-    client_type: Literal["openai"]
-    timeout: int
-    auth_key: SecretStr = Field(alias="HERACLES_OPENAI_API_KEY")
-    _client: object = PrivateAttr()
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self._client = openai.OpenAI(
-            api_key=self.auth_key.get_secret_value(), timeout=self.timeout
-        )
-
-    def call(self, model_info, tools, response_format, messages):
-        match response_format:
-            case "text":
-                # fmt = {"text": {"format": {"type": "text"}}}
-                fmt = {"format": {"type": "text"}}
-            case "json":
-                # fmt = {"text": {"format": {"type": "json_object"}}}
-                fmt = {"format": {"type": "json_object"}}
-            case BaseModel():
-                fmt = response_format
-            case _:
-                raise ValueError(
-                    f"Unknown response_format requested for LLM: {response_format}"
-                )
-
-        response = self._client.responses.create(
-            model=model_info.model,
-            temperature=model_info.temperature,
-            # seed=model_info.seed,
-            text=fmt,
-            tools=tools,
-            input=messages,
-        )
-        return response
-
-
-class AnthropicClientConfig(BaseSettings):
-    client_type: Literal["anthropic"]
-    auth_key: SecretStr = Field(alias="HERACLES_ANTHROPIC_API_KEY")
-    _client: object = PrivateAttr()
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self._client = anthropic.Anthropic(api_key=self.auth_key.get_secret_value())
-
-    def call(self, model_info, tools, response_format, messages):
-        if response_format != "text":
-            raise NotImplementedError(
-                "Only `text` format is currently implemented for interfacing with Anthropic"
-            )
-
-        messages = self._client.messages.create(
-            model=model_info.model,
-            temperature=model_info.temperature,
-            tools=tools,
-            messages=messages,
-            max_tokens=4096,
-            # system=""
-        )
-        return messages
-
+from heracles_evaluation.provider_integrations.openai.openai_client import (
+    OpenaiClientConfig,
+)
+from heracles_evaluation.provider_integrations.anthropic.anthropic_client import (
+    AnthropicClientConfig,
+)
 
 ModelInterfaceConfigType = Union[OpenaiClientConfig, AnthropicClientConfig]
+
+
+def get_client_union_type():
+    """Currently, this function just returns the hard-coded union type of the supported
+    integrations, but eventually it could take care of dynamic client plugin registration
+    """
+    return ModelInterfaceConfigType
