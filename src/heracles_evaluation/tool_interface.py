@@ -47,6 +47,7 @@ class FunctionParameter:
     def to_anthropic(self):
         return self.to_openai_responses()
 
+
 class ToolDescription(BaseModel):
     """Description of a tool / function"""
 

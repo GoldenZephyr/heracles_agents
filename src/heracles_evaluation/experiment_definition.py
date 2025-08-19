@@ -16,6 +16,7 @@ from pydantic import (
 
 from heracles_evaluation.dsg_interfaces import DsgInterfaceConfigType
 from heracles_evaluation.llm_interface import AnalyzedQuestions, EvalQuestion, LlmAgent
+from heracles_evaluation.pydantic_discriminated_dispatch import has_plum_generics
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ def register_pipeline(pipeline_description: PipelineDescription):
         PipelineRegistry.pipelines[name] = pipeline_description
 
 
+@has_plum_generics
 class ExperimentConfiguration(BaseModel):
     # Maps from "type" of model to model interface
     # normally use the "default" type, but in cases

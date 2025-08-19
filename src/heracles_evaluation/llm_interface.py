@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, Any
 
 from pydantic import BaseModel, Field, field_serializer, field_validator
 
@@ -18,6 +18,10 @@ from functools import partial
 import copy
 from anthropic import types as anthropic_types
 
+from plum import dispatch, parametric  # NOQA
+from heracles_evaluation.pydantic_discriminated_dispatch import (
+    discriminated_union_dispatch,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -164,25 +168,34 @@ class AgentInfo(BaseModel):
         return [tool.name for tool in tools]
 
 
-class LlmAgent(BaseModel):
+@parametric
+@discriminated_union_dispatch("client")
+class LlmAgent[T](BaseModel):
     agent_info: AgentInfo
     model_info: ModelInfo
     client: ModelInterfaceConfigType = Field(discriminator="client_type")
 
 
-def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent):
-    match agent.client:
-        case OpenaiClientConfig():
-            return prompt.to_openai_json()
-        case AnthropicClientConfig():
-            return prompt.to_anthropic_json()
-        case _:
-            raise NotImplementedError(
-                f"Cannot generate prompt for client of type {type(agent.client)}."
-            )
+@dispatch
+def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[AnthropicClientConfig]):
+    return prompt.to_anthropic_json()
+
+
+@dispatch
+def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OpenaiClientConfig]):
+    return prompt.to_openai_json()
+
+
+@dispatch
+def generate_prompt_for_agent(prompt: Prompt, agent: object):
+    raise NotImplementedError(
+        f"Cannot generate prompt for client of type {type(agent.client)}."
+    )
 
 
 def generate_tools_for_agent(agent_info):
+    # TODO: if we want to go all the way with dynamic dispatch, the tool rendering functions
+    # also need to be made dynamic dispatch
     match agent_info.tool_interface:
         case "openai":
             explicit_tools = [
@@ -197,6 +210,101 @@ def generate_tools_for_agent(agent_info):
                 f"Unknown tool interface: {agent_info.tool_interface}"
             )
     return explicit_tools
+
+
+@dispatch
+def is_function_call(agent: LlmAgent[AnthropicClientConfig], message):
+    return message.type == "tool_use"
+
+
+@dispatch
+def is_function_call(agent: LlmAgent[OpenaiClientConfig], message):
+    return message.type == "function_call"
+
+
+@dispatch
+def iterate_messages(agent: LlmAgent[AnthropicClientConfig], messages):
+    for m in messages.content:
+        yield m
+
+
+@dispatch
+def iterate_messages(agent: LlmAgent[OpenaiClientConfig], messages):
+    for m in messages.output:
+        yield m
+
+
+@dispatch
+def call_function(agent: LlmAgent[AnthropicClientConfig], tool_message):
+    available_tools = agent.agent_info.tools
+    name = tool_message.name
+    args = tool_message.input
+    # TODO: verify legal tool name
+    return available_tools[name].function(**args)
+
+
+@dispatch
+def call_function(agent: LlmAgent[OpenaiClientConfig], tool_message):
+    available_tools = agent.agent_info.tools
+    name = tool_message.name
+    args = json.loads(tool_message.arguments)
+    # TODO: verify legal tool name
+    return available_tools[name].function(**args)
+
+
+@dispatch
+def make_tool_response(
+    agent: LlmAgent[AnthropicClientConfig], tool_call_message, result
+):
+    m = {
+        "role": "user",
+        "content": [
+            {
+                "type": "tool_result",
+                "tool_use_id": tool_call_message.id,
+                "content": str(result),
+            }
+        ],
+    }
+    return m
+
+
+@dispatch
+def make_tool_response(agent: LlmAgent[OpenaiClientConfig], tool_call_message, result):
+    m = {
+        "type": "function_call_output",
+        "call_id": tool_call_message.call_id,
+        "output": str(result),
+    }
+    return m
+
+
+@dispatch
+def generate_update_for_history(
+    agent: LlmAgent[AnthropicClientConfig], response
+) -> list:
+    m = anthropic_types.MessageParam(role="assistant", content=response.content)
+    return [m]
+
+
+@dispatch
+def generate_update_for_history(agent: LlmAgent[OpenaiClientConfig], response) -> list:
+    return response.output
+
+
+@dispatch(precedence=1)
+def generate_update_for_history(agent: Any, response: list) -> list:
+    return response
+
+
+@dispatch
+def extract_answer(agent: LlmAgent[AnthropicClientConfig], extractor, message):
+    return extractor(message["content"][0].text)
+
+
+@dispatch
+def extract_answer(agent: LlmAgent[OpenaiClientConfig], extractor, message):
+    return extractor(message.content[0].text)
 
 
 class AgentContext:
@@ -220,86 +328,23 @@ class AgentContext:
             model_info, explicit_tools, response_format, history
         )
 
-    def iterate_messages(self, messages):
-        match self.agent.client:
-            case OpenaiClientConfig():
-                for message in messages.output:
-                    yield message
-            case AnthropicClientConfig():
-                for message in messages.content:
-                    yield message
-
-    def is_function_call(self, message):
-        match self.agent.client:
-            case OpenaiClientConfig():
-                return message.type == "function_call"
-            case AnthropicClientConfig():
-                return message.type == "tool_use"
-
-    def call_function(self, available_tools, tool_message):
-        match self.agent.client:
-            case OpenaiClientConfig():
-                name = tool_message.name
-                args = json.loads(tool_message.arguments)
-            case AnthropicClientConfig():
-                name = tool_message.name
-                args = tool_message.input
-
-        # TODO: verify legal tool name
-        return available_tools[name].function(**args)
-
-    def make_tool_response(self, tool_call_message, result):
-        match self.agent.client:
-            case OpenaiClientConfig():
-                m = {
-                    "type": "function_call_output",
-                    "call_id": tool_call_message.call_id,
-                    "output": str(result),
-                }
-                return m
-            case AnthropicClientConfig():
-                m = {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "tool_result",
-                            "tool_use_id": tool_call_message.id,
-                            "content": str(result),
-                        }
-                    ],
-                }
-                return m
-
     def handle_response(self, response):
         executed_tool_calls = []
-        for message in self.iterate_messages(response):
-            if not self.is_function_call(message):
+        for message in iterate_messages(self.agent, response):
+            if not is_function_call(self.agent, message):
                 continue
             self.n_tool_calls += 1
 
-            result = self.call_function(self.agent.agent_info.tools, message)
+            result = call_function(self.agent, message)
 
-            tool_response = self.make_tool_response(message, result)
+            tool_response = make_tool_response(self.agent, message, result)
             executed_tool_calls.append(tool_response)
 
         return executed_tool_calls
 
     def update_history(self, response):
-        if isinstance(response, list):
-            self.history += response
-            return
-        match self.agent.client:
-            case OpenaiClientConfig():
-                update = response.output
-                self.history += update
-            case AnthropicClientConfig():
-                # update = response.content
-
-                self.history += [
-                    anthropic_types.MessageParam(
-                        role="assistant", content=response.content
-                    )
-                ]
+        update = generate_update_for_history(self.agent, response)
+        self.history += update
 
     # def check_if_done(self, history):
     #    # If the last message in the history doesn't have tool calls, we are done
@@ -318,21 +363,6 @@ class AgentContext:
         # done = self.check_if_done(self.history)
         return done
 
-    def extract_answer(self, message):
-        # TODO: eventually this should be generalized to support different answer formats (e.g., structured output?)
-        match self.agent.client:
-            case OpenaiClientConfig():
-                return extract_answer_tag(message.content[0].text)
-            case AnthropicClientConfig():
-                print(message)
-                return extract_answer_tag(
-                    message["content"][0].text
-                )  # I hate Anthropic's API so much...
-            case _:
-                raise NotImplementedError(
-                    f"extract_answer not implemented for client {type(self.agent.client)}"
-                )
-
     def get_agent_responses(self):
         # TODO: parse the LLM responses into a more useful representation in "parsed_response"
         responses = [
@@ -347,7 +377,9 @@ class AgentContext:
             if done:
                 break
         if done:
-            answer = self.extract_answer(self.history[-1])
+            # TODO: eventually this should be generalized to support different answer formats (e.g., structured output?)
+            # Also need to handle answers that are supplied via function call (e.g., for OpenAI constrained decoding outputs)
+            answer = extract_answer(self.agent, extract_answer_tag, self.history[-1])
         else:
             answer = None
         logger.info(f"Agent exiting. Finished before max iteration cap? {done}")
