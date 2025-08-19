@@ -1,17 +1,16 @@
 import logging
 import re
-from typing import Literal, Optional, Union, Any
-
-from pydantic import BaseModel, Field
-
-from heracles_evaluation.llm_agent import LlmAgent
-from heracles_evaluation.prompt import Prompt
+from typing import Any, Literal, Optional, Union
 
 from plum import dispatch
+from pydantic import BaseModel, Field
+
+import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
 
 # TODO: these should probably get discovered elsewhere
 import heracles_evaluation.provider_integrations.openai.openai_agent_integration  # NOQA
-import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
+from heracles_evaluation.llm_agent import LlmAgent
+from heracles_evaluation.prompt import Prompt
 
 logger = logging.getLogger(__name__)
 

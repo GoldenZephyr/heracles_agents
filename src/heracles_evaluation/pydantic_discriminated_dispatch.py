@@ -1,7 +1,8 @@
-from pydantic import ValidationError, BaseModel
-from pydantic.functional_validators import WrapValidator
-from plum.parametric import CovariantMeta
 from typing import GenericAlias
+
+from plum.parametric import CovariantMeta
+from pydantic import BaseModel, ValidationError
+from pydantic.functional_validators import WrapValidator
 
 
 def resolve_descriminated_union(union_type, data):

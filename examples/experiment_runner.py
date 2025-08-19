@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 with open("experiments/master_experiment.yaml", "r") as fo:
-#with open("experiments/anthropic_test.yaml", "r") as fo:
+    # with open("experiments/anthropic_test.yaml", "r") as fo:
     yml = yaml.safe_load(fo)
 
 experiment = ExperimentDescription(**yml)

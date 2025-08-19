@@ -1,14 +1,16 @@
+import json
+from typing import Callable
+
+from openai.types.responses.response import Response
+from openai.types.responses.response_function_tool_call import ResponseFunctionToolCall
+from openai.types.responses.response_output_message import ResponseOutputMessage
 from plum import dispatch
+
+from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
-import json
-from heracles_evaluation.llm_agent import LlmAgent
-from typing import Callable
-from openai.types.responses.response_function_tool_call import ResponseFunctionToolCall
-from openai.types.responses.response import Response
-from openai.types.responses.response_output_message import ResponseOutputMessage
 
 
 @dispatch

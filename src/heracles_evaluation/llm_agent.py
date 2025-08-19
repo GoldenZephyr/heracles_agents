@@ -1,15 +1,17 @@
+import copy
+from functools import partial
+from typing import Optional
+
 from plum import parametric
+from pydantic import BaseModel, Field, field_serializer, field_validator
+
+from heracles_evaluation.model_client_interfaces import get_client_union_type
+from heracles_evaluation.prompt import PromptSettings
 from heracles_evaluation.pydantic_discriminated_dispatch import (
     discriminated_union_dispatch,
 )
-from heracles_evaluation.model_client_interfaces import get_client_union_type
-from pydantic import BaseModel, Field, field_validator, field_serializer
-from heracles_evaluation.prompt import PromptSettings
-from typing import Optional
-from heracles_evaluation.tool_registry import ToolRegistry
 from heracles_evaluation.tool_interface import ToolDescription
-from functools import partial
-import copy
+from heracles_evaluation.tool_registry import ToolRegistry
 
 
 class ModelInfo(BaseModel):
@@ -50,7 +52,7 @@ class AgentInfo(BaseModel):
             tool_name = t["name"]
             if tool_name not in ToolRegistry.tools:
                 raise ValueError(
-                    f"Unknown tool {tool_name}. Known tools: {list(  ToolRegistry.tools.keys())}"
+                    f"Unknown tool {tool_name}. Known tools: {list(ToolRegistry.tools.keys())}"
                 )
             if "bound_args" in t:
                 function = apply_bound_args(tool_name, t["bound_args"])

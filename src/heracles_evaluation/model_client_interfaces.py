@@ -1,11 +1,10 @@
 from typing import Union
 
-
-from heracles_evaluation.provider_integrations.openai.openai_client import (
-    OpenaiClientConfig,
-)
 from heracles_evaluation.provider_integrations.anthropic.anthropic_client import (
     AnthropicClientConfig,
+)
+from heracles_evaluation.provider_integrations.openai.openai_client import (
+    OpenaiClientConfig,
 )
 
 ModelInterfaceConfigType = Union[OpenaiClientConfig, AnthropicClientConfig]

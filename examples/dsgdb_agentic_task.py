@@ -1,7 +1,6 @@
 import copy
 import logging
 
-
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
     PipelinePhase,

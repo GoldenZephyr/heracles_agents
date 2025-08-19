@@ -1,12 +1,13 @@
+from anthropic import types as anthropic_types
+from anthropic.types.message import Message
+from anthropic.types.tool_use_block import ToolUseBlock
 from plum import dispatch
+
 from heracles_evaluation.llm_agent import LlmAgent
+from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.anthropic.anthropic_client import (
     AnthropicClientConfig,
 )
-from heracles_evaluation.prompt import Prompt
-from anthropic import types as anthropic_types
-from anthropic.types.tool_use_block import ToolUseBlock
-from anthropic.types.message import Message
 
 
 @dispatch
