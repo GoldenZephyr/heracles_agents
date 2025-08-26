@@ -47,6 +47,16 @@ class FunctionParameter:
     def to_anthropic(self):
         return self.to_openai_responses()
 
+    def to_custom(self):
+        d = [
+            f"Param name: {self.name}",
+            f"Param description: {self.param_description}",
+            f"type: {type_to_string(self.param_type)}",
+        ]
+        if self.enum_values is not None:
+            d.append(f"Allowed values: {str(self.enum_values)}")
+        return d
+
 
 class ToolDescription(BaseModel):
     """Description of a tool / function"""
@@ -133,4 +143,15 @@ class ToolDescription(BaseModel):
         return t
 
     def to_custom(self):
-        raise NotImplementedError()
+        parameter_descriptions = ""
+        for p in self.parameters:
+            d = "\n".join(["  " + s for s in p.to_custom()])
+            d = "-" + d[1:]
+            parameter_descriptions += d + "\n"
+        tool_description = f"""
+Function name: {self.name}
+Function Description: {self.description}
+Parameters:
+{parameter_descriptions}
+"""
+        return tool_description

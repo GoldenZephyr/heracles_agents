@@ -1,0 +1,24 @@
+?start: tool_call
+tool_call: function_name "(" [kwarg ("," kwarg)*] ")"
+kwarg: arg_name "=" arg_val
+arg_name: CNAME
+arg_val: primitive
+function_name: CNAME
+primitive: FLOAT -> float
+         | INT -> int
+         | DOUBLE_QUOTE_ESCAPED_STRING -> string
+         | SINGLE_QUOTE_ESCAPED_STRING -> string
+
+_STRING_INNER: /.*?/
+_STRING_ESC_INNER: _STRING_INNER /(?<!\\)(\\\\)*?/
+
+DOUBLE_QUOTE_ESCAPED_STRING : "\"" _STRING_ESC_INNER "\""
+SINGLE_QUOTE_ESCAPED_STRING : "'" _STRING_ESC_INNER "'"
+
+
+%import common.FLOAT
+%import common.LETTER
+%import common.INT
+%import common.WS
+%import common.CNAME
+%ignore WS

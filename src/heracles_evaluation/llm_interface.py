@@ -1,28 +1,27 @@
 import logging
-import re
-from typing import Any, Literal, Optional, Union
+from typing import Literal, Optional, Union
 
-from plum import dispatch
 from pydantic import BaseModel, Field
 
 import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
+import heracles_evaluation.provider_integrations.ollama.ollama_agent_integration  # NOQA
 
 # TODO: these should probably get discovered elsewhere
 import heracles_evaluation.provider_integrations.openai.openai_agent_integration  # NOQA
+from heracles_evaluation.agent_functions import (
+    call_function,
+    extract_answer,
+    extract_answer_tag,
+    generate_prompt_for_agent,
+    generate_update_for_history,
+    is_custom_tool_call,
+    is_function_call,
+    iterate_messages,
+    make_tool_response,
+)
 from heracles_evaluation.llm_agent import LlmAgent
-from heracles_evaluation.prompt import Prompt
 
 logger = logging.getLogger(__name__)
-
-
-def extract_answer_tag(string):
-    matches = re.findall("<answer>([\s\S]*?)<\/answer>", string, re.MULTILINE)
-    if len(matches) > 1:
-        # TODO: eventually fail more gracefully?
-        raise Exception("Found multiple answeres!")
-    if len(matches) == 0:
-        return None
-    return matches[0]
 
 
 class SldpComparison(BaseModel):
@@ -102,13 +101,6 @@ class AnalyzedExperiment(BaseModel):
     experiment_configurations: dict[str, AnalyzedQuestions]
 
 
-@dispatch
-def generate_prompt_for_agent(prompt: Prompt, agent: object):
-    raise NotImplementedError(
-        f"Cannot generate prompt for client of type {type(agent.client)}."
-    )
-
-
 def generate_tools_for_agent(agent_info):
     # TODO: if we want to go all the way with dynamic dispatch, the tool rendering functions
     # also need to be made dynamic dispatch
@@ -119,54 +111,15 @@ def generate_tools_for_agent(agent_info):
             ]
         case "anthropic":
             explicit_tools = [tool.to_anthropic() for tool in agent_info.tools.values()]
+        case "ollama":
+            explicit_tools = [tool.to_ollama() for tool in agent_info.tools.values()]
         case "custom":
-            explicit_tools = [tool.to_custom() for tool in agent_info.tools.values()]
+            explicit_tools = []
         case _:
             raise NotImplementedError(
                 f"Unknown tool interface: {agent_info.tool_interface}"
             )
     return explicit_tools
-
-
-@dispatch
-def is_function_call(agent, message):
-    raise NotImplementedError(
-        f"is_function_call not implemented for agent type {type(agent)}, message type {type(message)}."
-    )
-
-
-@dispatch
-def iterate_messages(agent, messages):
-    raise NotImplementedError(
-        f"iterate_messages not implemented for agent type {type(agent)}, messages type {type(messages)}"
-    )
-
-
-@dispatch
-def call_function(agent, tool_message):
-    raise NotImplementedError(
-        f"call_function not implemented for agent type {type(agent)}, tool_message type {type(tool_message)}"
-    )
-
-
-@dispatch
-def make_tool_response(agent, tool_call_message, result):
-    raise NotImplementedError(
-        f"make_tool_response not implemented for agent type {type(agent)}, tool_call_message type {type(tool_call_message)}, result type {type(result)}."
-    )
-
-
-# if response is a `list`, then we run this for *any* agent type
-@dispatch(precedence=1)
-def generate_update_for_history(agent: Any, response: list) -> list:
-    return response
-
-
-@dispatch
-def extract_answer(agent, extractor, message):
-    raise NotImplementedError(
-        f"extract_answer not implemented for agent type {type(agent)}, message type {type(message)}"
-    )
 
 
 class AgentContext:
@@ -180,6 +133,7 @@ class AgentContext:
 
     def call_llm(self, history):
         model_info = self.agent.model_info
+        print("Calling llm with history: ", history)
 
         explicit_tools = generate_tools_for_agent(self.agent.agent_info)
 
@@ -192,8 +146,12 @@ class AgentContext:
 
     def handle_response(self, response):
         executed_tool_calls = []
+        print("Handling response, ", response)
         for message in iterate_messages(self.agent, response):
-            if not is_function_call(self.agent, message):
+            if not (
+                is_function_call(self.agent, message)
+                or is_custom_tool_call(self.agent, message)
+            ):
                 continue
             self.n_tool_calls += 1
 
