@@ -115,6 +115,8 @@ def generate_tools_for_agent(agent_info):
             explicit_tools = [tool.to_ollama() for tool in agent_info.tools.values()]
         case "custom":
             explicit_tools = []
+        case "none":
+            explicit_tools = []
         case _:
             raise NotImplementedError(
                 f"Unknown tool interface: {agent_info.tool_interface}"

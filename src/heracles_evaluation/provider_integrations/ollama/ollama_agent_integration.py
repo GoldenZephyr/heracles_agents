@@ -1,19 +1,18 @@
+import copy
 from typing import Callable, overload
 
 from ollama import ChatResponse, Message
-
 from plum import dispatch
 
+from heracles_evaluation.agent_functions import (
+    call_custom_tool_from_string,
+    extract_tag,
+)
 from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
-from heracles_evaluation.agent_functions import (
-    extract_tag,
-    call_custom_tool_from_string,
-)
 from heracles_evaluation.provider_integrations.ollama.ollama_client import (
     OllamaClientConfig,
 )
-import copy
 
 
 @dispatch

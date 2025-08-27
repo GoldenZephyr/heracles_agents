@@ -1,6 +1,8 @@
-from typing import Literal, Union
+import os
+from typing import Literal, Optional, Union
 
-from pydantic import BaseModel, Field, SecretStr
+import spark_dsg
+from pydantic import BaseModel, Field, PrivateAttr, SecretStr, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -13,7 +15,18 @@ class HeraclesDsgInterface(BaseSettings):
 
 class InContextDsgInterfaceConfig(BaseModel):
     dsg_interface_type: Literal["in_context"]
-    an_example_field: int = 2
+    dsg_filepath: Optional[str] = None
+    _dsg: PrivateAttr() = None
+
+    @model_validator(mode="after")
+    def load_dsg(self):
+        self._dsg = spark_dsg.DynamicSceneGraph.load(
+            os.path.expandvars(self.dsg_filepath)
+        )
+        return self
+
+    def get_dsg(self):
+        return self._dsg
 
 
 class NoDsgInterface(BaseModel):

@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Optional
+from typing import List, Optional
 
 import yaml
 from pydantic import BaseModel, field_validator
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class InContextExample(BaseModel):
     user: str
     assistant: str
-    system: Optional[str]
+    system: Optional[str] = None
 
     def to_openai_json(self):
         parts = []
@@ -32,7 +32,7 @@ class Prompt(BaseModel):
     system: str
     tool_description: Optional[str] = None
     in_context_examples_preamble: Optional[str] = None
-    in_context_examples: Optional[InContextExample] = None
+    in_context_examples: Optional[List[InContextExample]] = None
     novel_instruction_preamble: Optional[str] = None
     novel_instruction: Optional[str] = None
     novel_instruction_template: Optional[str] = None

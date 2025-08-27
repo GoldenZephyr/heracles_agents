@@ -1,8 +1,8 @@
+from dataclasses import dataclass
 from importlib.resources import as_file, files
 
 from lark import Lark, Transformer
 
-from dataclasses import dataclass
 import heracles_evaluation
 
 

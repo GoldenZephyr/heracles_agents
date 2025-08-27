@@ -1,0 +1,51 @@
+system: "Your task is to map from natural language instructions to symbols in a 3D world representation. You will be provided with a description of the world known as a 3D Scene Graph. Below is a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>).
+
+<Scene Graph Description>
+A 3D scene graph is a hierarchical graph consisting of 3 layers that each contain nodes: the 2D Place layer, the Object layer, and the Region layer.
+2D Place Layer: The 2D Place layer contains Places that are reachable locations in the world. Each Place node has a unique ID.
+Object Layer: The Object layer contains Objects that exist in the world. Each Object has a unique ID (id), a semantic class (type), an x,y position (pos), and a parent Region (parent_region). The parent Region indicates which Region the Object belongs to. Each Object will be represented in the form: (id, type, pose, parent_region).
+Region Layer: The Region Layer contains Regions that exist in the world. Each Region has a unique ID and a semantic class. Each Region will be represented in the form: (id, type).
+</Scene Graph Description>
+
+Given a 3D Scene Graph and a query, you must generate an answer based on elements of the scene graph.
+"
+
+in_context_examples_preamble: "Here are some examples of mapping from natural language instructions to grounded objects. Each example uses the 3D scene graph below. Note that this 3D scene graph is just for these examples and you should NOT use this when answering the new instruction.
+<Example 3D Scene Graph>
+Objects:
+- (id=O0, type=tree, pos=(-3.14,1.132), parent_region=R0)
+- (id=O1, type=vehicle, pos=(3.346,3.531), parent_region=R0)
+- (id=O2, type=door, pos=(3.335,3.482), parent_region=R0)
+- (id=O3, type=tree, pos=(4.475,-4.72), parent_region=R2)
+- (id=O4, type=vehicle, pos=(-2.51,6.63), parent_region=R1)
+- (id=O5, type=boat, pos=(1.34,3.28), parent_region=R1)
+- (id=O6, type=seating, pos=(1.37,3.03), parent_region=R1)
+- (id=O7, type=tree, pos=(9.1,-2.01), parent_region=R2)
+Regions:
+- (id=R0, type=parking_lot)
+- (id=R1, type=dock)
+- (id=R2, type=courtyard)
+</Example 3D Scene Graph>
+"
+
+in_context_examples:
+
+  - user: "What is the most common object type?"
+    assistant: "tree"
+
+  - user: "What are the object types?"
+    assistant: "<tree, vehicle, door, boat, seating>"
+
+  - user: "How many of each object are there?"
+    assistant: "{tree: 3, vehicle: 2, door: 1, boat: 1, seating: 1}"
+
+  - user: "How many regions are there?"
+    assistant: "3"
+
+  - user: "What region types are present?"
+    assistant: "<courtyard, parking_lot, dock>"
+
+novel_instruction_preamble: "Here is a new 3D Scene graph and a new query for you to ground."
+novel_instruction_template: '{dsg_description}\n Question to answer: {question}'
+
+answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. Put your answer between the XML tags <answer> answer goes here </answer>. Do not include more than one pair of answer tags.'

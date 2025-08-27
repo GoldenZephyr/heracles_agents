@@ -1,9 +1,7 @@
 from typing import Literal
 
+from ollama import ChatResponse, chat
 from pydantic_settings import BaseSettings
-
-from ollama import chat
-from ollama import ChatResponse
 
 
 class OllamaClientConfig(BaseSettings):

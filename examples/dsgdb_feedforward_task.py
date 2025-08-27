@@ -42,7 +42,7 @@ def generate_prompt(
         print(ex)
         raise ex
 
-    prompt.answer_semantic_guidance = "Make you answer as concise as possible"
+    prompt.answer_semantic_guidance = "Make your answer as concise as possible"
 
     match agent_config.agent_info.prompt_settings.output_type:
         case "SLDP":

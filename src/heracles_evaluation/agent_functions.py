@@ -1,8 +1,10 @@
-from plum import dispatch
 import re
-from heracles_evaluation.prompt import Prompt
-from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from typing import Any
+
+from plum import dispatch
+
+from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
+from heracles_evaluation.prompt import Prompt
 
 
 def call_custom_tool_from_string(tools, tool_string):

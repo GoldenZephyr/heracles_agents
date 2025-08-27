@@ -5,3 +5,4 @@
 build/
 yaml_pipeline/
 output/
+scene_graphs/
