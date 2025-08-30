@@ -10,6 +10,7 @@ from heracles_evaluation.prompt import PromptSettings
 from heracles_evaluation.pydantic_discriminated_dispatch import (
     discriminated_union_dispatch,
 )
+from heracles_evaluation.structured_tool_interface import StructuredToolDescription
 from heracles_evaluation.tool_interface import ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry
 
@@ -40,7 +41,7 @@ class AgentInfo(BaseModel):
     """Configuration for "agentic" behaviors, e.g., tool calling"""
 
     prompt_settings: PromptSettings
-    tools: dict[str, ToolDescription]
+    tools: dict[str, ToolDescription | StructuredToolDescription]
     tool_interface: str  # Openai vs. custom vs. ???
     max_iterations: int
 

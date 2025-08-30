@@ -1,6 +1,8 @@
 import copy
 import logging
 
+from prompt_utils import get_answer_formatting_guidance
+
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
     PipelinePhase,
@@ -15,8 +17,7 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-from heracles_evaluation.prompt import get_sldp_format_description
-from sldp.sldp_lang import get_sldp_type, parse_sldp, sldp_equals
+from sldp.sldp_lang import parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -41,23 +42,9 @@ def generate_prompt(
         raise ex
 
     prompt.answer_semantic_guidance = "Make you answer as concise as possible"
-
-    match agent_config.agent_info.prompt_settings.output_type:
-        case "SLDP":
-            prompt.answer_formatting_guidance = get_sldp_format_description()
-            if agent_config.agent_info.prompt_settings.sldp_answer_type_hint:
-                sldp_type = get_sldp_type(question.solution)
-                prompt.answer_formatting_guidance += (
-                    f"\n Your answer should be an SLDP {sldp_type}"
-                )
-        case None:
-            # The "default". Presumably the description of the output format is
-            # in the base prompt.
-            pass
-        case _:
-            raise ValueError(
-                f"Unknown output type: {agent_config.prompt_settings.output_type}"
-            )
+    prompt.answer_formatting_guidance = get_answer_formatting_guidance(
+        agent_config, question
+    )
 
     print("prompt: ")
     print(prompt)
@@ -67,6 +54,7 @@ def generate_prompt(
 def agentic_cypher_qa(exp):
     analyzed_questions = []
     for question in exp.questions:
+        logger.info(f"\n=======================\nQuestion: {question.question}\n")
         cxt = AgentContext(exp.phases["main"])
 
         prompt = generate_prompt(question, exp.phases["main"])

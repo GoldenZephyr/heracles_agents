@@ -18,18 +18,19 @@ test_input = f"I have a collection of an apple, an orange and a pear. Call the l
 
 lark_grammar = get_sldp_lark_grammar()
 
+tools = [
+    {
+        "type": "custom",
+        "name": "lark_answer",
+        "description": "Call this tool to submit your answer to the question",
+        "format": {"type": "grammar", "syntax": "lark", "definition": lark_grammar},
+    }
+]
 response = client.responses.create(
     model="gpt-5-mini",
     input=test_input,
     text={"format": {"type": "text"}},
-    tools=[
-        {
-            "type": "custom",
-            "name": "lark_answer",
-            "description": "Call this tool to submit your answer to the question",
-            "format": {"type": "grammar", "syntax": "lark", "definition": lark_grammar},
-        }
-    ],
+    tools=tools,
     parallel_tool_calls=False,
     max_output_tokens=3000,
 )

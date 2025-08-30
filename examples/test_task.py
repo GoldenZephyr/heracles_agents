@@ -17,7 +17,10 @@ from heracles_evaluation.llm_interface import (
     AnalyzedQuestions,
     QuestionAnalysis,
 )
-from heracles_evaluation.prompt import get_sldp_format_description
+from heracles_evaluation.prompt import (
+    get_sldp_answer_tag_text,
+    get_sldp_format_description,
+)
 from heracles_evaluation.summarize_results import display_experiment_results
 from sldp.sldp_lang import parse_sldp, sldp_equals
 
@@ -32,7 +35,10 @@ def canary_pipeline(exp):
     for question in exp.questions:
         prompt_obj = exp.phases["main"].agent_info.prompt_settings.base_prompt
         prompt_obj.novel_instruction = question.question
-        prompt_obj.answer_formatting_guidance = get_sldp_format_description()
+        formatting = get_sldp_format_description()
+        if exp.phases["main"].agent_info.prompt_settings.output_type != "SLDP_TOOL":
+            formatting += get_sldp_answer_tag_text()
+        prompt_obj.answer_formatting_guidance = formatting
         cxt.initialize_agent(prompt_obj)
         success, answer = cxt.run()
         logger.info(f"\nLLM Answer: {answer}\n")

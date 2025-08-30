@@ -25,7 +25,7 @@ There are two kinds of existing edges. First is (a)-[:CONTAINS]->(b), which conn
 
 Note that in the current version of cypher, `distance` has been replaced by `point.distance`.
 
-Also, do not use any apoc functions in your queries, because apoc is not installed so those queries will crash.
+Also, do not use any apoc functions in your queries, because apoc is not installed so those queries will crash. Use chain of thought to think along the way.
 "
 
 novel_instruction_preamble: 'Now, generate a cypher query for this natural language query:'

@@ -1,0 +1,34 @@
+from heracles_evaluation.prompt import (
+    get_sldp_answer_tag_text,
+    get_sldp_format_description,
+)
+from sldp.sldp_lang import get_sldp_type
+
+
+def get_answer_formatting_guidance(agent_config, question):
+    match agent_config.agent_info.prompt_settings.output_type:
+        case "SLDP":
+            format_instruction = get_sldp_format_description()
+            format_instruction += get_sldp_answer_tag_text()
+            if agent_config.agent_info.prompt_settings.sldp_answer_type_hint:
+                sldp_type = get_sldp_type(question.solution)
+                format_instruction += f"\n Your answer should be an SLDP {sldp_type}"
+            return format_instruction
+        case "SLDP_TOOL":
+            format_instruction = get_sldp_format_description()
+            if agent_config.agent_info.prompt_settings.sldp_answer_type_hint:
+                sldp_type = get_sldp_type(question.solution)
+                format_instruction += f"\n Your answer should be an SLDP {sldp_type}"
+
+            format_instruction += (
+                "\n Call the tool sldp_answer_tool to submit your final answer."
+            )
+            return format_instruction
+        case None:
+            # The "default". Presumably the description of the output format is
+            # in the base prompt.
+            return None
+        case _:
+            raise ValueError(
+                f"Unknown output type: {agent_config.prompt_settings.output_type}"
+            )

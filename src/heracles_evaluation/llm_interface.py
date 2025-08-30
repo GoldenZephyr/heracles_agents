@@ -1,6 +1,9 @@
 import logging
 from typing import Literal, Optional, Union
 
+from openai.types.responses.response_custom_tool_call import (
+    ResponseCustomToolCall,
+)  # TODO: push this down into the provider integration
 from pydantic import BaseModel, Field
 
 import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
@@ -14,6 +17,7 @@ from heracles_evaluation.agent_functions import (
     extract_answer_tag,
     generate_prompt_for_agent,
     generate_update_for_history,
+    get_text_body,
     is_custom_tool_call,
     is_function_call,
     iterate_messages,
@@ -124,6 +128,36 @@ def generate_tools_for_agent(agent_info):
     return explicit_tools
 
 
+def process_answer(agent: LlmAgent, message):
+    match agent.agent_info.prompt_settings.output_type:
+        case "SLDP_TOOL" | "PDDL_TOOL":
+            if isinstance(message, ResponseCustomToolCall):
+                # TODO: sanity check that tool matches our requested output tool?
+                return message.input
+
+        # case "SLDP" | "PDDL":
+        case _:
+            answer = extract_answer(agent, extract_answer_tag, message)
+            return answer
+
+
+def is_answer_tool_call(agent: LlmAgent, message):
+    # TODO: abstract this check across providers
+    # TODO: really we need to explicitly connect the output_type to the tool call name from the LLM.
+    # We cannot run both constrained Cypher and constrained SLDP in an agentic framework until we get that right.
+    if agent.agent_info.prompt_settings.output_type in [
+        "SLDP_TOOL",
+        "PDDL_TOOL",
+    ] and isinstance(message, ResponseCustomToolCall):
+        return False
+
+
+def needs_tool_processing(agent: LlmAgent, message):
+    if is_answer_tool_call(agent, message):
+        return False
+    return is_function_call(agent, message) or is_custom_tool_call(agent, message)
+
+
 class AgentContext:
     def __init__(self, agent: LlmAgent):
         self.agent = agent
@@ -135,7 +169,7 @@ class AgentContext:
 
     def call_llm(self, history):
         model_info = self.agent.model_info
-        print("Calling llm with history: ", history)
+        logger.debug(f"Calling llm with history: {history}")
 
         explicit_tools = generate_tools_for_agent(self.agent.agent_info)
 
@@ -148,13 +182,14 @@ class AgentContext:
 
     def handle_response(self, response):
         executed_tool_calls = []
-        print("Handling response, ", response)
+        logger.debug(f"Handling response: {response}")
         for message in iterate_messages(self.agent, response):
-            if not (
-                is_function_call(self.agent, message)
-                or is_custom_tool_call(self.agent, message)
-            ):
+            message_text = get_text_body(message)
+            if message_text is not None:
+                logger.info(f"Processing message ({type(message)}: {message_text}")
+            if not needs_tool_processing(self.agent, message):
                 continue
+
             self.n_tool_calls += 1
 
             result = call_function(self.agent, message)
@@ -168,21 +203,23 @@ class AgentContext:
         update = generate_update_for_history(self.agent, response)
         self.history += update
 
-    # def check_if_done(self, history):
-    #    # If the last message in the history doesn't have tool calls, we are done
-    #    return self.done
+    def check_if_done(self, history, response, last_update):
+        # If any of the LLM's response messages called an answer tool, we are done
+        for message in iterate_messages(self.agent, response):
+            if is_answer_tool_call(self.agent, message):
+                return True
+        # If the LLM didn't call an answer tool, we are done if the LLM didn't call *any* tools.
+        return len(last_update) == 0
 
     def step(self):
-        logger.info("Agent stepping")
+        logger.debug("Agent stepping")
         # TODO: Handle timeout and RateLimit errors
-        # print("calling with history: ", self.history)
         response = self.call_llm(self.history)
-        logger.info(f"Got response: {response}")
+        logger.debug(f"Got response: {response}")
         update = self.handle_response(response)
         self.update_history(response)
         self.update_history(update)
-        done = len(update) == 0
-        # done = self.check_if_done(self.history)
+        done = self.check_if_done(self.history, response, update)
         return done
 
     def get_agent_responses(self):
@@ -199,11 +236,10 @@ class AgentContext:
             if done:
                 break
         if done:
-            # TODO: eventually this should be generalized to support different answer formats (e.g., structured output?)
-            # Also need to handle answers that are supplied via function call (e.g., for OpenAI constrained decoding outputs)
-            answer = extract_answer(self.agent, extract_answer_tag, self.history[-1])
+            answer = process_answer(self.agent, self.history[-1])
         else:
             answer = None
         logger.info(f"Agent exiting. Finished before max iteration cap? {done}")
         logger.info(f"Agent used {self.n_tool_calls} tool calls")
+        logger.info(f"Answer: {answer}")
         return done, answer

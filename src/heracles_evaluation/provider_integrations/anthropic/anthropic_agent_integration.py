@@ -109,6 +109,12 @@ def get_text_body(message: Message):
     return "\n".join(b.text for b in text_blocks)
 
 
+@overload
+@dispatch
+def get_text_body(message: ToolUseBlock):
+    return f"{message.name}({message.input})"
+
+
 @dispatch
 def get_text_body(block: TextBlock):
     return block.text

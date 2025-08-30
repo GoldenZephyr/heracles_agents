@@ -194,7 +194,11 @@ A `set` is written as `<element1, element2, ... elementN>`
 A `dict` is written as `{k1: v1, k2: v2}`
 
 A `point` is written as `POINT(x y z)` (note the lack of comma)
+"""
 
+
+def get_sldp_answer_tag_text():
+    return """
 ### Denoting Final Answer:
 
 Format your final answer as an SLDP expression wrapped between <answer> and

@@ -21,11 +21,11 @@ def query_db(cypher_string, dsgdb_conf: HeraclesDsgInterface = None):
     ) as db:
         try:
             query_result = str(db.query(cypher_string))
-            return True, query_result
+            return query_result
         except Exception as ex:
             print(ex)
             query_result = str(ex)
-            return False, query_result
+            return query_result
 
 
 # TODO: we need to warp the query_db in another function that takes only the cypher string, and not the dsgdb_conf

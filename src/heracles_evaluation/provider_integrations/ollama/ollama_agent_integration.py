@@ -116,6 +116,12 @@ def get_text_body(message: Message):
     return message.content
 
 
+@overload
 @dispatch
 def get_text_body(response: ChatResponse):
     return response.message.content
+
+
+@dispatch
+def get_text_body(tool_call: Message.ToolCall):
+    return f"{tool_call.function.name}({tool_call.function.arguments})"

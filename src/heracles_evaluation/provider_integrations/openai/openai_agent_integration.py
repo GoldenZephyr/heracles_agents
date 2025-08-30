@@ -1,9 +1,11 @@
 import json
-from typing import Callable
+from typing import Callable, overload
 
 from openai.types.responses.response import Response
+from openai.types.responses.response_custom_tool_call import ResponseCustomToolCall
 from openai.types.responses.response_function_tool_call import ResponseFunctionToolCall
 from openai.types.responses.response_output_message import ResponseOutputMessage
+from openai.types.responses.response_reasoning_item import ResponseReasoningItem
 from plum import dispatch
 
 from heracles_evaluation.llm_agent import LlmAgent
@@ -72,3 +74,34 @@ def extract_answer(
     message: ResponseOutputMessage,
 ):
     return extractor(message.content[0].text)
+
+
+@overload
+@dispatch
+def get_text_body(response: Response):
+    return "\n".join([get_text_body(m) for m in response.output])
+
+
+@overload
+@dispatch
+def get_text_body(message: ResponseOutputMessage):
+    return "\n".join([c.text for c in message.content])
+
+
+@overload
+@dispatch
+def get_text_body(tool_call: ResponseFunctionToolCall):
+    return f"{tool_call.name}({tool_call.arguments})"
+
+
+@overload
+@dispatch
+def get_text_body(message: ResponseReasoningItem):
+    if message.content is None:
+        return None
+    return "\n".join(c.text for c in message.content)
+
+
+@dispatch
+def get_text_body(tool_call: ResponseCustomToolCall):
+    return f"{tool_call.name}({tool_call.input})"

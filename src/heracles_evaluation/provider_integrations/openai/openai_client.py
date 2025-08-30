@@ -39,5 +39,6 @@ class OpenaiClientConfig(BaseSettings):
             text=fmt,
             tools=tools,
             input=messages,
+            parallel_tool_calls=False,
         )
         return response

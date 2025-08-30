@@ -32,10 +32,8 @@ Note that in the current version of cypher, `distance` has been replaced by `poi
 
 If the query you generate is invalid, fails to run, or produces an error or unexpected output, retry by correcting the Cypher based on feedback or known schema rules.
 
-You can call the cypher query tool up to 5 times.
+You can call the cypher query tool up to 5 times. Use chain of thought to think along the way.
 "
 
 novel_instruction_preamble: 'Now, use cypher queries to answer this question:'
 novel_instruction_template: '{question}'
-
-answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. When you are ready to give your final answer, put it between a beginning and ending answer tag: <answer> the answer here </answer>'
