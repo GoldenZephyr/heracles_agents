@@ -1,0 +1,18 @@
+?start: element
+element: clause | atomic | negated_atomic
+atomic: fact | symbol | negated_atomic
+symbol: "?" CNAME
+fact: "(" LNAME CNAME* ")"
+negated_atomic: "(not" atomic ")"
+LNAME: ("_"|LETTER) ("_"|"-"|LETTER|DIGIT)* ("_"|LETTER|DIGIT)*
+
+clause: conjunction | disjunction | negation
+disjunction: "(or" element* ")"
+conjunction: "(and" element* ")"
+negation: "(not" clause ")"
+
+%import common.WS
+%import common.CNAME
+%import common.LETTER
+%import common.DIGIT
+%ignore WS
