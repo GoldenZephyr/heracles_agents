@@ -1,15 +1,26 @@
+OR: "or"
+AND: "and"
+NOT: "not"
+TRUE: "True"
+FALSE: "False"
+LNAME: /[_A-Za-z](\w+|-)*/
+//LNAME: ("_"|LETTER) ("_"|"-"|LETTER|DIGIT)* ("_"|LETTER|DIGIT)*
+
 ?start: element
 element: clause | atomic | negated_atomic
-atomic: fact | symbol | negated_atomic
+atomic: fact | symbol | bool
 symbol: "?" CNAME
+negated_atomic: "(" NOT atomic ")"
 fact: "(" LNAME CNAME* ")"
-negated_atomic: "(not" atomic ")"
-LNAME: ("_"|LETTER) ("_"|"-"|LETTER|DIGIT)* ("_"|LETTER|DIGIT)*
+bool: TRUE -> bool_true
+    | FALSE -> bool_false
 
 clause: conjunction | disjunction | negation
-disjunction: "(or" element* ")"
-conjunction: "(and" element* ")"
-negation: "(not" clause ")"
+disjunction: "(" OR element* ")"
+conjunction: "(" AND element* ")"
+//negation: "(not" clause ")"
+negation: "(" NOT (clause | negated_atomic) ")"
+
 
 %import common.WS
 %import common.CNAME
