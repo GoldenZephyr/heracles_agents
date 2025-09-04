@@ -46,3 +46,43 @@ is `parse_sldp`. If you call `parse_sldp` on your string, you can verify
 whether it correctly parses into the AST.  Second is `sldp_equals(s1, s2)`
 which will return true if sldp strings s1 and s2 are equal in the sense of
 sldp.
+
+## Checking PDDL correctness
+
+A PDDL goal represents a set of states. Each state is a set of facts. However,
+the states are usually not fully enumerated.  Facts that don't appear in a goal
+clause are assumed to be "don't care", which means that the total number of
+distinct goal states is normally exponentially larger than the number of facts
+in the goal. As a result, we cannot simply count the precision/recall of our answer
+wrt the "ground truth" answer by enumerating all states.
+
+However, if we just look at the clauses in the DNF form of the goal, we can think of this
+as "factoring out" all of the don't-care facts. Then we can compute precision/recall
+wrt clauses in the DNF forms of the correct answer and the LLM answer.
+
+For very simple goals this will clearly give reasonable results. But to make sense in general,
+we would want to understand:
+1. In which cases do the DNF forms differ while representing the same truth table? For example, A is equivalent to (A AND B) OR (A AND nB)
+If we remove all trivial cases like this, is there a canonical DNF?
+
+# TODO:
+
+* LLM sometimes generates Cypher queries with extra enclosing quotes. Stop this by either prompting, or detect this failure mode in the tool call
+* Our detection of valid SLDP is not quite right -- we mark empty sets / lists as invalid SLDP, but they are technically valid
+* Unit tests...
+* Ensure prompt consistency -- Currently the prompts for different tasks look a little different. Need to take a pass and make sure that the common parts of the different prompts are all the same.
+* Merge (some) pipeline files
+    * I think only the agentic and non-agentic pipelines need to be separate, the others can probably be merged
+    * requires small updates to how we (generically) handle answer type comparison
+    * may also require slight updates to the generate-prompt function
+    * Sayplan-esque pipeline may also need to be separate
+
+For adding PDDL:
+
+- [x] Example pddl yaml
+- [x] implement equality checking for PDDL (goal) states
+- [x] add feedforward pipeline
+- [x] update feedforward prompt
+- [ ] update agentic pipeline
+- [ ] update agentic prompt
+- [ ] constrained generation

@@ -5,6 +5,14 @@ from heracles_evaluation.prompt import (
 from sldp.sldp_lang import get_sldp_type
 
 
+def get_pddl_format_description():
+    return ""
+
+
+def get_pddl_answer_tag_text():
+    return "Return the PDDL goal between two answer tags, e.g. <answer> pddl goes here </answer>"
+
+
 def get_answer_formatting_guidance(agent_config, question):
     match agent_config.agent_info.prompt_settings.output_type:
         case "SLDP":
@@ -24,6 +32,12 @@ def get_answer_formatting_guidance(agent_config, question):
                 "\n Call the tool sldp_answer_tool to submit your final answer."
             )
             return format_instruction
+        case "PDDL":
+            format_instruction = get_pddl_format_description()
+            format_instruction += get_pddl_answer_tag_text()
+            return format_instruction
+        case "PDDL_TOOL":
+            raise NotImplementedError("PDDL_TOOL answer format not yet implemented...")
         case None:
             # The "default". Presumably the description of the output format is
             # in the base prompt.

@@ -33,11 +33,16 @@ class SldpComparison(BaseModel):
     relation: str  # equal, subset, superset
 
 
+class PddlComparison(BaseModel):
+    comparison_type: Literal["PDDL"]
+    relation: str  # equal, subset, superset
+
+
 class LLmJudgeComparison(BaseModel):
     comparison_type: Literal["LLM_JUDGE"]
 
 
-ComparisonType = Union[SldpComparison, LLmJudgeComparison]
+ComparisonType = Union[SldpComparison, PddlComparison, LLmJudgeComparison]
 
 
 class EvalQuestion(BaseModel):
