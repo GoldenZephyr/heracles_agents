@@ -1,26 +1,27 @@
-from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-from pypddl.pddl_goal_types import literal_equals
+from functools import partial
+
 from pypddl.pddl_goal_manipulations import (
-    try_fn,
-    simplify,
+    evaluate,
     flatten_conjunction,
     flatten_disjunction,
     remove_double_negative,
-    simplify_singleton_clause,
+    simplify,
     simplify_contradiction,
+    simplify_singleton_clause,
     simplify_tautology,
-    evaluate,
+    try_fn,
 )
-from functools import partial
+from pypddl.pddl_goal_parser import lark_parse_pddl_goal
+from pypddl.pddl_goal_types import literal_equals
 
 
 def assert_step_equals(fn, formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
     stepped = fn(parsed_formula)
-    assert literal_equals(
-        stepped, parsed_expected
-    ), f"Got {str(stepped)}, Expected {str(parsed_expected)}"
+    assert literal_equals(stepped, parsed_expected), (
+        f"Got {str(stepped)}, Expected {str(parsed_expected)}"
+    )
 
 
 try_simplify = partial(try_fn, simplify)

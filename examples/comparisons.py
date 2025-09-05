@@ -1,9 +1,11 @@
 # ruff: noqa: F811
 import logging
+
+from plum import dispatch
+
+from heracles_evaluation.llm_interface import PddlComparison, SldpComparison
 from pypddl.pddl_goal_manipulations import pddl_goal_equals
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-from plum import dispatch
-from heracles_evaluation.llm_interface import PddlComparison, SldpComparison
 from sldp.sldp_lang import parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)

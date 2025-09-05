@@ -1,8 +1,10 @@
 # ruff: noqa: F811
 from __future__ import annotations
+
 from dataclasses import dataclass
+
+from beartype.typing import Callable, Iterable, List, Set
 from plum import dispatch
-from beartype.typing import Callable, List, Set, Iterable
 
 
 @dataclass

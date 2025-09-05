@@ -1,15 +1,16 @@
 from importlib.resources import as_file, files
-import pypddl
+
 from lark import Lark, Transformer
 
+import pypddl
 from pypddl.pddl_goal_types import (
-    Symbol,
-    NegatedAtomic,
+    Bool,
     Conjunction,
     Disjunction,
     Fact,
+    NegatedAtomic,
     NegatedClause,
-    Bool,
+    Symbol,
 )
 
 
@@ -59,7 +60,8 @@ class PddlGoalTransformer(Transformer):
 
 pddl_goal_grammar = get_pddl_goal_lark_grammar()
 pddl_goal_parser = Lark(pddl_goal_grammar, parser="lalr")
-#T = PddlGoalTransformer()
+# T = PddlGoalTransformer()
+
 
 def lark_parse_pddl_goal(string):
     T = PddlGoalTransformer()

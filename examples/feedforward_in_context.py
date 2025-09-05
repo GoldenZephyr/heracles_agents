@@ -2,6 +2,7 @@ import copy
 import logging
 
 import spark_dsg
+from comparisons import evaluate_answer
 from prompt_utils import get_answer_formatting_guidance
 
 from heracles_evaluation.experiment_definition import (
@@ -18,7 +19,6 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-from comparisons import evaluate_answer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     experiment = ExperimentConfiguration(**yml)
     logger.debug(f"Loaded experiment configuration: {experiment}")
 
-    aqs = incontext_dsg_qa(experiment)
+    aqs = incontext_dsg(experiment)
     with open("output/dsgdb_feedforward_out.yaml", "w") as fo:
         fo.write(yaml.dump(aqs.model_dump()))
 

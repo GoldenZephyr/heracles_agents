@@ -1,4 +1,5 @@
 import logging
+import os
 
 import agentic_pipeline  # NOQA
 import feedforward_cypher_pipeline  # NOQA
@@ -12,7 +13,6 @@ import heracles_evaluation.tools.sldp_answer_tool  # NOQA
 from heracles_evaluation.experiment_definition import ExperimentDescription
 from heracles_evaluation.llm_interface import AnalyzedExperiment
 from heracles_evaluation.summarize_results import display_experiment_results
-import os
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, force=True)

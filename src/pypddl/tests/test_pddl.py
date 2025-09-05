@@ -1,24 +1,23 @@
-from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-
 from pypddl.pddl_goal_manipulations import (
     pddl_goal_equals,
 )
+from pypddl.pddl_goal_parser import lark_parse_pddl_goal
 
 
 def assert_equal(formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
-    assert pddl_goal_equals(
-        parsed_formula, parsed_expected
-    ), f"Got {str(parsed_formula)}, Expected {str(parsed_expected)}"
+    assert pddl_goal_equals(parsed_formula, parsed_expected), (
+        f"Got {str(parsed_formula)}, Expected {str(parsed_expected)}"
+    )
 
 
 def assert_unequal(formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
-    assert not pddl_goal_equals(
-        parsed_formula, parsed_expected
-    ), f"Got {str(parsed_formula)}, expected to not equal {str(parsed_expected)}"
+    assert not pddl_goal_equals(parsed_formula, parsed_expected), (
+        f"Got {str(parsed_formula)}, expected to not equal {str(parsed_expected)}"
+    )
 
 
 def test_simple():

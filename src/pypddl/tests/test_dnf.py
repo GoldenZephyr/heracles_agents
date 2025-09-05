@@ -8,9 +8,9 @@ def assert_dnf_equal(formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
     dnf = convert_to_dnf(parsed_formula)
-    assert clause_equals(
-        dnf, parsed_expected
-    ), f"Got {str(dnf)}, Expected {str(parsed_expected)}"
+    assert clause_equals(dnf, parsed_expected), (
+        f"Got {str(dnf)}, Expected {str(parsed_expected)}"
+    )
 
 
 def test_single_variable():

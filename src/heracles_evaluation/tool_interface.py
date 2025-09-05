@@ -2,7 +2,7 @@ import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, model_validator, PrivateAttr
+from pydantic import BaseModel, PrivateAttr, model_validator
 
 from heracles_evaluation.tool_registry import ToolRegistry
 

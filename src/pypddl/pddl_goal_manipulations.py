@@ -1,25 +1,26 @@
 # Turn off warnings for duplicated function definitions
 # ruff: noqa: F811
 from __future__ import annotations
+
+from functools import partial
+
 from plum import dispatch
 
-from pypddl.pddl_goal_types import (
-    Disjunction,
-    Conjunction,
-    NegatedClause,
-    Clause,
-    NegatedAtomic,
-    Symbol,
-    Fact,
-    fmap,
-    Atomic,
-    literal_equals,
-    Bool,
-    clause_equals,
-)
-
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-from functools import partial
+from pypddl.pddl_goal_types import (
+    Atomic,
+    Bool,
+    Clause,
+    Conjunction,
+    Disjunction,
+    Fact,
+    NegatedAtomic,
+    NegatedClause,
+    Symbol,
+    clause_equals,
+    fmap,
+    literal_equals,
+)
 
 
 ### Negate

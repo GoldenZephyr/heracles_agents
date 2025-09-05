@@ -1,6 +1,7 @@
 import copy
 import logging
 
+from comparisons import evaluate_answer
 from prompt_utils import get_answer_formatting_guidance
 
 from heracles_evaluation.experiment_definition import (
@@ -17,8 +18,6 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-
-from comparisons import evaluate_answer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

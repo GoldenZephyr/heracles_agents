@@ -1,5 +1,5 @@
-from pypddl.pddl_goal_types import literal_equals
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
+from pypddl.pddl_goal_types import literal_equals
 
 
 def assert_equal(a, b):
