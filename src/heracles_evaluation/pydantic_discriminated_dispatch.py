@@ -5,7 +5,7 @@ from pydantic import BaseModel, ValidationError
 from pydantic.functional_validators import WrapValidator
 
 
-def resolve_descriminated_union(union_type, data):
+def resolve_descriminated_union(union_type, data: dict):
     """We need a way to understand which member of a union_type is compatible with `data`.
     We need our resolution to match Pydantic's discriminated union resolution. They
     don't expose a function for this, so we just manually try to instantiate each member
@@ -35,9 +35,12 @@ def discriminated_union_dispatch(union_field):
                     "The discriminated union dispatch functionality has been designed with a Pydantic-based workflow in mind, where all classes are initialized with keyword args only. If you need to initialize this class with positional args, you will need to extend the functiona  lity of discriminated_union_dispatch"
                 )
 
-            resolved_type = resolve_descriminated_union(
-                K.model_fields[union_field].annotation, kwargs[union_field]
-            )
+            if type(kwargs[union_field]) is dict:
+                resolved_type = resolve_descriminated_union(
+                    K.model_fields[union_field].annotation, kwargs[union_field]
+                )
+            else:
+                resolved_type = type(kwargs[union_field])
             return resolved_type
 
         setattr(K, "__infer_type_parameter__", inference_function)
@@ -75,7 +78,15 @@ def has_plum_generics(K):
                 if issubclass(type(value_type), CovariantMeta):
 
                     def validator(v, handler, info, constructor=value_type):
-                        return {key: constructor(**val) for key, val in v.items()}
+                        constructed_args = {}
+                        for key, val in v.items():
+                            print("val: ", val)
+                            if type(val) is dict:
+                                constructed_args[key] = constructor(**val)
+                            else:
+                                constructed_args[key] = val
+                        return constructed_args
+                        # return {key: constructor(**val) for key, val in v.items()}
 
                     K.model_fields[name].metadata.append(WrapValidator(validator))
 

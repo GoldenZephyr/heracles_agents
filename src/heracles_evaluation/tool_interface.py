@@ -2,7 +2,7 @@ import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, PrivateAttr
 
 from heracles_evaluation.tool_registry import ToolRegistry
 
@@ -65,6 +65,7 @@ class ToolDescription(BaseModel):
     description: str
     parameters: list[FunctionParameter]
     function: Callable
+    _bound_args: PrivateAttr() = None  # dict[str, object]
 
     def get_tool_function(self):
         try:

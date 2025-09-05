@@ -1,11 +1,9 @@
 import logging
 
-import dsgdb_agentic_task  # NOQA
-import dsgdb_feedforward_task  # NOQA
-import incontext_dsg  # NOQA
+import agentic_pipeline  # NOQA
+import feedforward_cypher_pipeline  # NOQA
+import feedforward_in_context  # NOQA
 import test_task  # NOQA
-import dsgdb_feedforward_pddl # NOQA
-import dsgdb_agentic_pddl  # NOQA
 import yaml
 
 import heracles_evaluation.tools.canary_favog_tool  # NOQA
@@ -20,7 +18,7 @@ logging.basicConfig(level=logging.INFO, force=True)
 
 # experiment_fn = "experiments/ollama_test.yaml"
 # experiment_fn = "experiments/structured_sldp.yaml"
-#experiment_fn = "experiments/master_experiment.yaml"
+# experiment_fn = "experiments/master_experiment.yaml"
 experiment_fn = "experiments/pddl_experiment.yaml"
 with open(experiment_fn, "r") as fo:
     yml = yaml.safe_load(fo)

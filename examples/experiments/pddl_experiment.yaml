@@ -5,7 +5,7 @@ configurations:
         dsg_interface:
             dsg_interface_type: none
 
-        pipeline: agentic_cypher_pddl
+        pipeline: agentic
         phases:
             main:
                 client:
@@ -38,7 +38,7 @@ configurations:
         dsg_interface:
             dsg_interface_type: heracles
             uri: "neo4j://127.0.0.1:7687"
-        pipeline: feedforward_cypher_pddl
+        pipeline: feedforward_cypher
         phases:
             generate-cypher:
                 client:
@@ -58,7 +58,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 1
 
-            refine-to-pddl:
+            refine:
                 client:
                     client_type: openai
                     timeout: 20

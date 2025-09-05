@@ -23,7 +23,7 @@ class ModelInfo(BaseModel):
     """
 
     model: str
-    temperature: float
+    temperature: float = 1.0
     seed: Optional[int] = None
 
 
@@ -34,7 +34,7 @@ def apply_bound_args(tool_name, bound_args):
         arg_instance = arg_type(**fields)
         args_to_bind[arg_name] = arg_instance
     function = partial(ToolRegistry.tools[tool_name].function, **args_to_bind)
-    return function
+    return function, args_to_bind
 
 
 class AgentInfo(BaseModel):
@@ -56,9 +56,10 @@ class AgentInfo(BaseModel):
                     f"Unknown tool {tool_name}. Known tools: {list(ToolRegistry.tools.keys())}"
                 )
             if "bound_args" in t:
-                function = apply_bound_args(tool_name, t["bound_args"])
+                function, validated_args = apply_bound_args(tool_name, t["bound_args"])
                 resolved_tool = copy.deepcopy(ToolRegistry.tools[tool_name])
                 resolved_tool.function = function
+                resolved_tool._bound_args = validated_args
             else:
                 resolved_tool = ToolRegistry.tools[tool_name]
             tool_descriptions[tool_name] = resolved_tool
@@ -66,8 +67,23 @@ class AgentInfo(BaseModel):
         return tool_descriptions
 
     @field_serializer("tools")
-    def serialize_tools(self, tools):
-        return [tool.name for tool in tools]
+    def serialize_tools(
+        self, tools: dict[str, ToolDescription | StructuredToolDescription]
+    ):
+        def dump(x):
+            if isinstance(x, BaseModel):
+                return x.model_dump()
+            return x
+
+        serialized_tools = []
+        for tool in tools.values():
+            d = {"name": tool.name}
+            if tool._bound_args is not None:
+                d["bound_args"] = {
+                    argname: dump(val) for argname, val in tool._bound_args.items()
+                }
+            serialized_tools.append(d)
+        return serialized_tools
 
 
 model_interface_config_type = get_client_union_type()

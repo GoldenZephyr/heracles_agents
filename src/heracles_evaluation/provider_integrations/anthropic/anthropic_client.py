@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings
 
 class AnthropicClientConfig(BaseSettings):
     client_type: Literal["anthropic"]
-    auth_key: SecretStr = Field(alias="HERACLES_ANTHROPIC_API_KEY")
+    auth_key: SecretStr = Field(alias="HERACLES_ANTHROPIC_API_KEY", exclude=True)
     _client: object = PrivateAttr()
 
     def __init__(self, **data):

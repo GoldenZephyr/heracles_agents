@@ -9,8 +9,8 @@ from pydantic_settings import BaseSettings
 class HeraclesDsgInterface(BaseSettings):
     dsg_interface_type: Literal["heracles"]
     uri: str
-    username: SecretStr = Field(alias="HERACLES_NEO4J_USERNAME")
-    password: SecretStr = Field(alias="HERACLES_NEO4J_PASSWORD")
+    username: SecretStr = Field(alias="HERACLES_NEO4J_USERNAME", exclude=True)
+    password: SecretStr = Field(alias="HERACLES_NEO4J_PASSWORD", exclude=True)
 
 
 class InContextDsgInterfaceConfig(BaseModel):
@@ -33,6 +33,13 @@ class NoDsgInterface(BaseModel):
     dsg_interface_type: Literal["none"]
 
 
+class PythonDsgInterface(BaseModel):
+    dsg_interface_type: Literal["python"]
+
+
 DsgInterfaceConfigType = Union[
-    HeraclesDsgInterface, InContextDsgInterfaceConfig, NoDsgInterface
+    HeraclesDsgInterface,
+    InContextDsgInterfaceConfig,
+    NoDsgInterface,
+    PythonDsgInterface,
 ]

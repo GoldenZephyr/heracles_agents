@@ -1,10 +1,3 @@
-#<Robots>
-#Euclid: Euclid is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'euclid'.
-#Hamilton: Hamilton is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hamilton'.
-#Hilbert: Hilbert is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hilbert'.
-#Apollo: Apollo is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'apollo'.
-#</Robots>
-
 system: "You are a helpful assistant who is an expert at mapping from natural language queries to Cypher queries for a Neo4j graph database. You have access to a database representing a 3D scene graph, which stores spatial information that robot can use to understand the world. Given a task, your task is to generate a Cypher query that queries the relevant information from the database. You will later use this information to formulate a PDDL goal for a robot.
 
 Labels in Database:

@@ -108,6 +108,7 @@ class AnalyzedQuestions(BaseModel):
 
 class AnalyzedExperiment(BaseModel):
     experiment_configurations: dict[str, AnalyzedQuestions]
+    metadata: dict = Field(default_factory=dict)
 
 
 def generate_tools_for_agent(agent_info):

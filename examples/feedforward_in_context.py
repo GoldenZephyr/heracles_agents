@@ -18,7 +18,7 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-from sldp.sldp_lang import parse_sldp, sldp_equals
+from comparisons import evaluate_answer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -38,12 +38,12 @@ def get_region_parent_of_object(object_node, scene_graph):
     if not parent_region_id:
         return "none"
     parent_region_node = scene_graph.get_node(parent_region_id)
-    return str(parent_region_node.id)
+    return parent_region_node.id.str(True)
 
 
 def object_to_prompt(object_node, scene_graph):
     attrs = object_node.attributes
-    symbol = str(object_node.id)
+    symbol = object_node.id.str(True)
     object_labelspace = scene_graph.get_labelspace(2, 0)
     if not object_labelspace:
         raise PromptingFailure("No available object labelspace")
@@ -56,7 +56,7 @@ def object_to_prompt(object_node, scene_graph):
 
 def region_to_prompt(region_node, scene_graph):
     attrs = region_node.attributes
-    symbol = str(region_node.id)
+    symbol = region_node.id.str(True)
     region_labelspace = scene_graph.get_labelspace(4, 0)
     if not region_labelspace:
         raise PromptingFailure("No available region labelspace")
@@ -112,7 +112,7 @@ def generate_prompt(
     return prompt
 
 
-def incontext_dsg_qa(exp):
+def incontext_dsg(exp):
     analyzed_questions = []
     for question in exp.questions:
         cxt = AgentContext(exp.phases["main"])
@@ -124,23 +124,16 @@ def incontext_dsg_qa(exp):
         logger.info(f"\nLLM Final Answer: {answer}\n")
 
         sequence = AgentSequence(
-            description="in-context qa pipeline", responses=cxt.get_agent_responses()
+            description="in-context pipeline", responses=cxt.get_agent_responses()
         )
 
-        try:
-            parse_sldp(answer)
-            valid_sldp = True
-        except Exception:
-            logger.warning("Invalid SLDP")
-            valid_sldp = False
+        valid_format, correct = evaluate_answer(
+            question.correctness_comparator, answer, question.solution
+        )
 
-        if valid_sldp:
-            correct = sldp_equals(question.solution, answer)
-        else:
-            correct = False
         logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
+        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
         aq = AnalyzedQuestion(
             question=question, sequences=[sequence], analysis=analysis
         )
@@ -156,10 +149,10 @@ main_phase = PipelinePhase(
 )
 
 d = PipelineDescription(
-    name="in_context_qa",
+    name="feedforward_in_context",
     description="in-context scene graph",
     phases=[main_phase],
-    function=incontext_dsg_qa,
+    function=incontext_dsg,
 )
 
 register_pipeline(d)

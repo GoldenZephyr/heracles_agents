@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings
 class OpenaiClientConfig(BaseSettings):
     client_type: Literal["openai"]
     timeout: int
-    auth_key: SecretStr = Field(alias="HERACLES_OPENAI_API_KEY")
+    auth_key: SecretStr = Field(alias="HERACLES_OPENAI_API_KEY", exclude=True)
     _client: object = PrivateAttr()
 
     def __init__(self, **data):

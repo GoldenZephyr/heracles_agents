@@ -156,12 +156,22 @@ class PromptSettings(BaseModel):
         # round-tripping where we want to dump the experiment back out to the
         # final (in which case we will have lost track of the original file
         # path. Instead we would just dump the full prompt structure
-        prompt_path = os.path.expandvars(prompt_path)
-        if not os.path.exists(prompt_path):
-            raise ValueError(f"Prompt path does not exist: {prompt_path}")
-        with open(prompt_path, "r") as fo:
-            prompt_yaml = yaml.safe_load(fo)
-        return Prompt(**prompt_yaml)
+        match prompt_path:
+            case str():
+                prompt_path = os.path.expandvars(prompt_path)
+                if not os.path.exists(prompt_path):
+                    raise ValueError(f"Prompt path does not exist: {prompt_path}")
+                with open(prompt_path, "r") as fo:
+                    prompt_yaml = yaml.safe_load(fo)
+                return Prompt(**prompt_yaml)
+            case dict():
+                return prompt_path
+            case Prompt():
+                return prompt_path
+            case _:
+                raise ValueError(
+                    f"PromptSettings cannot initialize base_prompt from type {type(prompt_path)}"
+                )
 
 
 def get_sldp_format_description():

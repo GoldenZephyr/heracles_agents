@@ -1,11 +1,4 @@
-system: "Your task is to map from natural language instructions to Planning Domain Definition Language (PDDL) goal predicates assigned to individual robots within a robot team. The robots may have different capabilities. If the instruction does not explicitly assign tasks to specific robots, you are responsible for deciding which robot completes which tasks. You will be provided with a description of the world known as a 3D Scene Graph, and you should generate grounded PDDL goal predicates that use entities from the scene graph as arguments. Below are descriptions of (1) the available robots in the team (delimited by XML tags: <Robots> description of robots </Robots>), (2) a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>), and (3) the PDDL domain predicates (delimited by XML tags: <PDDL Domain> description of the domain </PDDL Domain>).
-
-<Robots>
-Euclid: Euclid is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'euclid'.
-Hamilton: Hamilton is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hamilton'.
-Hilbert: Hilbert is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hilbert'.
-Apollo: Apollo is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'apollo'.
-</Robots>
+system: "You are a helpful assistant who is an expert at assigning robots PDDL planning goals based on natural language commands grounded in 3D scene graphs. You have access to a database representing a 3D scene graph, which stores spatial information that robot can use to understand the world. Given a command, your task is to formulate a PDDL goal for a robot. Below are descriptions of a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>), and the PDDL domain predicates (delimited by XML tags: <PDDL Domain> description of the domain </PDDL Domain>).
 
 <Scene Graph Description>
 A 3D scene graph is a hierarchical graph consisting of 3 layers that each contain nodes: the 2D Place layer, the Object layer, and the Region layer. The entities of the graph can be used as arguments in the PDDL goal predicates, which is described below.
@@ -57,30 +50,30 @@ Regions:
 "
 
 in_context_examples:
-  - user: "Hamilton, go to object 1."
-    assistant: "{\"hamilton\": \"(visited-object O1)\"}"
-  - user: "Hamilton, move to o1."
-    assistant: "{\"hamilton\": \"(visited-object O1)\"}"
-  - user: "Hamilton, head to place 100."
-    assistant: "{\"hamilton\": \"(visited-place P100)\"}"
-  - user: "Hilbert, head to region 21."
-    assistant: "{\"hilbert\": \"(visited-place R21)\"}"
-  - user: "Euclid, drive over to the door and visit the boat."
-    assistant: "{\"euclid\": \"(and (visited-object O2) (visited-object O5))\"}"
-  - user: "Euclid, walk over to the door or end up by the boat."
-    assistant: "{\"euclid\": \"(or (visited-object O2) (visited-object O5))\"}"
-  - user: "Euclid, head over to the door. Hamilton, move to the boat."
-    assistant: "{\"euclid\": \"(visited-object O2)\", \"hamilton\": \"(visited-object O5)\"}"
-  - user: "Euclid, could you navigate to the vehicle on the dock?"
-    assistant: "{\"euclid\": \"(visited-object O4)\"}"
-  - user: "Hamilton, head to the rightmost vehicle."
-    assistant: "{\"hamilton\": \"(visited-object O1)\"}"
-  - user: "Euclid, move to the vehicle on the left."
-    assistant: "{\"euclid\": \"(visited-object O4)\"}"
-  - user: "I need one of you to go to the parking lot and the other to head to the dock."
-    assistant: "{\"euclid\": \"(visited-place R0)\", \"hamilton\": \"(visited-place R1)\"}"
+  - user: "Go to object 1."
+    assistant: "(visited-object O1)"
+  - user: "Move to o1."
+    assistant: "(visited-object O1)"
+  - user: "Head to place 100."
+    assistant: "(visited-place P100)"
+  - user: "Head to region 21."
+    assistant: "(visited-place R21)"
+  - user: "Drive over to the door and visit the boat."
+    assistant: "(and (visited-object O2) (visited-object O5))"
+  - user: "Walk over to the door or end up by the boat."
+    assistant: "(or (visited-object O2) (visited-object O5))"
+  - user: "Head over to the door and move to the boat."
+    assistant: "(and (visited-object O2) (visited-object O5))"
+  - user: "Could you navigate to the vehicle on the dock?"
+    assistant: "(visited-object O4)"
+  - user: "Head to the rightmost vehicle."
+    assistant: "(visited-object O1)"
+  - user: "Move to the vehicle on the left."
+    assistant: "(visited-object O4)"
+  - user: "I need you to go to the parking lot and the dock."
+    assistant: "(and (visited-place R0) (visited-place R1))"
 
 novel_instruction_preamble: "Here is a new 3D Scene graph and a new instruction for you to translate."
 novel_instruction_template: '{dsg_description}\n Question to answer: {question}'
 
-answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. You response MUST be dictionary of the form: {\"robot id\": \"PDDL goal\", \"robot id\": \"PDDL goal\"}. The arguments to the predicates MUST NOT include parenthesis. For example, \"(visited-place R(1))\" is NOT correct and should instead be \"(visited-place R1)\". Put your answer between the XML tags <answer> answer goes here </answer>.'
+#answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. You response MUST be dictionary of the form: {\"robot id\": \"PDDL goal\", \"robot id\": \"PDDL goal\"}. The arguments to the predicates MUST NOT include parenthesis. For example, \"(visited-place R(1))\" is NOT correct and should instead be \"(visited-place R1)\". Put your answer between the XML tags <answer> answer goes here </answer>.'

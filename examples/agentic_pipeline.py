@@ -17,7 +17,8 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-from sldp.sldp_lang import parse_sldp, sldp_equals
+
+from comparisons import evaluate_answer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -51,13 +52,14 @@ def generate_prompt(
     return prompt
 
 
-def agentic_cypher_qa(exp):
+def agentic_pipeline(exp):
     analyzed_questions = []
     for question in exp.questions:
         logger.info(f"\n=======================\nQuestion: {question.question}\n")
         cxt = AgentContext(exp.phases["main"])
 
         prompt = generate_prompt(question, exp.phases["main"])
+        logger.info(f"\nLLM Prompt: {prompt}\n")
 
         cxt.initialize_agent(prompt)
         success, answer = cxt.run()
@@ -67,24 +69,13 @@ def agentic_cypher_qa(exp):
             description="cypher-agent", responses=cxt.get_agent_responses()
         )
 
-        # TODO: In theory, I think the analysis of the correct answer can be
-        # handled automatically (i.e., little of the below code here) using the
-        # answer comparator that has been defined.
+        valid_format, correct = evaluate_answer(
+            question.correctness_comparator, answer, question.solution
+        )
 
-        try:
-            parse_sldp(answer)
-            valid_sldp = True
-        except Exception:
-            logger.warning("Invalid SLDP")
-            valid_sldp = False
-
-        if valid_sldp:
-            correct = sldp_equals(question.solution, answer)
-        else:
-            correct = False
         logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
+        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
         aq = AnalyzedQuestion(
             question=question, sequences=[agent_sequence], analysis=analysis
         )
@@ -96,32 +87,15 @@ def agentic_cypher_qa(exp):
 
 main_phase = PipelinePhase(
     name="main",
-    description="Map question to (sequence of) Cypher queries, and then to final answer.",
+    description="Use tools to reason about question, and then to submit final answer.",
 )
 
 
 d = PipelineDescription(
-    name="agentic_cypher_qa",
-    description="Multi-query Cypher tool calling",
+    name="agentic",
+    description="Agentic pipeline for 3D scene graphs",
     phases=[main_phase],
-    function=agentic_cypher_qa,
+    function=agentic_pipeline,
 )
 
 register_pipeline(d)
-
-if __name__ == "__main__":
-    import yaml
-
-    from heracles_evaluation.experiment_definition import ExperimentConfiguration
-    from heracles_evaluation.summarize_results import display_experiment_results
-
-    with open("experiments/dsg_agentic_experiment.yaml", "r") as fo:
-        yml = yaml.safe_load(fo)
-    experiment = ExperimentConfiguration(**yml)
-    logger.debug(f"Loaded experiment configuration: {experiment}")
-
-    aqs = agentic_cypher_qa(experiment)
-    with open("output/dsgdb_agentic_out.yaml", "w") as fo:
-        fo.write(yaml.dump(aqs.model_dump()))
-
-    display_experiment_results(aqs)

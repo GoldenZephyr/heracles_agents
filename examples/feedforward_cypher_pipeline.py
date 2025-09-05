@@ -18,7 +18,7 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
-from sldp.sldp_lang import parse_sldp, sldp_equals
+from comparisons import evaluate_answer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +52,7 @@ def generate_prompt(
     return prompt
 
 
-def feedforward_cypher_qa(exp):
+def feedforward_cypher(exp):
     analyzed_questions = []
     for question in exp.questions:
         logger.info(f"\n=======================\nQuestion: {question.question}\n")
@@ -81,21 +81,10 @@ def feedforward_cypher_qa(exp):
         success, answer = cxt2.run()
         logger.info(f"LLM Final Answer: {answer}")
 
-        # TODO: In theory, I think the analysis of the correct answer can be
-        # handled automatically (i.e., little of the below code here) using the
-        # answer comparator that has been defined.
+        valid_format, correct = evaluate_answer(
+            question.correctness_comparator, answer, question.solution
+        )
 
-        try:
-            parse_sldp(answer)
-            valid_sldp = True
-        except Exception:
-            logger.warning("Invalid SLDP")
-            valid_sldp = False
-
-        if valid_sldp:
-            correct = sldp_equals(question.solution, answer)
-        else:
-            correct = False
         logger.info(f"\n\nCorrect? {correct}\n\n")
 
         refinement_sequence = AgentSequence(
@@ -104,7 +93,7 @@ def feedforward_cypher_qa(exp):
 
         sequences = [cypher_generation_sequence, refinement_sequence]
 
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
+        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
         aq = AnalyzedQuestion(question=question, sequences=sequences, analysis=analysis)
         analyzed_questions.append(aq)
 
@@ -119,10 +108,10 @@ refine_phase = PipelinePhase(
     name="refine", description="Map result of cypher query to final answer"
 )
 d = PipelineDescription(
-    name="feedforward_cypher_qa",
+    name="feedforward_cypher",
     description="Single cypher query, then refinement",
     phases=[cypher_phase, refine_phase],
-    function=feedforward_cypher_qa,
+    function=feedforward_cypher,
 )
 
 register_pipeline(d)
@@ -138,7 +127,7 @@ if __name__ == "__main__":
     experiment = ExperimentConfiguration(**yml)
     logger.debug(f"Loaded experiment configuration: {experiment}")
 
-    aqs = feedforward_cypher_qa(experiment)
+    aqs = feedforward_cypher(experiment)
     with open("output/dsgdb_feedforward_out.yaml", "w") as fo:
         fo.write(yaml.dump(aqs.model_dump()))
 

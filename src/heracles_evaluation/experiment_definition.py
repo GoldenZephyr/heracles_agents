@@ -76,6 +76,8 @@ class ExperimentConfiguration(BaseModel):
     @field_validator("questions", mode="before")
     @classmethod
     def load_questions(cls, question_path):
+        if type(question_path) is list:
+            return question_path
         question_path = os.path.expandvars(question_path)
         logger.debug(f"Loading questions from: {question_path}")
         with open(question_path, "r") as fo:
@@ -97,6 +99,8 @@ class ExperimentConfiguration(BaseModel):
     @field_validator("pipeline", mode="before")
     @classmethod
     def lookup_pipeline(cls, pipeline_name):
+        if type(pipeline_name) is PipelineDescription:
+            return pipeline_name
         if pipeline_name in PipelineRegistry.pipelines:
             return PipelineRegistry.pipelines[pipeline_name]
         else:
