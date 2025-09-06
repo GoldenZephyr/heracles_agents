@@ -34,8 +34,6 @@ if not os.path.exists(output_dir):
 table_element_fns = os.listdir(table_dir)
 
 for fn in table_element_fns:
-    if "context" not in fn:
-        continue
     print("Processing ", fn)
     element_path = os.path.join(table_dir, fn)
     experiment = load_experiment(element_path)

@@ -40,7 +40,10 @@ def summarize_results(questions: list[dict]):
     string_summaries = {k: f"{v}/{n_questions}" for k, v in acc.items()}
     string_summaries["questions"] = str(n_questions)
 
-    return string_summaries
+    ratio_summaries = {k: v / n_questions for k, v in acc.items()}
+    ratio_summaries["questions"] = n_questions
+
+    return ratio_summaries, string_summaries
 
 
 def construct_per_question_info(aqs: AnalyzedQuestions):
@@ -103,7 +106,7 @@ def display_experiment_results(aqs):
         "# Questions": "questions",
     }
     result_dicts = [q.analysis.model_dump(mode="json") for q in aqs.analyzed_questions]
-    summary_data = [summarize_results(result_dicts)]
+    summary_data = [summarize_results(result_dicts)[1]]
     display_table("Summary", summary_data, column_data_map=summary_column_data_map)
 
 
@@ -133,7 +136,7 @@ def main():
         "Valid SLDP": "valid_sldp",
         "Correct": "correct",
     }
-    summary_data = summarize_results(results["questions"])
+    summary_data = summarize_results(results["questions"])[1]
     display_table("Results Summary", summary_column_data_map, summary_data)
 
 

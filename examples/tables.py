@@ -44,13 +44,15 @@ if not os.path.exists(output_base):
     os.makedirs(output_base)
 
 dsg_paths = {}
-dsg_paths["small"] = ""
+dsg_paths["b45"] = (
+    "$HERACLES_EVALUATION_PATH/examples/scene_graphs/2025-09-04-heracles-eval-2_dsg_with_mesh.json"
+)
 dsg_paths["westpoint"] = (
     "$HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json"
 )
 
 # dsg_tags = ["small", "westpoint"]
-dsg_tags = ["westpoint"]
+dsg_tags = ["westpoint", "b45"]
 
 methods = [
     "cypher",
@@ -316,23 +318,30 @@ for m in methods:
             print("config_name: ", config_name)
             configurations = {}
             metadata = {"config_name": config_name}
-            try:
-                config = ExperimentConfiguration(
-                    pipeline=get_pipeline(m),
-                    phases=get_phases(m, t),
-                    dsg_interface=get_interface_for_method(m, tag),
-                    questions=get_questions_fn(t, tag),
-                )
-                print("config: ", config)
-                metadata["dsg_tag"] = tag
-                configurations[config_name] = config
-            except NotImplementedError as ex:
-                print(ex)
-                metadata["skip"] = True
-                metadata["going_to_implement"] = True
+            questions_fn = get_questions_fn(t, tag)
+            if os.path.exists(os.path.expandvars(questions_fn)):
+                try:
+                    config = ExperimentConfiguration(
+                        pipeline=get_pipeline(m),
+                        phases=get_phases(m, t),
+                        dsg_interface=get_interface_for_method(m, tag),
+                        questions=questions_fn,
+                    )
+                    print("config: ", config)
+                    metadata["dsg_tag"] = tag
+                    configurations[config_name] = config
+                except NotImplementedError as ex:
+                    print(ex)
+                    metadata["skip"] = True
+                    metadata["going_to_implement"] = True
 
-            except FileNotFoundError as ex:
-                print(ex)
+                except FileNotFoundError as ex:
+                    print(ex)
+                    metadata["skip"] = True
+                    metadata["going_to_implement"] = True
+
+            else:
+                print(f"No questions for configuration ({questions_fn}). Skipping")
                 metadata["skip"] = True
                 metadata["going_to_implement"] = True
 
