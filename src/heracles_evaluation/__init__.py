@@ -3,3 +3,8 @@
 import heracles_evaluation.tools.canary_favog_tool
 import heracles_evaluation.tools.cypher_query_tool
 import heracles_evaluation.tools.sldp_answer_tool
+
+import heracles_evaluation.pipelines.agentic_pipeline
+import heracles_evaluation.pipelines.feedforward_cypher_pipeline
+import heracles_evaluation.pipelines.feedforward_in_context
+import heracles_evaluation.pipelines.test_task

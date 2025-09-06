@@ -2,8 +2,8 @@ import copy
 import logging
 
 import spark_dsg
-from comparisons import evaluate_answer
-from prompt_utils import get_answer_formatting_guidance
+from heracles_evaluation.pipelines.comparisons import evaluate_answer
+from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
@@ -135,7 +135,7 @@ def incontext_dsg(exp):
 
         analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
         aq = AnalyzedQuestion(
-            question=question, sequences=[sequence], analysis=analysis
+            question=question, answer=answer, sequences=[sequence], analysis=analysis
         )
         analyzed_questions.append(aq)
 

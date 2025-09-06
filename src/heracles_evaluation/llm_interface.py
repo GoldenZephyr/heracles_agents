@@ -99,6 +99,7 @@ class AnalyzedQuestion(BaseModel):
     # TODO: do we need to deal with partially-completed response lists?
     question: EvalQuestion
     sequences: list[AgentSequence]
+    answer: Optional[str]
     analysis: Optional[QuestionAnalysis]
 
 

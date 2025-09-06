@@ -27,12 +27,14 @@ def summarize_results(questions: list[dict]):
     n_questions = len(questions)
 
     acc = {}
-    for k in questions[0]:
-        acc[k] = 0
+    for k, v in questions[0].items():
+        if type(v) in [int, float, bool]:
+            acc[k] = 0
 
     for q in questions:
         for k, v in q.items():
-            acc[k] += v
+            if type(v) in [int, float, bool]:
+                acc[k] += v
 
     # cypher_color = "green" if valid_cypher == n_questions else "red"
     # cypher_str = colorize(cypher_color, f"{valid_cypher}/{n_questions}")
@@ -108,6 +110,25 @@ def display_experiment_results(aqs):
     result_dicts = [q.analysis.model_dump(mode="json") for q in aqs.analyzed_questions]
     summary_data = [summarize_results(result_dicts)[1]]
     display_table("Summary", summary_data, column_data_map=summary_column_data_map)
+
+
+def display_experiment_results_with_answer(per_question_info, title="Title"):
+    column_data_map = {
+        "Name": "name",
+        "Question": "question",
+        "Solution": "solution",
+        "Answer": "answer",
+    }
+    # display_analyzed_question_table("Test Table", aqs, column_data_map)
+
+    # summary_column_data_map = {
+    #    "# Questions": "questions",
+    # }
+    # result_dicts = [q.analysis.model_dump(mode="json") for q in aqs.analyzed_questions]
+
+    table = generate_table(title, per_question_info, column_data_map)
+    console = Console()
+    console.print(table)
 
 
 def main():

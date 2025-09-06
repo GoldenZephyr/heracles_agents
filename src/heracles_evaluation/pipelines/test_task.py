@@ -2,8 +2,6 @@ import logging
 
 import yaml
 
-# TODO: I think if the tool gets exported to the __init__.py we can get rid of this
-import heracles_evaluation.tools.canary_favog_tool  # NOQA
 from heracles_evaluation.experiment_definition import (
     ExperimentDescription,
     PipelineDescription,

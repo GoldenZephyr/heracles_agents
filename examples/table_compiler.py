@@ -1,10 +1,6 @@
 import logging
 import os
 
-import agentic_pipeline  # NOQA
-import feedforward_cypher_pipeline  # NOQA
-import feedforward_in_context  # NOQA
-import test_task  # NOQA
 import yaml
 
 from heracles_evaluation.llm_interface import AnalyzedExperiment
@@ -13,8 +9,9 @@ from heracles_evaluation.llm_interface import AnalyzedExperiment
 #    AnalyzedExperiment,
 # )  # , AnalyzedQuestions
 from heracles_evaluation.summarize_results import (
-    display_experiment_results,
+    # display_experiment_results,
     summarize_results,
+    display_experiment_results_with_answer,
 )
 from string import Template
 
@@ -41,7 +38,7 @@ latex_macro_template = """
 \\newcommand{\\cypherXqaXlarge}{$cypher_qa_westpoint}
 \\newcommand{\\agenticcypherXqaXlarge}{$agentic_cypher_qa_westpoint}
 \\newcommand{\\incontextXqaXlarge}{$in_context_qa_westpoint}
-\\newcommand{\\agenticincontextXqaXlarge}{agentic_in_context_qa_westpoint}
+\\newcommand{\\agenticincontextXqaXlarge}{$agentic_in_context_qa_westpoint}
 \\newcommand{\\pythonXqaXlarge}{$python_qa_westpoint}
 \\newcommand{\\agenticpythonXqaXlarge}{$agentic_python_qa_westpoint}
 \
@@ -60,6 +57,19 @@ latex_macro_template = """
 \\newcommand{\\agenticpythonXpddlXlarge}{$agentic_python_pddl_westpoint}
 
 """
+
+
+def get_per_question_info(analyzed_questions):
+    result_dicts = [
+        q.analysis.model_dump(mode="json")
+        for q in analyzed_questions.analyzed_questions
+    ]
+    for rd, q in zip(result_dicts, analyzed_questions.analyzed_questions):
+        rd["answer"] = q.answer
+        rd["solution"] = q.question.solution
+        rd["name"] = q.question.name
+        rd["question"] = q.question.question
+    return result_dicts
 
 
 results_dir = "tables/table1/output"
@@ -84,13 +94,12 @@ for fn in results_fns:
         continue
     analyzed_questions = list(results.experiment_configurations.values())[0]
     print("  Processing ", fn)
-    display_experiment_results(analyzed_questions)
+    # display_experiment_results(analyzed_questions)
     # display_analyzed_question_table(results)
-    result_dicts = [
-        q.analysis.model_dump(mode="json")
-        for q in analyzed_questions.analyzed_questions
-    ]
-    ratio_summaries, _ = summarize_results(result_dicts)
+
+    per_question_summary_info = get_per_question_info(analyzed_questions)
+    display_experiment_results_with_answer(per_question_summary_info)
+    ratio_summaries, _ = summarize_results(per_question_summary_info)
     correct_ratio[config_name] = f"{ratio_summaries['correct']:.2f}"
 
 output_macros = Template(latex_macro_template).safe_substitute(**correct_ratio)
