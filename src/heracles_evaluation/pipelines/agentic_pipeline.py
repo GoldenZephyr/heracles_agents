@@ -73,7 +73,12 @@ def agentic_pipeline(exp):
 
         logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
+        analysis = QuestionAnalysis(
+            correct=correct,
+            valid_answer_format=valid_format,
+            input_tokens=cxt.total_input_tokens,
+            output_tokens=cxt.total_output_tokens,
+        )
         aq = AnalyzedQuestion(
             question=question,
             answer=answer,

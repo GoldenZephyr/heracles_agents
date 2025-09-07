@@ -19,6 +19,8 @@ from heracles_evaluation.agent_functions import (
     is_function_call,
     iterate_messages,
     make_tool_response,
+    count_message_tokens,
+    count_tool_description_tokens,
 )
 from heracles_evaluation.llm_agent import LlmAgent
 
@@ -90,6 +92,8 @@ class QuestionAnalysis(BaseModel):
 
     valid_answer_format: bool
     correct: bool
+    input_tokens: int
+    output_tokens: int
 
 
 class AnalyzedQuestion(BaseModel):
@@ -167,6 +171,8 @@ class AgentContext:
         self.agent = agent
         self.history = []
         self.n_tool_calls = 0
+        self.total_input_tokens = 0
+        self.total_output_tokens = 0
 
     def initialize_agent(self, prompt):
         self.history = generate_prompt_for_agent(prompt, self.agent)
@@ -181,6 +187,12 @@ class AgentContext:
         # Needs to align with prompt, most likely
         response_format = "text"
 
+        prompt_tokens = count_message_tokens(self.agent, history)
+        tool_description_tokens = count_tool_description_tokens(
+            self.agent, explicit_tools
+        )
+        self.total_input_tokens += prompt_tokens + tool_description_tokens
+
         n_ratelimit_retries = 5
         wait_time_s = 60
         for idx in range(n_ratelimit_retries):
@@ -189,7 +201,9 @@ class AgentContext:
                     model_info, explicit_tools, response_format, history
                 )
             except openai.RateLimitError as ex:
-                # TODO: probably should be handled by client. But we need at least some control over the *total* wait time that we set here
+                # TODO: probably should be handled by client. But we need at
+                # least some control over the *total* wait time that we set
+                # here
                 print(ex)
                 logging.warning(
                     f"Hit OpenAI rate limit error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
@@ -203,6 +217,8 @@ class AgentContext:
         executed_tool_calls = []
         logger.debug(f"Handling response: {response}")
         for message in iterate_messages(self.agent, response):
+            output_tokens = count_message_tokens(self.agent, message)
+            self.total_output_tokens += output_tokens
             message_text = get_text_body(message)
             if message_text is not None:
                 logger.info(f"Processing message ({type(message)}: {message_text}")

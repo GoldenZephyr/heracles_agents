@@ -92,7 +92,15 @@ def feedforward_cypher(exp):
 
         sequences = [cypher_generation_sequence, refinement_sequence]
 
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
+        n_input_tokens = cxt.total_input_tokens + cxt2.total_input_tokens
+        n_output_tokens = cxt.total_output_tokens + cxt2.total_output_tokens
+
+        analysis = QuestionAnalysis(
+            correct=correct,
+            valid_answer_format=valid_format,
+            input_tokens=n_input_tokens,
+            output_tokens=n_output_tokens,
+        )
         aq = AnalyzedQuestion(
             question=question, answer=answer, sequences=sequences, analysis=analysis
         )

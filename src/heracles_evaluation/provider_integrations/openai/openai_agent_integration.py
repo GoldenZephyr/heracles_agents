@@ -13,6 +13,7 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
+import tiktoken
 
 
 @dispatch
@@ -105,3 +106,16 @@ def get_text_body(message: ResponseReasoningItem):
 @dispatch
 def get_text_body(tool_call: ResponseCustomToolCall):
     return f"{tool_call.name}({tool_call.input})"
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[OpenaiClientConfig], message: dict):
+    model_name = agent.model_info.model
+    enc = tiktoken.encoding_for_model(model_name)
+    # https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken
+    num_tokens = 3
+    for key, value in message.items():
+        num_tokens += len(enc.encode(value))
+    if key == "name":
+        num_tokens += 1
+    return num_tokens

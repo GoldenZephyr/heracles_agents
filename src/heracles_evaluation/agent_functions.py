@@ -1,3 +1,4 @@
+# ruff: noqa: F811
 import re
 from typing import Any
 
@@ -6,6 +7,8 @@ from plum import dispatch
 from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from heracles_evaluation.prompt import Prompt
 import logging
+import tiktoken
+from heracles_evaluation.llm_agent import LlmAgent
 
 logger = logging.getLogger(__name__)
 
@@ -92,3 +95,32 @@ def extract_answer(agent, extractor, message):
     raise NotImplementedError(
         f"extract_answer not implemented for agent type {type(agent)}, message type {type(message)}"
     )
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent, messages: list):
+    return sum([count_message_tokens(agent, m) for m in messages])
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent, message):
+    model_name = agent.model_info.model
+    enc = tiktoken.encoding_for_model(model_name)
+    text = get_text_body(message)
+    return len(enc.encode(text))
+
+
+@dispatch
+def count_tool_description_tokens(agent: LlmAgent, explicit_tools: dict):
+    model_name = agent.model_info.model
+    enc = tiktoken.encoding_for_model(model_name)
+    print(
+        "Using this string representation for computing tool tokens: ",
+        str(explicit_tools),
+    )
+    return len(enc.encode(str(explicit_tools)))
+
+
+@dispatch
+def count_tool_description_tokens(agent: LlmAgent, explicit_tools: list):
+    return sum([count_tool_description_tokens(agent, t) for t in explicit_tools])

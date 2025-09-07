@@ -15,6 +15,10 @@ def to_string(value):
         else:
             color = "red"
         return colorize(color, value)
+    elif type(value) is int:
+        return str(value)
+    elif type(value) is float:
+        return str(value)
     else:
         return value
 
