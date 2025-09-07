@@ -1,16 +1,13 @@
 import logging
+import time
 from typing import Literal, Optional, Union
 
+import openai
 from openai.types.responses.response_custom_tool_call import (
     ResponseCustomToolCall,
 )  # TODO: push this down into the provider integration
 from pydantic import BaseModel, Field
 
-import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration  # NOQA
-import heracles_evaluation.provider_integrations.ollama.ollama_agent_integration  # NOQA
-
-# TODO: these should probably get discovered elsewhere
-import heracles_evaluation.provider_integrations.openai.openai_agent_integration  # NOQA
 from heracles_evaluation.agent_functions import (
     call_function,
     extract_answer,
@@ -183,9 +180,24 @@ class AgentContext:
         # TODO: what's a reasonable way to set the response format in general?
         # Needs to align with prompt, most likely
         response_format = "text"
-        return self.agent.client.call(
-            model_info, explicit_tools, response_format, history
-        )
+
+        n_ratelimit_retries = 5
+        wait_time_s = 60
+        for idx in range(n_ratelimit_retries):
+            try:
+                response = self.agent.client.call(
+                    model_info, explicit_tools, response_format, history
+                )
+            except openai.RateLimitError as ex:
+                # TODO: probably should be handled by client. But we need at least some control over the *total* wait time that we set here
+                print(ex)
+                logging.warning(
+                    f"Hit OpenAI rate limit error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
+            break
+        return response
 
     def handle_response(self, response):
         executed_tool_calls = []

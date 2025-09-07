@@ -6,7 +6,7 @@ from plum import dispatch
 from heracles_evaluation.llm_interface import PddlComparison, SldpComparison
 from pypddl.pddl_goal_manipulations import pddl_goal_equals
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-from sldp.sldp_lang import parse_sldp, sldp_equals
+from sldp.sldp_lang import lark_parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, force=True)
@@ -33,7 +33,7 @@ def evaluate_answer(comparator: PddlComparison, answer, solution):
 @dispatch
 def evaluate_answer(comparator: SldpComparison, answer, solution):
     try:
-        parse_sldp(answer)
+        lark_parse_sldp(answer)
         valid_sldp = True
     except Exception as ex:
         print(ex)

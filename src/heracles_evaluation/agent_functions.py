@@ -5,6 +5,9 @@ from plum import dispatch
 
 from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from heracles_evaluation.prompt import Prompt
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def call_custom_tool_from_string(tools, tool_string):
@@ -21,12 +24,11 @@ def generate_prompt_for_agent(prompt: Prompt, agent: object):
 
 def extract_tag(tag, string):
     matches = re.findall(f"<{tag}>([\s\S]*?)<\/{tag}>", string, re.MULTILINE)
-    if len(matches) > 1:
-        # TODO: eventually fail more gracefully?
-        raise Exception("Found multiple tags for {tag}!")
     if len(matches) == 0:
         return None
-    return matches[0]
+    if len(matches) > 1:
+        logger.warning(f"Found multiple {tag} tags in string: {string}")
+    return matches[-1]
 
 
 def extract_answer_tag(string):

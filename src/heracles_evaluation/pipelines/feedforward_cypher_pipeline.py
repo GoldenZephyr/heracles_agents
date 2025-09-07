@@ -1,10 +1,6 @@
 import copy
 import logging
 
-from heracles_evaluation.pipelines.comparisons import evaluate_answer
-from heracles_evaluation.pipelines.db_utils import query_db
-from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
-
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
     PipelinePhase,
@@ -19,6 +15,9 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
+from heracles_evaluation.pipelines.comparisons import evaluate_answer
+from heracles_evaluation.pipelines.db_utils import query_db
+from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -94,7 +93,9 @@ def feedforward_cypher(exp):
         sequences = [cypher_generation_sequence, refinement_sequence]
 
         analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_format)
-        aq = AnalyzedQuestion(question=question, answer=answer, sequences=sequences, analysis=analysis)
+        aq = AnalyzedQuestion(
+            question=question, answer=answer, sequences=sequences, analysis=analysis
+        )
         analyzed_questions.append(aq)
 
     aqs = AnalyzedQuestions(analyzed_questions=analyzed_questions)

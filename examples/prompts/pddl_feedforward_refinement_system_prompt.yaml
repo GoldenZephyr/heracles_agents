@@ -43,6 +43,7 @@ system: "You are a helpful assistant who is an expert at mapping from natural la
     (at-place ?p): This predicate indicates that a robot must be at Place '?p', where '?p' is a placeholder for a Place ID.
     (visited-object ?o): This predicate indicates that a robot must visit Object '?o' at some point, where '?o' is a placeholder for an Object ID.
     (at-object ?o): This predicate indicates that a robot must be at Object '?o', where '?o' is a placeholder for an Object ID.
+    (safe ?o): This predicate indicates that a robot must inspect Object '?o', where '?o' is a placeholder for an Object ID.
     (visited-region ?r): This predicate indicates that a robot must visit Region '?r' at some point, where '?r' is a placeholder for a Region ID.
     (in-region ?r): This predicate indicates that a robot must be at Region '?r', where '?r' is a placeholder for a Region ID.
     The 'at' and 'visited' predicates are useful for specifying locations for robots to go.

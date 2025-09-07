@@ -1,8 +1,8 @@
 from sldp.hand_parser import parse_sldp  # NOQA
 from sldp.lark_parser import lark_parse_sldp  # NOQA
 
-sldp_parser_impl = parse_sldp
-# sldp_parser_impl = lark_parse_sldp
+# sldp_parser_impl = parse_sldp
+sldp_parser_impl = lark_parse_sldp
 
 
 def get_sldp_type(s: str):

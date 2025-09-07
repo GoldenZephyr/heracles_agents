@@ -1,0 +1,160 @@
+configurations:
+  in_context_gpt-4.1-mini_pddl_westpoint:
+    dsg_interface:
+      dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
+      dsg_interface_type: in_context
+    phases:
+      main:
+        agent_info:
+          max_iterations: 1
+          prompt_settings:
+            base_prompt:
+              answer_formatting_guidance: null
+              answer_semantic_guidance: null
+              in_context_examples:
+              - assistant: (visited-object O1)
+                system: null
+                user: Go to object 1.
+              - assistant: (visited-object O1)
+                system: null
+                user: Move to o1.
+              - assistant: (visited-place P100)
+                system: null
+                user: Head to place 100.
+              - assistant: (visited-place R21)
+                system: null
+                user: Head to region 21.
+              - assistant: (and (visited-object O2) (visited-object O5))
+                system: null
+                user: Drive over to the door and visit the boat.
+              - assistant: (or (visited-object O2) (visited-object O5))
+                system: null
+                user: Walk over to the door or end up by the boat.
+              - assistant: (and (visited-object O2) (visited-object O5))
+                system: null
+                user: Head over to the door and move to the boat.
+              - assistant: (visited-object O4)
+                system: null
+                user: Could you navigate to the vehicle on the dock?
+              - assistant: (visited-object O1)
+                system: null
+                user: Head to the rightmost vehicle.
+              - assistant: (visited-object O4)
+                system: null
+                user: Move to the vehicle on the left.
+              - assistant: (and (visited-place R0) (visited-place R1))
+                system: null
+                user: I need you to go to the parking lot and the dock.
+              in_context_examples_preamble: 'Here are some examples of mapping from
+                natural language instructions to PDDL goals paired with robot IDs.
+                Each example uses the 3D scene graph below. Note that this 3D scene
+                graph is just for these examples and you should NOT use this when
+                answering the new instruction. <Example 3D Scene Graph> Objects: -
+                (id=O0, type=tree, pos=(-3.14,1.132), parent_region=R0) - (id=O1,
+                type=vehicle, pos=(3.346,3.531), parent_region=R0) - (id=O2, type=door,
+                pos=(3.335,3.482), parent_region=R0) - (id=O3, type=tree, pos=(4.475,-4.72),
+                parent_region=R2) - (id=O4, type=vehicle, pos=(-2.51,6.63), parent_region=R1)
+                - (id=O5, type=boat, pos=(1.34,3.28), parent_region=R1) - (id=O6,
+                type=seating, pos=(1.37,3.03), parent_region=R1) Regions: - (id=R0,
+                type=parking_lot) - (id=R1, type=dock) - (id=R2, type=courtyard) </Example
+                3D Scene Graph> '
+              novel_instruction: null
+              novel_instruction_preamble: Here is a new 3D Scene graph and a new instruction
+                for you to translate.
+              novel_instruction_template: '{dsg_description}\n Question to answer:
+                {question}'
+              system: 'You are a helpful assistant who is an expert at assigning robots
+                PDDL planning goals based on natural language commands grounded in
+                3D scene graphs. You have access to a database representing a 3D scene
+                graph, which stores spatial information that robot can use to understand
+                the world. Given a command, your task is to formulate a PDDL goal
+                for a robot. Below are descriptions of a description of 3D scene graphs
+                (delimited by XML tags: <Scene Graph Description> description of 3D
+                Scene Graphs </Scene Graph Description>), and the PDDL domain predicates
+                (delimited by XML tags: <PDDL Domain> description of the domain </PDDL
+                Domain>).
+
+                <Scene Graph Description> A 3D scene graph is a hierarchical graph
+                consisting of 3 layers that each contain nodes: the 2D Place layer,
+                the Object layer, and the Region layer. The entities of the graph
+                can be used as arguments in the PDDL goal predicates, which is described
+                below. 2D Place Layer: The 2D Place layer contains Places that are
+                reachable locations in the world. Each Place node has a unique ID.
+                Object Layer: The Object layer contains Objects that exist in the
+                world. Each Object has a unique ID (id), a semantic class (type),
+                an x,y position (pos), and a parent Region (parent_region). The parent
+                Region indicates which Region the Object belongs to. Each Object will
+                be represented in the form: (id, type, pose, parent_region). Region
+                Layer: The Region Layer contains Regions that exist in the world.
+                Each Region has a unique ID and a semantic class. Each Region will
+                be represented in the form: (id, type). </Scene Graph Description>
+
+                <PDDL Domain> The PDDL domain consists of the following predicates
+                described below. (visited-place ?p): This predicate indicates that
+                a robot must visit Place ''?p'' at some point, where ''?p'' is a placeholder
+                for a Place ID. (at-place ?p): This predicate indicates that a robot
+                must be at Place ''?p'', where ''?p'' is a placeholder for a Place
+                ID. (visited-object ?o): This predicate indicates that a robot must
+                visit Object ''?o'' at some point, where ''?o'' is a placeholder for
+                an Object ID. (at-object ?o): This predicate indicates that a robot
+                must be at Object ''?o'', where ''?o'' is a placeholder for an Object
+                ID. (visited-region ?r): This predicate indicates that a robot must
+                visit Region ''?r'' at some point, where ''?r'' is a placeholder for
+                a Region ID. (in-region ?r): This predicate indicates that a robot
+                must be at Region ''?r'', where ''?r'' is a placeholder for a Region
+                ID. The ''at'' and ''visited'' predicates are useful for specifying
+                locations for robots to go.
+
+                (holding ?o): This predicates indicates the a robot must be holding
+                an Object ''?o'', where ''?o'' is a placeholder for an Object ID.
+                The ''holding'' predicate is useful for specifying that a robot should
+                pick up an object.
+
+                (object-in-place ?o ?p): This predicate indicates that an Object ''?o''
+                must be located inside a Place ''?p'', where ''?o'' is a placeholder
+                for an Object ID and ''?p'' is a placeholder for a Place ID. The ''object-in-place''
+                predicate is useful for specifying that a robot should place an object
+                somewhere. If the robot should move an object from one place to another,
+                you should use the ''object-in-place'' predicate for the goal instead
+                of the ''holding'' predicate.
+
+                You can compose PDDL goal predicates into more complex goals using
+                the following operators: not: the ''not'' operator negates the truth
+                value of the predicate. For example ''(not (visited-place r1))'' means
+                Region ''r1'' should not be visited. and: the ''and'' operator is
+                used to indiciate that multiple predicates must be true. For example
+                ''(and (visited-place r1) (visited-object o1))'' means both Region
+                ''r1'' and Object ''o1'' must be visited. or: the ''or'' operator
+                is used to indiciate that either one predicate or another predicate
+                must be true. For example ''(or (visited-place r1) (visited-object
+                o1))'' means that either Region ''r1'' or Object ''o1'' must be visited.
+                </PDDL Domain>
+
+                Given a 3D Scene Graph and an instruction, you must generate PDDL
+                goal predicates associated with the instruction and assign those goals
+                to specific robots. You MUST format your final answer using the defined
+                response format {response_format}. '
+              tool_description: null
+            output_type: PDDL
+            sldp_answer_type_hint: false
+          tool_interface: openai
+          tools: []
+        client:
+          client_type: openai
+          timeout: 120
+        model_info:
+          model: gpt-4.1-mini
+          seed: null
+          temperature: 0.2
+    pipeline: feedforward_in_context
+    questions:
+    - correctness_comparator:
+        comparison_type: PDDL
+        relation: equal
+      name: Visit Objects Near Point
+      question: Visit all objects within 10 meters of x:-100, y:16, z:0?
+      solution: (and (visited-object O370) (visited-object O371) (visited-object O372)
+        (visited-object O373))
+metadata:
+  config_name: in_context_gpt-4.1-mini_pddl_westpoint
+  dsg_tag: westpoint

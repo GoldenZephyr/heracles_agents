@@ -1,21 +1,23 @@
 import logging
 import os
+import shutil
 
-import agentic_pipeline  # NOQA
-import feedforward_cypher_pipeline  # NOQA
-import feedforward_in_context  # NOQA
-import test_task  # NOQA
 import yaml
 
-import heracles_evaluation.tools.canary_favog_tool  # NOQA
-import heracles_evaluation.tools.cypher_query_tool  # NOQA
-import heracles_evaluation.tools.sldp_answer_tool  # NOQA
 from heracles_evaluation.experiment_definition import ExperimentDescription
 from heracles_evaluation.llm_interface import AnalyzedExperiment
 from heracles_evaluation.summarize_results import display_experiment_results
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, force=True)
+
+
+def load_results(fn):
+    with open(fn, "r") as fo:
+        yml = yaml.safe_load(fo)
+
+    ae = AnalyzedExperiment(**yml)
+    return ae
 
 
 def load_experiment(fn):
@@ -26,8 +28,11 @@ def load_experiment(fn):
     return experiment
 
 
-table_dir = "tables/table1/configurations"
-output_dir = "tables/table1/output"
+table_to_run = "table1"
+
+tables_base = "tables"
+table_dir = f"{tables_base}/{table_to_run}/configurations"
+output_dir = f"{tables_base}/{table_to_run}/output"
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)
 
@@ -39,11 +44,21 @@ for fn in table_element_fns:
     experiment = load_experiment(element_path)
     logger.debug(f"Loaded experiment: {experiment}")
 
+    conf_name = experiment.metadata["config_name"]
+    output_filepath = f"{output_dir}/{conf_name}_results.yaml"
+
     if experiment.metadata.get("skip", False):
         print("  Skipping ", fn)
         ae = AnalyzedExperiment(
             experiment_configurations={}, metadata=experiment.metadata
         )
+    elif "prerun_reference" in experiment.metadata:
+        parent_table = experiment.metadata["prerun_reference"]["table"]
+        parent_fn = experiment.metadata["prerun_reference"]["results_fn"]
+        parent_filepath = f"{tables_base}/{parent_table}/output/{parent_fn}"
+        logger.info(f"Copying {parent_filepath} --> {output_filepath}")
+        shutil.copyfile(parent_filepath, output_filepath)
+        continue
     else:
         print("  Processing ", fn)
         results = {}
@@ -56,7 +71,6 @@ for fn in table_element_fns:
 
         ae = AnalyzedExperiment(experiment_configurations=results)
 
-    conf_name = experiment.metadata["config_name"]
     ae.metadata["config_name"] = conf_name
-    with open(f"{output_dir}/{conf_name}_results.yaml", "w") as fo:
+    with open(output_filepath, "w") as fo:
         fo.write(yaml.dump(ae.model_dump()))

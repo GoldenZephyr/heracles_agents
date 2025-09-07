@@ -1,9 +1,7 @@
 import os
 
-import agentic_pipeline  # NOQA
-import feedforward_cypher_pipeline  # NOQA
-import feedforward_in_context  # NOQA
 import yaml
+from table_utils import get_method_to_pipeline
 
 from heracles_evaluation.dsg_interfaces import (
     HeraclesDsgInterface,
@@ -14,7 +12,6 @@ from heracles_evaluation.dsg_interfaces import (
 from heracles_evaluation.experiment_definition import (
     ExperimentConfiguration,
     ExperimentDescription,
-    PipelineRegistry,
 )
 from heracles_evaluation.llm_agent import AgentInfo, LlmAgent, ModelInfo
 from heracles_evaluation.prompt import PromptSettings
@@ -37,51 +34,6 @@ from heracles_evaluation.provider_integrations.openai.openai_client import (
 # +---------------------+-------+-------+-------+-------+-------+-------+
 # GPT-4.1
 
-prompt_base = "prompts"
-output_base = "tables/table1/configurations"
-if not os.path.exists(output_base):
-    print(f"{output_base} does not exist, creating it!")
-    os.makedirs(output_base)
-
-dsg_paths = {}
-dsg_paths["b45"] = (
-    "$HERACLES_EVALUATION_PATH/examples/scene_graphs/2025-09-04-heracles-eval-2_dsg_with_mesh.json"
-)
-dsg_paths["westpoint"] = (
-    "$HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json"
-)
-
-# dsg_tags = ["small", "westpoint"]
-dsg_tags = ["westpoint", "b45"]
-
-methods = [
-    "cypher",
-    "agentic_cypher",
-    "in_context",
-    "agentic_in_context",
-    "python",
-    "agentic_python",
-]
-tasks = ["qa", "pddl", "update_qa"]
-
-
-pipelines = [
-    "agentic",
-    "feedforward_cypher",
-    "feedforward_in_context",
-    "feedforward_python",
-]
-
-pr = PipelineRegistry.pipelines
-method_to_pipeline = {
-    "cypher": pr["feedforward_cypher"],
-    "agentic_cypher": pr["agentic"],
-    "in_context": pr["feedforward_in_context"],
-    "agentic_in_context": None,  # pr["agentic_in_context"]
-    "python": None,  # pr["feedforward_python"],
-    "agentic_python": None,  # pr["agentic"],
-}
-
 
 def get_cypher_tool():
     return {
@@ -96,6 +48,8 @@ def get_cypher_tool():
 
 
 def get_pipeline(method):
+    # pr = PipelineRegistry.pipelines
+    method_to_pipeline = get_method_to_pipeline()
     return method_to_pipeline[method]
 
 
@@ -113,9 +67,7 @@ def get_interface_for_method(m, dsg_tag):
         case "python":
             return PythonDsgInterface(dsg_interface_type="python")
         case "in_context":
-            return InContextDsgInterfaceConfig(
-                dsg_interface_type="in_context", dsg_filepath=dsg_paths[dsg_tag]
-            )
+            return in_context_dsg_interface_config[dsg_tag]
         case _:
             return NoDsgInterface(dsg_interface_type="none")
 
@@ -297,9 +249,10 @@ def get_agent_infos(method, task, tool_interface):
     return get_agent_info_builder(method, task)(tool_interface)
 
 
-def get_phases(method, task):
+def get_phases(method, task, model="gpt-5-nano"):
+    """NOTE: this function is hard-coded to use openai"""
     client = OpenaiClientConfig(client_type="openai", timeout=120)
-    model_info = ModelInfo(model="gpt-5-nano")
+    model_info = ModelInfo(model=model, temperature=0.2)
 
     agent_infos = get_agent_infos(method, task, "openai")
 
@@ -311,44 +264,91 @@ def get_phases(method, task):
     return phases
 
 
-for m in methods:
-    for t in tasks:
-        for tag in dsg_tags:
-            config_name = f"{m}_{t}_{tag}"
-            print("config_name: ", config_name)
-            configurations = {}
-            metadata = {"config_name": config_name}
-            questions_fn = get_questions_fn(t, tag)
-            if os.path.exists(os.path.expandvars(questions_fn)):
-                try:
-                    config = ExperimentConfiguration(
-                        pipeline=get_pipeline(m),
-                        phases=get_phases(m, t),
-                        dsg_interface=get_interface_for_method(m, tag),
-                        questions=questions_fn,
-                    )
-                    print("config: ", config)
-                    metadata["dsg_tag"] = tag
-                    configurations[config_name] = config
-                except NotImplementedError as ex:
-                    print(ex)
+model = "gpt-4.1"
+# model = "gpt-5-nano"
+prompt_base = "prompts"
+output_base = "tables/table1/configurations"
+if not os.path.exists(output_base):
+    print(f"{output_base} does not exist, creating it!")
+    os.makedirs(output_base)
+
+dsg_paths = {}
+dsg_paths["b45"] = (
+    "$HERACLES_EVALUATION_PATH/examples/scene_graphs/2025-09-04-heracles-eval-2_dsg_with_mesh.json"
+)
+dsg_paths["westpoint"] = (
+    "$HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json"
+)
+
+# dsg_tags = ["small", "westpoint"]
+dsg_tags = ["westpoint", "b45"]
+
+
+in_context_dsg_interface_config = {}
+
+in_context_dsg_interface_config["b45"] = InContextDsgInterfaceConfig(
+    dsg_interface_type="in_context", dsg_filepath=dsg_paths["b45"]
+)
+in_context_dsg_interface_config["westpoint"] = InContextDsgInterfaceConfig(
+    dsg_interface_type="in_context", dsg_filepath=dsg_paths["westpoint"]
+)
+
+methods = [
+    "cypher",
+    "agentic_cypher",
+    "in_context",
+    "agentic_in_context",
+    "python",
+    "agentic_python",
+]
+tasks = ["qa", "pddl", "update_qa"]
+
+pipelines = [
+    "agentic",
+    "feedforward_cypher",
+    "feedforward_in_context",
+    "feedforward_python",
+]
+
+if __name__ == "__main__":
+    for m in methods:
+        for t in tasks:
+            for tag in dsg_tags:
+                config_name = f"{m}_{model}_{t}_{tag}"
+                print("config_name: ", config_name)
+                configurations = {}
+                metadata = {"config_name": config_name}
+                questions_fn = get_questions_fn(t, tag)
+                if os.path.exists(os.path.expandvars(questions_fn)):
+                    try:
+                        config = ExperimentConfiguration(
+                            pipeline=get_pipeline(m),
+                            phases=get_phases(m, t, model=model),
+                            dsg_interface=get_interface_for_method(m, tag),
+                            questions=questions_fn,
+                        )
+                        print("config: ", config)
+                        metadata["dsg_tag"] = tag
+                        configurations[config_name] = config
+                    except NotImplementedError as ex:
+                        print(ex)
+                        metadata["skip"] = True
+                        metadata["going_to_implement"] = True
+
+                    except FileNotFoundError as ex:
+                        print(ex)
+                        metadata["skip"] = True
+                        metadata["going_to_implement"] = True
+
+                else:
+                    print(f"No questions for configuration ({questions_fn}). Skipping")
                     metadata["skip"] = True
                     metadata["going_to_implement"] = True
 
-                except FileNotFoundError as ex:
-                    print(ex)
-                    metadata["skip"] = True
-                    metadata["going_to_implement"] = True
+                exp = ExperimentDescription(
+                    metadata=metadata,
+                    configurations=configurations,
+                )
 
-            else:
-                print(f"No questions for configuration ({questions_fn}). Skipping")
-                metadata["skip"] = True
-                metadata["going_to_implement"] = True
-
-            exp = ExperimentDescription(
-                metadata=metadata,
-                configurations=configurations,
-            )
-
-            with open(f"{output_base}/{config_name}.yaml", "w") as fo:
-                fo.write(yaml.dump(exp.model_dump()))
+                with open(f"{output_base}/{config_name}.yaml", "w") as fo:
+                    fo.write(yaml.dump(exp.model_dump()))

@@ -1,9 +1,6 @@
 import copy
 import logging
 
-from heracles_evaluation.pipelines.comparisons import evaluate_answer
-from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
-
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
     PipelinePhase,
@@ -18,6 +15,8 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
+from heracles_evaluation.pipelines.comparisons import evaluate_answer
+from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
