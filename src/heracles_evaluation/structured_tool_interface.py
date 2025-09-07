@@ -22,6 +22,11 @@ class StructuredToolDescription(BaseModel):
             "Structured tool calling not supported for anthropic tools"
         )
 
+    def to_ollama(self):
+        raise NotImplementedError(
+            "Structured tool calling not supported for ollama tools"
+        )
+
     def to_custom(self):
         raise NotImplementedError(
             "Structured tool calling not supported for custom tools"
