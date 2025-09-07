@@ -48,7 +48,7 @@ class EvalQuestion(BaseModel):
     name: str
     question: str
     solution: str
-    correctness_comparator: ComparisonType = Field(descriminator="comparison_type")
+    correctness_comparator: ComparisonType = Field(discriminator="comparison_type")
 
 
 class AgentResponse(BaseModel):

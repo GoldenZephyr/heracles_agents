@@ -5,7 +5,7 @@ from pydantic import BaseModel, ValidationError
 from pydantic.functional_validators import WrapValidator
 
 
-def resolve_descriminated_union(union_type, data: dict):
+def resolve_discriminated_union(union_type, data: dict):
     """We need a way to understand which member of a union_type is compatible with `data`.
     We need our resolution to match Pydantic's discriminated union resolution. They
     don't expose a function for this, so we just manually try to instantiate each member
@@ -36,7 +36,7 @@ def discriminated_union_dispatch(union_field):
                 )
 
             if type(kwargs[union_field]) is dict:
-                resolved_type = resolve_descriminated_union(
+                resolved_type = resolve_discriminated_union(
                     K.model_fields[union_field].annotation, kwargs[union_field]
                 )
             else:
