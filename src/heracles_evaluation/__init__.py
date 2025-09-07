@@ -7,6 +7,8 @@ import heracles_evaluation.pipelines.test_task
 import heracles_evaluation.provider_integrations.anthropic.anthropic_agent_integration
 import heracles_evaluation.provider_integrations.ollama.ollama_agent_integration
 import heracles_evaluation.provider_integrations.openai.openai_agent_integration
+import heracles_evaluation.tools.answer_tool
+import heracles_evaluation.tools.calculator_tool
 import heracles_evaluation.tools.canary_favog_tool
 import heracles_evaluation.tools.cypher_query_tool
 import heracles_evaluation.tools.sldp_answer_tool
