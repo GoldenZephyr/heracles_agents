@@ -1,6 +1,7 @@
 import json
 from typing import Callable, overload
 
+import tiktoken
 from openai.types.responses.response import Response
 from openai.types.responses.response_custom_tool_call import ResponseCustomToolCall
 from openai.types.responses.response_function_tool_call import ResponseFunctionToolCall
@@ -13,7 +14,6 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
-import tiktoken
 
 
 @dispatch

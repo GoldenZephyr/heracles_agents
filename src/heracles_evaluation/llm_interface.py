@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field
 
 from heracles_evaluation.agent_functions import (
     call_function,
+    count_message_tokens,
+    count_tool_description_tokens,
     extract_answer,
     extract_answer_tag,
     generate_prompt_for_agent,
@@ -19,8 +21,6 @@ from heracles_evaluation.agent_functions import (
     is_function_call,
     iterate_messages,
     make_tool_response,
-    count_message_tokens,
-    count_tool_description_tokens,
 )
 from heracles_evaluation.llm_agent import LlmAgent
 

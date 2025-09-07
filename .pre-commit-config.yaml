@@ -1,5 +1,5 @@
 ---
-exclude: .*\.tsv|\.clang-format|questions/|prompts/|experiments/|yaml_pipeline/|legacy/
+exclude: .*\.tsv|\.clang-format|questions/|prompts/|experiments/|yaml_pipeline/|legacy/|examples/table_generation/tables
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
