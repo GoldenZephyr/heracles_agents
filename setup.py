@@ -11,6 +11,20 @@ setup(
     packages=find_packages("src"),
     package_data={"": ["*.yaml", "*.pddl", "*.lark"]},
     install_requires=[
-        "openai",
+        "pydantic-settings",
+        "plum-dispatch",
+        "lark",
+        "spark-dsg @ git+https://github.com/MIT-SPARK/Spark-DSG.git",
+        "heracles @ git+https://github.com/GoldenZephyr/heracles.git",
     ],
+    extras_require={
+        "openai": ["openai"],
+        "anthropic": ["anthropic"],
+        "ollama": ["ollama"],
+        "all": [
+            "openai",
+            "anthropic",
+            "ollama",
+        ],
+    },
 )
