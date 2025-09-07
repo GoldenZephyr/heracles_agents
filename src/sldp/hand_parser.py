@@ -22,6 +22,12 @@ def parse_collection(open_delim, close_delim, sep, name, toks):
 
     toks = toks[1:]
     data = (name,)
+
+    # Handle empty
+    if len(toks) > 0 and toks[0] == close_delim:
+        toks = toks[1:]
+        return data, toks
+
     while len(toks) > 0:
         next_datum, toks = parse(toks)
         data += (next_datum,)
@@ -60,6 +66,12 @@ def parse_dict(toks):
     data = ("dict",)
 
     toks = toks[1:]
+
+    # Handle empty
+    if len(toks) > 0 and toks[0] == "}":
+        toks = toks[1:]
+        return data, toks
+
     while len(toks) > 0:
         next_key, toks = parse(toks)
         if toks[0] != ":":
