@@ -101,12 +101,12 @@ def display_table(title, row_data, column_data_map={}):
     console.print(table)
 
 
-def display_experiment_results(aqs):
+def display_experiment_results(aqs, title="Title"):
     column_data_map = {
         "Name": "name",
         "Question": "question",
     }
-    display_analyzed_question_table("Test Table", aqs, column_data_map)
+    display_analyzed_question_table(title, aqs, column_data_map)
 
     summary_column_data_map = {
         "# Questions": "questions",
