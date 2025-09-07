@@ -1,6 +1,0 @@
-configurations: {}
-metadata:
-  config_name: agentic_cypher_gpt-4.1_update_qa_b45
-  prerun_reference:
-    results_fn: agentic_cypher_gpt-4.1_update_qa_b45_results.yaml
-    table: table1

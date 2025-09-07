@@ -65,6 +65,30 @@ we would want to understand:
 1. In which cases do the DNF forms differ while representing the same truth table? For example, A is equivalent to (A AND B) OR (A AND nB)
 If we remove all trivial cases like this, is there a canonical DNF?
 
+# Generating data for tables
+
+In `examples/table_generation` there are scripts for running experiments and
+generating tables for the paper.  The scripts `table1.py`, `table2.py`, etc.
+will generate a description of what model pipelines need to be run for each
+element in the corresponding table. `table_runner.py` takes a table name and
+runs all elements of that table. `table_compiler.py` takes a table name that
+has already been run and tallies the results and generates some latex macros
+that we use to populate the tables in the paper.
+
+Example usage:
+```bash
+./table1.py
+./table_runner.py table1 # A long and expensive command ...
+./table_compiler.py table1
+cat tables/table1/latex/table1.tex
+
+# \newcommand{\cypherXqaXsmall}{-}
+# \newcommand{\agenticcypherXqaXsmall}{-}
+# \newcommand{\cypherXqaXlarge}{0.84}
+# \newcommand{\agenticcypherXqaXlarge}{0.80}
+# ...
+```
+
 # TODO:
 
 * LLM sometimes generates Cypher queries with extra enclosing quotes. Stop this by either prompting, or detect this failure mode in the tool call
@@ -83,6 +107,6 @@ For adding PDDL:
 - [x] implement equality checking for PDDL (goal) states
 - [x] add feedforward pipeline
 - [x] update feedforward prompt
-- [ ] update agentic pipeline
-- [ ] update agentic prompt
+- [x] update agentic pipeline
+- [x] update agentic prompt
 - [ ] constrained generation

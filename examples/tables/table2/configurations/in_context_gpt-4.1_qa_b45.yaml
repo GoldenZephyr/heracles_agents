@@ -1,6 +1,0 @@
-configurations: {}
-metadata:
-  config_name: in_context_gpt-4.1_qa_b45
-  prerun_reference:
-    results_fn: in_context_gpt-4.1_qa_b45_results.yaml
-    table: table1
