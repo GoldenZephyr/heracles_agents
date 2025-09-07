@@ -26,7 +26,7 @@ def generate_prompt_for_agent(prompt: Prompt, agent: object):
 
 
 def extract_tag(tag, string):
-    matches = re.findall(f"<{tag}>([\s\S]*?)<\/{tag}>", string, re.MULTILINE)
+    matches = re.findall(rf"<{tag}>([\s\S]*?)<\/{tag}>", string, re.MULTILINE)
     if len(matches) == 0:
         return None
     if len(matches) > 1:
