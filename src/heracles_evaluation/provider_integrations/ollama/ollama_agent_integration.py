@@ -1,5 +1,6 @@
+# ruff: noqa: F811
 import copy
-from typing import Callable, overload
+from typing import Callable
 
 from ollama import ChatResponse, Message
 from plum import dispatch
@@ -37,7 +38,6 @@ def iterate_messages(agent: LlmAgent[OllamaClientConfig], response: ChatResponse
     yield response.message
 
 
-@overload
 @dispatch
 def is_function_call(agent: LlmAgent[OllamaClientConfig], tool_call: Message.ToolCall):
     return True
@@ -48,7 +48,6 @@ def is_function_call(agent: LlmAgent[OllamaClientConfig], tool_call):
     return False
 
 
-@overload
 @dispatch
 def call_function(agent: LlmAgent[OllamaClientConfig], tool_call: Message.ToolCall):
     available_tools = agent.agent_info.tools
@@ -63,7 +62,6 @@ def call_function(agent: LlmAgent[OllamaClientConfig], tool_call: Message):
     return call_custom_tool_from_string(available_tools, tool_string)
 
 
-@overload
 @dispatch
 def make_tool_response(
     agent: LlmAgent[OllamaClientConfig],
@@ -91,7 +89,6 @@ def generate_update_for_history(
     return response.message
 
 
-@overload
 @dispatch
 def extract_answer(
     agent: LlmAgent[OllamaClientConfig],
@@ -110,13 +107,11 @@ def extract_answer(
     return extractor(message.content)
 
 
-@overload
 @dispatch
 def get_text_body(message: Message):
     return message.content
 
 
-@overload
 @dispatch
 def get_text_body(response: ChatResponse):
     return response.message.content

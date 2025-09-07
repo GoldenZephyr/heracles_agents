@@ -1,5 +1,5 @@
+# ruff: noqa: F811
 import logging
-from typing import overload
 
 from anthropic import types as anthropic_types
 from anthropic.types.message import Message
@@ -36,7 +36,6 @@ def iterate_messages(agent: LlmAgent[AnthropicClientConfig], messages: Message):
         yield m
 
 
-@overload
 @dispatch
 def call_function(agent: LlmAgent[AnthropicClientConfig], tool_message: ToolUseBlock):
     available_tools = agent.agent_info.tools
@@ -53,7 +52,6 @@ def call_function(agent: LlmAgent[AnthropicClientConfig], tool_message: TextBloc
     return call_custom_tool_from_string(available_tools, tool_string)
 
 
-@overload
 @dispatch
 def make_tool_response(
     agent: LlmAgent[AnthropicClientConfig], tool_call_message: ToolUseBlock, result
@@ -100,7 +98,6 @@ def get_content_blocks_of_type(t, message):
     return blocks
 
 
-@overload
 @dispatch
 def get_text_body(message: Message):
     text_blocks = get_content_blocks_of_type("text", message)
@@ -109,7 +106,6 @@ def get_text_body(message: Message):
     return "\n".join(b.text for b in text_blocks)
 
 
-@overload
 @dispatch
 def get_text_body(message: ToolUseBlock):
     return f"{message.name}({message.input})"

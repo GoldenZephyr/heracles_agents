@@ -1,5 +1,6 @@
+# ruff: noqa: F811
 import json
-from typing import Callable, overload
+from typing import Callable
 
 import tiktoken
 from openai.types.responses.response import Response
@@ -77,25 +78,21 @@ def extract_answer(
     return extractor(message.content[0].text)
 
 
-@overload
 @dispatch
 def get_text_body(response: Response):
     return "\n".join([get_text_body(m) for m in response.output])
 
 
-@overload
 @dispatch
 def get_text_body(message: ResponseOutputMessage):
     return "\n".join([c.text for c in message.content])
 
 
-@overload
 @dispatch
 def get_text_body(tool_call: ResponseFunctionToolCall):
     return f"{tool_call.name}({tool_call.arguments})"
 
 
-@overload
 @dispatch
 def get_text_body(message: ResponseReasoningItem):
     if message.content is None:
