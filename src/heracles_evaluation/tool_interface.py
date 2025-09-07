@@ -12,15 +12,15 @@ def type_to_string(typ):
         case str():
             return "string"
         case float():
-            return "float"
+            return "number"
         case int():
-            return "int"
+            return "integer"
         case dict():
-            return "dict"
+            return "object"
         case set():
-            return "set"
+            return "array"
         case list():
-            return "list"
+            return "array"
 
 
 @dataclass
