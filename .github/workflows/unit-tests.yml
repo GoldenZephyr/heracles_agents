@@ -1,0 +1,72 @@
+---
+name: Unit tests
+on:
+  pull_request:
+    branches: [master]
+    paths: [src/**, setup.py, .github/workflows/unit-tests.yml]
+  push:
+    branches: [master]
+    paths: [src/**, setup.py, .github/workflows/unit-tests.yml]
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            setup.py
+      - name: Cache virtual environment
+        uses: actions/cache@v3
+        id: cache-venv
+        with:
+          path: venv
+          key: ${{ runner.os }}-python-3.12-venv-${{ hashFiles('setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-python-3.12-venv-
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+      - name: Create and activate virtual environment
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install pytest pytest-mock pytest-cov
+          pip install -e .[all]
+      - name: Activate virtual environment (cache hit)
+        if: steps.cache-venv.outputs.cache-hit == 'true'
+        run: |
+          source venv/bin/activate
+          echo "VIRTUAL_ENV=$VIRTUAL_ENV" >> $GITHUB_ENV
+          echo "$VIRTUAL_ENV/bin" >> $GITHUB_PATH
+      - name: Run all unit tests with coverage
+        run: |
+          source venv/bin/activate
+          cd src
+          python -m pytest . -v --tb=short --cov=. --cov-report=xml --cov-report=term-missing
+        env:
+        # Currently no API keys are used in tests
+          HERACLES_OPENAI_API_KEY: ''
+          HERACLES_ANTHROPIC_API_KEY: ''
+          HERACLES_NEO4J_URI: ''
+          HERACLES_NEO4J_USERNAME: ''
+          HERACLES_NEO4J_PASSWORD: ''
+      - name: Generate coverage summary
+        run: |
+          source venv/bin/activate
+          cd src
+          python -m coverage report --format=markdown > coverage_summary.md
+          echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
+          cat coverage_summary.md >> $GITHUB_STEP_SUMMARY
+      - name: Upload coverage markdown report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-markdown-report
+          path: src/coverage_summary.md

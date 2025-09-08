@@ -14,6 +14,7 @@ setup(
         "pydantic-settings",
         "plum-dispatch",
         "lark",
+        "tiktoken",
         "spark-dsg @ git+https://github.com/MIT-SPARK/Spark-DSG.git",
         "heracles @ git+https://github.com/GoldenZephyr/heracles.git",
     ],

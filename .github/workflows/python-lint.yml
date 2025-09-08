@@ -1,0 +1,35 @@
+---
+name: Python Lint
+on:
+  pull_request:
+    branches: [master]
+    paths: [src/**/*.py, examples/**/*.py, setup.py, .github/workflows/python-lint.yml, .pre-commit-config.yaml]
+  push:
+    branches: [master]
+    paths: [src/**/*.py, examples/**/*.py, setup.py, .github/workflows/python-lint.yml, .pre-commit-config.yaml]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          echo "VIRTUAL_ENV=$(pwd)/venv" >> $GITHUB_ENV
+          echo "$(pwd)/venv/bin" >> $GITHUB_PATH
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pre-commit
+          # Install project dependencies if they exist
+          if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
+          if [ -f "pyproject.toml" ]; then pip install -e .; fi
+      - name: Run pre-commit
+        run: |-
+          pre-commit run --all-files

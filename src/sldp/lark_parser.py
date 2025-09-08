@@ -20,6 +20,8 @@ class SldpTransformer(Transformer):
         return ("point", *coords)
 
     def list(self, items):
+        if items[0] is None:
+            return ("list",)
         return ("list", *items)
 
     def kv_pair(self, kv):
@@ -27,9 +29,13 @@ class SldpTransformer(Transformer):
         return ("pair", k, v)
 
     def dict(self, items):
+        if items[0] is None:
+            return ("dict",)
         return ("dict", *items)
 
     def set(self, items):
+        if items[0] is None:
+            return ("set",)
         return ("set", *items)
 
 
