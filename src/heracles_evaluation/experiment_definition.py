@@ -116,6 +116,15 @@ class ExperimentConfiguration(BaseModel):
             raise ve
         return self
 
+    @model_validator(mode="after")
+    def verify_unique_ids(self):
+        id_set = set()
+        for q in self.questions:
+            if q.uid in id_set:
+                raise ValueError(f"Duplicate uid: {q.uid}")
+            id_set.add(q.uid)
+        return self
+
     @field_serializer("pipeline")
     def serialize_pipeline(self, pipeline: PipelineDescription):
         return pipeline.name

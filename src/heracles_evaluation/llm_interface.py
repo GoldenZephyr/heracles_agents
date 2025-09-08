@@ -48,6 +48,7 @@ class EvalQuestion(BaseModel):
     name: str
     question: str
     solution: str
+    uid: str | int
     correctness_comparator: ComparisonType = Field(discriminator="comparison_type")
 
 
@@ -168,6 +169,25 @@ def needs_tool_processing(agent: LlmAgent, message):
     return is_function_call(agent, message) or is_custom_tool_call(agent, message)
 
 
+def get_summary_text(resp):
+    if isinstance(resp, dict):
+        if "role" in resp and "content" in resp:
+            return resp["role"] + ": " + resp["content"]
+        elif (
+            "type" in resp
+            and resp["type"] == "function_call_output"
+            and "output" in resp
+        ):
+            return "Function result: " + resp["output"]
+        else:
+            return str(resp)
+    elif isinstance(resp, list):
+        return "\n".join(get_summary_text(r) for r in resp)
+    elif isinstance(resp, str):
+        return resp
+    return get_text_body(resp)
+
+
 class AgentContext:
     def __init__(self, agent: LlmAgent):
         self.agent = agent
@@ -262,7 +282,9 @@ class AgentContext:
     def get_agent_responses(self):
         # TODO: parse the LLM responses into a more useful representation in "parsed_response"
         responses = [
-            AgentResponse(raw_response=str(resp), parsed_response="TODO")
+            AgentResponse(
+                raw_response=str(resp), parsed_response=get_summary_text(resp)
+            )
             for resp in self.history
         ]
         return responses
