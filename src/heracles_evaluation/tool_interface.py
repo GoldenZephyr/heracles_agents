@@ -47,6 +47,9 @@ class FunctionParameter:
     def to_anthropic(self):
         return self.to_openai_responses()
 
+    def to_ollama(self):
+        return self.to_openai_responses()
+
     def to_custom(self):
         d = [
             f"Param name: {self.name}",
@@ -140,6 +143,30 @@ class ToolDescription(BaseModel):
             "name": self.name,
             "description": self.description,
             "input_schema": parameter_descriptions,
+        }
+        return t
+
+    def to_ollama(self):
+        parameter_properties = {}
+        for p in self.parameters:
+            parameter_properties |= p.to_ollama()
+
+        required = [p.name for p in self.parameters if p.required]
+
+        parameter_descriptions = {
+            "type": "object",
+            "properties": parameter_properties,
+            "required": required,
+            "additionalProperties": False,
+        }
+
+        t = {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": parameter_descriptions,
+            },
         }
         return t
 

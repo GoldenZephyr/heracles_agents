@@ -157,7 +157,9 @@ def is_answer_tool_call(agent: LlmAgent, message):
         "SLDP_TOOL",
         "PDDL_TOOL",
     ] and isinstance(message, ResponseCustomToolCall):
-        return False
+        return True
+
+    return False
 
 
 def needs_tool_processing(agent: LlmAgent, message):

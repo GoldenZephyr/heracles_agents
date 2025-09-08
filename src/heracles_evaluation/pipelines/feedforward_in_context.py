@@ -75,12 +75,7 @@ def scene_graph_to_prompt(scene_graph):
     for region_node in scene_graph.get_layer(spark_dsg.DsgLayers.ROOMS).nodes:
         regions_prompt += region_to_prompt(region_node, scene_graph)
     # Construct the prompt
-    scene_graph_prompt = (
-        f"<Scene Graph>"
-        f"\nObjects: {objects_prompt}"
-        f"\nRegions: {regions_prompt}"
-        f"</Scene Graph>"
-    )
+    scene_graph_prompt = f"<Scene Graph>\nObjects: {objects_prompt}\nRegions: {regions_prompt}</Scene Graph>"
     return scene_graph_prompt
 
 

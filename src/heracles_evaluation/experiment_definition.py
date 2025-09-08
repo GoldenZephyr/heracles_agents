@@ -93,7 +93,7 @@ class ExperimentConfiguration(BaseModel):
                 )
                 raise
             questions.append(question)
-        logger.debug(f"Loaded {len(questions)} quetions")
+        logger.debug(f"Loaded {len(questions)} questions")
         return questions
 
     @field_validator("pipeline", mode="before")
