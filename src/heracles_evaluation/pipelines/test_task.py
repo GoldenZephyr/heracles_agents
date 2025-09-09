@@ -59,7 +59,13 @@ def canary_pipeline(exp):
         agent_sequence = AgentSequence(
             description="tool-calling-agent", responses=cxt.get_agent_responses()
         )
-        analysis = QuestionAnalysis(correct=correct, valid_answer_format=valid_sldp)
+        analysis = QuestionAnalysis(
+            correct=correct,
+            valid_answer_format=valid_sldp,
+            input_tokens=cxt.total_input_tokens,
+            output_tokens=cxt.total_output_tokens,
+        )
+
         aq = AnalyzedQuestion(
             question=question, sequences=[agent_sequence], analysis=analysis
         )
