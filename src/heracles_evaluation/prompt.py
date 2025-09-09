@@ -145,10 +145,6 @@ class Prompt(BaseModel):
         prompt = [{"role": "user", "content": [{"text": self.system}]}]
 
         if self.tool_description:
-            print("Adding bedrock tool description: ")
-            print("\n")
-            print(self.tool_description)
-            print("\n")
             prompt.append(
                 {"role": "user", "content": [{"text": self.tool_description}]}
             )

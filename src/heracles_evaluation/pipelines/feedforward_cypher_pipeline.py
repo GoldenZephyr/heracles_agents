@@ -46,8 +46,6 @@ def generate_prompt(
     if formatting is not None:
         prompt.answer_formatting_guidance = formatting
 
-    print("prompt: ")
-    print(prompt)
     return prompt
 
 

@@ -2,6 +2,7 @@ import logging
 import time
 from typing import Literal, Optional, Union
 
+import boto3
 import openai
 from openai.types.responses.response_custom_tool_call import (
     ResponseCustomToolCall,
@@ -23,8 +24,6 @@ from heracles_evaluation.agent_functions import (
     make_tool_response,
 )
 from heracles_evaluation.llm_agent import LlmAgent
-
-import boto3
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +177,6 @@ def get_summary_text(resp):
     # TODO: Good example of why we need to parse all client responses into types.....
     if isinstance(resp, dict):
         if "role" in resp and "content" in resp:
-            print(resp)
             if isinstance(resp["content"], list):
                 # bedrock
                 return (
@@ -211,6 +209,8 @@ class AgentContext:
 
     def initialize_agent(self, prompt):
         self.history = generate_prompt_for_agent(prompt, self.agent)
+
+        logger.info(f"Agent inintialized with: \n{get_summary_text(self.history)}")
 
     def call_llm(self, history):
         model_info = self.agent.model_info
@@ -262,7 +262,7 @@ class AgentContext:
             self.total_output_tokens += output_tokens
             message_text = get_text_body(message)
             if message_text is not None:
-                logger.info(f"Processing message ({type(message)}: {message_text}")
+                logger.debug(f"Processing message ({type(message)}: {message_text}")
             if not needs_tool_processing(self.agent, message):
                 continue
 
@@ -276,6 +276,7 @@ class AgentContext:
         return executed_tool_calls
 
     def update_history(self, response):
+        logger.info(f"History update: \n{get_summary_text(response)}")
         update = generate_update_for_history(self.agent, response)
         self.history += update
 

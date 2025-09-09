@@ -4,12 +4,12 @@ import re
 from typing import Any
 
 import tiktoken
+from lark.exceptions import LarkError
 from plum import dispatch
 
 from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
-from lark.exceptions import LarkError
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,8 @@ def extract_tag(tag, string):
     if len(matches) == 0:
         return None
     if len(matches) > 1:
-        logger.warning(f"Found multiple {tag} tags in string: {string}")
+        logger.warning(f"Found multiple {tag} tags in string")
+        logger.debug(f"String with multiple tags: {string}")
     return matches[-1]
 
 
@@ -141,7 +142,7 @@ def count_message_tokens(agent: LlmAgent, message):
 def count_tool_description_tokens(agent: LlmAgent, explicit_tools: dict):
     model_name = agent.model_info.model
     enc = tiktoken.encoding_for_model(model_name)
-    print(
+    logger.debug(
         "Using this string representation for computing tool tokens: ",
         str(explicit_tools),
     )

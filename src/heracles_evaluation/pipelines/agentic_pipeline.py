@@ -45,8 +45,6 @@ def generate_prompt(
         agent_config, question
     )
 
-    print("prompt: ")
-    print(prompt)
     return prompt
 
 
