@@ -27,7 +27,7 @@ setup(
             "openai",
             "anthropic",
             "ollama",
-            "bedrock",
+            "boto3",
         ],
     },
 )
