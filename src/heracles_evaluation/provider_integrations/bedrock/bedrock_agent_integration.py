@@ -1,33 +1,29 @@
 # ruff: noqa: F811, F401
+import copy
 import json
 from typing import Callable
 
 import tiktoken
-
 from plum import dispatch
-
-from heracles_evaluation.llm_agent import LlmAgent
-from heracles_evaluation.prompt import Prompt
-from heracles_evaluation.provider_integrations.bedrock.bedrock_client import (
-    BedrockClientConfig,
-)
-import copy
 
 from heracles_evaluation.agent_functions import (
     call_custom_tool_from_string,
     extract_tag,
 )
+from heracles_evaluation.llm_agent import LlmAgent
+from heracles_evaluation.prompt import Prompt
+from heracles_evaluation.provider_integrations.bedrock.bedrock_client import (
+    BedrockClientConfig,
+)
 
 
 @dispatch
 def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[BedrockClientConfig]):
-    print("prompt for agent!")
-    print("Tool interface: ", agent.agent_info.tool_interface)
     p = copy.deepcopy(prompt)
 
     if agent.agent_info.tool_interface == "custom":
         # TODO: centralize custom tool prompt logic
-        tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(arg1=1,arg2=2,arg3='3') </tool>.\n"
+        tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(arg1=1,arg2=2,arg3='3') </tool>. Use a single tool call per message. Do not <answer> and tool call in the same message\n"
         for tool in agent.agent_info.tools.values():
             d = tool.to_custom()
             tool_command += d
@@ -53,7 +49,6 @@ def is_function_call(agent: LlmAgent[BedrockClientConfig], message):
 
 @dispatch
 def call_function(agent: LlmAgent[BedrockClientConfig], tool_message: dict):
-    print("tool_message: ", tool_message)
     available_tools = agent.agent_info.tools
     tool_string = extract_tag("tool", tool_message["text"])
     return call_custom_tool_from_string(available_tools, tool_string)

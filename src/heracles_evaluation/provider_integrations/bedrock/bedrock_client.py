@@ -1,12 +1,12 @@
 from typing import Literal
 
+import boto3
 from pydantic import PrivateAttr
 from pydantic_settings import BaseSettings
 
-import boto3
-
 model_name_to_bedrock_model_id = {
-    "bedrock_claude-3-haiku": "anthropic.claude-3-haiku-20240307-v1:0"
+    "bedrock_claude-3-haiku": "anthropic.claude-3-haiku-20240307-v1:0",
+    "bedrock_claude-4-sonnet": "us.anthropic.claude-sonnet-4-20250514-v1:0",
 }
 
 

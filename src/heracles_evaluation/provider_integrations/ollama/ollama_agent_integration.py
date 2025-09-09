@@ -2,6 +2,7 @@
 import copy
 from typing import Callable
 
+import tiktoken
 from ollama import ChatResponse, Message
 from plum import dispatch
 
@@ -14,7 +15,6 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.ollama.ollama_client import (
     OllamaClientConfig,
 )
-import tiktoken
 
 
 @dispatch
@@ -126,6 +126,5 @@ def get_text_body(tool_call: Message.ToolCall):
 
 @dispatch
 def count_message_tokens(agent: LlmAgent[OllamaClientConfig], message: dict):
-    print(message)
     enc = tiktoken.get_encoding("cl100k_base")
     return len(enc.encode(message["content"]))
