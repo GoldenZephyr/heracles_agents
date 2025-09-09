@@ -1,0 +1,90 @@
+domain: "(define (domain " name ")" [require_def] [types_def] [constants_def] [predicates_def] [functions_def] [constraints] structure_def* ")"
+
+require_def: "(:requirements " require_key+ ")"
+require_key: ":strips" | ":typing" | ":negative-preconditions" | ":disjunctive-preconditions" | ":equality" | ":existential-preconditions" | ":universal-preconditions" | ":quantified-preconditions" | ":conditional-effects" | ":fluents" | ":adl" | ":durative-actions" | ":derived-predicates" | ":timed-initial-literals" | ":preferences" | ":constraints"
+
+types_def: "(:types " typed_list{name} ")"
+constants_def: "(:constants " typed_list{name} ")"
+predicates_def: "(:predicates" atomic_formula_skeleton+ ")"
+atomic_formula_skeleton: "(" predicate typed_list{variable} ")"
+predicate: name
+variable: "?"name
+atomic_function_skeleton: "(" function_symbol typed_list{variable}")"
+function_symbol: name
+functions_def: "(:functions" function_typed_list{atomic_function_skeleton} ")"
+constraints: "(:constraints" con_gd ")"
+structure_def: action_def | durative_action_def | derived_def
+typed_list{x}: x* | x+ "-" type typed_list{x}
+primitive_type: name
+type: "(either " primitive_type+ ")" | primitive_type
+function_typed_list{x}: x* | x+ "-" function_type function_typed_list{x}
+function_type: "number"
+emptyor{x}: "()" | x
+name: CNAME
+
+action_def: "(:action" action_symbol ":parameters (" typed_list{variable} ")" action_def_body")"
+action_symbol: name
+action_def_body: [":precondition " emptyor{pre_gd}] [":effect" emptyor{effect}]
+pre_gd: pref_gd | "(and" pre_gd* ")" | "forall (" typed_list{variable} ")" pre_gd ")"
+
+pref_gd: "(preference" [pref_name] gd ")" | gd
+pref_name: name
+gd: atomic_formula{term} | literal{term} | "(and " gd* ")" | "(or" gd* ")" | "(not" gd ")" | "(imply" gd gd ")" | "(exists (" typed_list{variable} ")" gd ")" | "(forall (" typed_list{variable} ")" gd ")" | f_comp
+f_comp: "(" binary_comp f_exp f_exp ")"
+literal{t}: atomic_formula{t} | "(not" atomic_formula{t} ")"
+atomic_formula{t}: "(" predicate t* ")"
+term: name | variable
+f_exp: number | "(" binary_op f_exp f_exp ")" | "(-" f_exp ")" | f_head
+f_head: "(" function_symbol term* ")"
+binary_op: multi_op | "-" | "/"
+multi_op: "*" | "+"
+binary_comp: ">" | "<" | "=" | ">=" | "<="
+number: NUMBER
+effect: "(and" c_effect* ")" | c_effect
+c_effect: "(forall (" typed_list{variable}* ")" effect ")" | "(when" gd cond_effect")" | p_effect
+p_effect: "(" assign_op f_head f_exp ")" | "(not" atomic_formula{term} ")" | atomic_formula{term} "(" assign_op f_head f_exp ")"
+cond_effect: "(and" p_effect* ")" | p_effect
+assign_op: "assign" | "scale-up" | "scale-down" | "increase" | "decrease"
+
+
+durative_action_def: "(:durative-action" da_symbol ":parameters (" typed_list{variable} ")" da_def_body ")"
+da_symbol: name
+da_def_body: ":duration" duration_constraint ":condition" emptyor{da_gd} ":effect" emptyor{da_effect}
+da_gd: pref_timed_gd | "(and" da_gd* ")" | "(forall (" typed_list{variable} ")" da_gd ")"
+pref_timed_gd: timed_gd | "(preference" [pref_name] timed_gd ")"
+timed_gd: "(at" time_specifier gd ")" | "(over" interval gd ")"
+time_specifier: "start" | "end"
+interval: "all"
+
+duration_constraint: "(and" simple_duration_constraint+ ")" | "()" | simple_duration_constraint
+simple_duration_constraint: "(" d_op "?duration" d_value ")" | "(at" time_specifier simple_duration_constraint ")"
+d_op: "<=" | ">=" | "="
+d_value: number | f_exp
+
+da_effect: "(and" da_effect* ")" | timed_effect | "(forall (" typed_list{variable} ")" da_effect ")" | "(when" da_gd timed_effect "(" | "(" assign_op f_head f_exp_da ")"
+timed_effect: "(at" time_specifier a_effect ")" | "(at" time_specifier f_assign_da ")" | "(" assign_op_t f_head f_exp_t ")"
+
+f_assign_da: "(" assign_op f_head f_exp_da ")"
+f_exp_da: "(" binary_op f_exp_da f_exp_da ")" | "(-" f_exp_da ")" | "?duration" | f_exp
+
+derived_def: "(:derived" typed_list{variable} gd ")"
+
+
+%import common.WS
+%import common.CNAME
+%import common.NUMBER
+%ignore WS
+
+//?start: expression
+//?expression: float | string | set | list | dict | point
+//string: CNAME
+//float: FLOAT | INT
+//set: "<" [expression ("," expression)*] ">"
+//list: "[" [expression ("," expression)*] "]"
+//kv_pair: string ":" expression
+//dict: "{" [kv_pair] ("," kv_pair)* "}"
+//point: "POINT(" float float float ")"
+//
+//%import common.FLOAT
+//%import common.LETTER
+//%import common.INT
