@@ -53,8 +53,18 @@ def extract_answer_tag(string):
 def is_function_call(agent, message):
     print("is_function_call called with message: ", message)
     raise NotImplementedError(
-        f"is_function_call not implemented for agent type {type(agent)}, message type {type(message)}."
+        f"is_function_call not implemented for agent type {type(agent)}, message type {type(message)}. Message: {message}"
     )
+
+
+@dispatch
+def get_text_body(message: dict):
+    # TODO: it would be better to not need this class and
+    # instead wrap Bedrock responses in a type
+    if "text" in message:
+        return message["text"]
+    else:
+        raise NotImplementedError(f"get_text_body not implemented for dict: {message}")
 
 
 @dispatch

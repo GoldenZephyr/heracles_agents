@@ -24,7 +24,12 @@ from heracles_evaluation.agent_functions import (
 )
 from heracles_evaluation.llm_agent import LlmAgent
 
+import boto3
+
 logger = logging.getLogger(__name__)
+
+BedrockRuntime = boto3.client("bedrock-runtime", "us-east-1")
+ThrottlingException = BedrockRuntime.exceptions.ThrottlingException
 
 
 class SldpComparison(BaseModel):
@@ -170,9 +175,17 @@ def needs_tool_processing(agent: LlmAgent, message):
 
 
 def get_summary_text(resp):
+    # TODO: Good example of why we need to parse all client responses into types.....
     if isinstance(resp, dict):
         if "role" in resp and "content" in resp:
-            return resp["role"] + ": " + resp["content"]
+            print(resp)
+            if isinstance(resp["content"], list):
+                # bedrock
+                return (
+                    resp["role"] + ":" + "\n".join(r["text"] for r in resp["content"])
+                )
+            else:
+                return resp["role"] + ": " + resp["content"]
         elif (
             "type" in resp
             and resp["type"] == "function_call_output"
@@ -223,15 +236,21 @@ class AgentContext:
                     model_info, explicit_tools, response_format, history
                 )
             except openai.RateLimitError as ex:
-                # TODO: probably should be handled by client. But we need at
-                # least some control over the *total* wait time that we set
-                # here
+                # TODO: each client should catch their own rate limit errors and then emit a shared single error type that we catch here
                 print(ex)
                 logging.warning(
                     f"Hit OpenAI rate limit error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
                 )
                 time.sleep(wait_time_s)
                 continue
+            except ThrottlingException as ex:
+                print(ex)
+                logging.warning(
+                    f"Hit Bedrock rate limit error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
+
             break
         return response
 

@@ -24,6 +24,7 @@ def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OllamaClientConfig
     p = copy.deepcopy(prompt)
 
     if agent.agent_info.tool_interface == "custom":
+        # TODO: centralize custom tool prompt logic
         tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(arg1=1,arg2=2,arg3='3') </tool>.\n"
         for tool in agent.agent_info.tools.values():
             d = tool.to_custom()

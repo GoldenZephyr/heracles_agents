@@ -9,9 +9,12 @@ from heracles_evaluation.provider_integrations.ollama.ollama_client import (
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
+from heracles_evaluation.provider_integrations.bedrock.bedrock_client import (
+    BedrockClientConfig,
+)
 
 ModelInterfaceConfigType = Union[
-    OpenaiClientConfig, AnthropicClientConfig, OllamaClientConfig
+    OpenaiClientConfig, AnthropicClientConfig, OllamaClientConfig, BedrockClientConfig
 ]
 
 

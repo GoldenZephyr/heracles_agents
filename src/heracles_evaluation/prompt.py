@@ -137,7 +137,61 @@ class Prompt(BaseModel):
 
         return prompt
 
-        pass
+    def to_bedrock_json(self, novel_instruction=None):
+        if self.novel_instruction is None and novel_instruction is None:
+            raise ValueError(
+                "novel_instruction must be set either at Prompt initialization or as an argument to `to_anthropic_json`"
+            )
+        prompt = [{"role": "user", "content": [{"text": self.system}]}]
+
+        if self.tool_description:
+            print("Adding bedrock tool description: ")
+            print("\n")
+            print(self.tool_description)
+            print("\n")
+            prompt.append(
+                {"role": "user", "content": [{"text": self.tool_description}]}
+            )
+
+        if self.in_context_examples_preamble:
+            prompt.append(
+                {
+                    "role": "user",
+                    "content": [{"text": self.in_context_examples_preamble}],
+                }
+            )
+
+        if self.in_context_examples:
+            for e in self.in_context_examples:
+                prompt += e.to_openai_json()
+
+        if self.novel_instruction_preamble:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.novel_instruction_preamble}]}
+            )
+
+        if novel_instruction:
+            if self.novel_instruction:
+                logger.warning(
+                    f"Overriding default novel instruction `{self.novel_instruction}` with new instruction `{novel_instruction}`"
+                )
+            prompt.append({"role": "user", "content": [{"text": novel_instruction}]})
+        elif self.novel_instruction:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.novel_instruction}]}
+            )
+
+        if self.answer_semantic_guidance:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.answer_semantic_guidance}]}
+            )
+
+        if self.answer_formatting_guidance:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.answer_formatting_guidance}]}
+            )
+
+        return prompt
 
     def __repr__(self):
         return repr(self.to_openai_json("<Question>"))
