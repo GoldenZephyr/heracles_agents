@@ -67,7 +67,10 @@ def canary_pipeline(exp):
         )
 
         aq = AnalyzedQuestion(
-            question=question, sequences=[agent_sequence], analysis=analysis
+            question=question,
+            sequences=[agent_sequence],
+            analysis=analysis,
+            answer=answer,
         )
         analyzed_questions.append(aq)
 
