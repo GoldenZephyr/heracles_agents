@@ -1,3 +1,4 @@
+# ruff: noqa: F811
 import logging
 import time
 from typing import Literal, Optional, Union
@@ -7,6 +8,7 @@ import openai
 from openai.types.responses.response_custom_tool_call import (
     ResponseCustomToolCall,
 )  # TODO: push this down into the provider integration
+from plum import dispatch
 from pydantic import BaseModel, Field
 
 from heracles_evaluation.agent_functions import (
@@ -173,30 +175,50 @@ def needs_tool_processing(agent: LlmAgent, message):
     return is_function_call(agent, message) or is_custom_tool_call(agent, message)
 
 
+@dispatch
+def get_summary_text(resp: str):
+    return resp
+
+
+@dispatch
+def get_summary_text(resp: type(None)):
+    return ""
+
+
+@dispatch
+def get_summary_text(resp: list):
+    return "\n".join(get_summary_text(r) for r in resp)
+
+
+@dispatch
 def get_summary_text(resp):
+    return get_text_body(resp)
+
+
+@dispatch
+def get_summary_text(resp: dict):
     # TODO: Good example of why we need to parse all client responses into types.....
-    if isinstance(resp, dict):
-        if "role" in resp and "content" in resp:
-            if isinstance(resp["content"], list):
+    if "role" in resp and "content" in resp:
+        if isinstance(resp["content"], list):
+            if "text" in resp["content"][0]:
                 # bedrock
                 return (
                     resp["role"] + ":" + "\n".join(r["text"] for r in resp["content"])
                 )
             else:
-                return resp["role"] + ": " + resp["content"]
-        elif (
-            "type" in resp
-            and resp["type"] == "function_call_output"
-            and "output" in resp
-        ):
-            return "Function result: " + resp["output"]
+                # anthropic
+                return (
+                    resp["role"]
+                    + ":"
+                    + "\n".join(get_summary_text(r) for r in resp["content"])
+                )
         else:
-            return str(resp)
-    elif isinstance(resp, list):
-        return "\n".join(get_summary_text(r) for r in resp)
-    elif isinstance(resp, str):
-        return resp
-    return get_text_body(resp)
+            return resp["role"] + ": " + resp["content"]
+    elif "type" in resp and resp["type"] == "function_call_output" and "output" in resp:
+        return "Function result: " + resp["output"]
+    else:
+        logger.warning(f"Don't know how to turn dict {resp} into elegant string")
+        return str(resp)
 
 
 class AgentContext:

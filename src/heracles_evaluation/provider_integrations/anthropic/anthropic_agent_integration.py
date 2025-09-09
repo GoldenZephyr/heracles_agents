@@ -1,6 +1,7 @@
 # ruff: noqa: F811
 import logging
 
+import tiktoken
 from anthropic import types as anthropic_types
 from anthropic.types.message import Message
 from anthropic.types.text_block import TextBlock
@@ -114,3 +115,48 @@ def get_text_body(message: ToolUseBlock):
 @dispatch
 def get_text_body(block: TextBlock):
     return block.text
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[AnthropicClientConfig], message: dict):
+    enc = tiktoken.get_encoding("cl100k_base")
+    if "content" in message:
+        # Response from model?
+        if isinstance(message["content"], list):
+            return sum(count_message_tokens(agent, m) for m in message["content"])
+        else:
+            return len(enc.encode(message["content"]))
+    else:
+        # Tool result?
+        total = 0
+        for k, v in message.items():
+            total += len(enc.encode(k)) + len(enc.encode(v))
+        return total
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[AnthropicClientConfig], message: TextBlock):
+    return count_message_tokens(agent, message.citations) + count_message_tokens(
+        agent, message.text
+    )
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[AnthropicClientConfig], message: ToolUseBlock):
+    return (
+        count_message_tokens(agent, message.id)
+        + count_message_tokens(agent, message.input)
+        + count_message_tokens(agent, message.name)
+    )
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[AnthropicClientConfig], message: str):
+    enc = tiktoken.get_encoding("cl100k_base")
+    return len(enc.encode(message))
+
+
+@dispatch
+def get_summary_text(agent: LlmAgent[AnthropicClientConfig], message: TextBlock):
+    enc = tiktoken.get_encoding("cl100k_base")
+    return len(enc.encode(message.text))

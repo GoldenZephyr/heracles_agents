@@ -3,13 +3,13 @@ import logging
 import re
 from typing import Any
 
-import tiktoken
 from lark.exceptions import LarkError
 from plum import dispatch
 
 from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
+from heracles_evaluation.token_utils import get_token_encoder
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +64,8 @@ def get_text_body(message: dict):
     # instead wrap Bedrock responses in a type
     if "text" in message:
         return message["text"]
+    elif "content" in message:
+        return message["content"]
     else:
         raise NotImplementedError(f"get_text_body not implemented for dict: {message}")
 
@@ -126,22 +128,19 @@ def count_message_tokens(agent: LlmAgent, messages: list):
 
 @dispatch
 def count_message_tokens(agent: LlmAgent, message):
-    model_name = agent.model_info.model
-    try:
-        enc = tiktoken.encoding_for_model(model_name)
-    except KeyError:
-        logger.warning(
-            f"No tiktoken encoder for model: {model_name}. Falling back to cl100k_base"
-        )
-        enc = tiktoken.get_encoding("cl100k_base")
+    enc = get_token_encoder(agent.model_info.model)
     text = get_text_body(message)
     return len(enc.encode(text))
 
 
 @dispatch
+def count_message_tokens(agent: LlmAgent, message: type(None)):
+    return 0
+
+
+@dispatch
 def count_tool_description_tokens(agent: LlmAgent, explicit_tools: dict):
-    model_name = agent.model_info.model
-    enc = tiktoken.encoding_for_model(model_name)
+    enc = get_token_encoder(agent.model_info.model)
     logger.debug(
         "Using this string representation for computing tool tokens: ",
         str(explicit_tools),

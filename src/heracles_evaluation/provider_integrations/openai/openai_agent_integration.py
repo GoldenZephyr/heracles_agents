@@ -108,6 +108,8 @@ def get_text_body(tool_call: ResponseCustomToolCall):
 @dispatch
 def count_message_tokens(agent: LlmAgent[OpenaiClientConfig], message: dict):
     model_name = agent.model_info.model
+    if model_name == "gpt-5":
+        model_name = "gpt-5-latest"  # tiktoken is broken
     enc = tiktoken.encoding_for_model(model_name)
     # https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken
     num_tokens = 3
