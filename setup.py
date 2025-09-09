@@ -15,7 +15,7 @@ setup(
         "plum-dispatch",
         "lark",
         "tiktoken",
-        "spark-dsg @ git+https://github.com/MIT-SPARK/Spark-DSG.git",
+        "spark-dsg @ git+https://github.com/MIT-SPARK/Spark-DSG.git@develop",
         "heracles @ git+https://github.com/GoldenZephyr/heracles.git",
     ],
     extras_require={
