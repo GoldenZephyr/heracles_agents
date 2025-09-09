@@ -9,12 +9,23 @@ from plum import dispatch
 from heracles_evaluation.custom_tool_call_parser import lark_parse_tool
 from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
+from lark.exceptions import LarkError
 
 logger = logging.getLogger(__name__)
 
 
 def call_custom_tool_from_string(tools, tool_string):
-    function_call = lark_parse_tool(tool_string)
+    try:
+        function_call = lark_parse_tool(tool_string)
+    except LarkError:
+        return "Improperly formatted tool call. Tool call should look like: <tool> a_tool_call(arg1=1, arg2='2') </tool>"
+
+    # I didn't want to deal with escaping logic in Lark, so the parsed string has unparsed escape sequences like \"
+    # This should turn \" in to "
+    for k, v in function_call.args.items():
+        if isinstance(v, str):
+            function_call.args[k] = v.encode("utf-8").decode("unicode_escape")
+
     return tools[function_call.name].function(**function_call.args)
 
 
