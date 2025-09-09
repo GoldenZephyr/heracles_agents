@@ -5,7 +5,7 @@ configurations:
         dsg_interface:
             dsg_interface_type: none
 
-        pipeline: agentic_cypher_qa
+        pipeline: agentic
         phases:
             main:
                 client:
@@ -33,15 +33,14 @@ configurations:
                     tool_interface: openai
                     max_iterations: 6
 
-        #questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/nina_questions.yaml
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
 
 
     cypher-feedforward-qa:
         dsg_interface:
             dsg_interface_type: heracles
             uri: "neo4j://127.0.0.1:7687"
-        pipeline: feedforward_cypher_qa
+        pipeline: feedforward_cypher
         phases:
             generate-cypher:
                 client:
@@ -80,8 +79,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 1
 
-        #questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/nina_questions.yaml
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
     canary:
         dsg_interface:
             dsg_interface_type: none
@@ -106,24 +104,24 @@ configurations:
                     max_iterations: 5
                     tool_interface: "openai"
         questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
-    canary-anthropic:
-        dsg_interface:
-            dsg_interface_type: none
-        pipeline: canary
-        phases:
-            main:
-                client:
-                    client_type: anthropic
+    #canary-anthropic:
+    #    dsg_interface:
+    #        dsg_interface_type: none
+    #    pipeline: canary
+    #    phases:
+    #        main:
+    #            client:
+    #                client_type: anthropic
 
-                model_info:
-                    model: claude-3-5-haiku-latest
-                    temperature: 0.2
+    #            model_info:
+    #                model: claude-3-5-haiku-latest
+    #                temperature: 0.2
 
-                agent_info:
-                    prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
-                    tools:
-                        - name: ask_favog
-                    max_iterations: 5
-                    tool_interface: "anthropic"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+    #            agent_info:
+    #                prompt_settings:
+    #                    base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
+    #                tools:
+    #                    - name: ask_favog
+    #                max_iterations: 5
+    #                tool_interface: "anthropic"
+    #    questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml

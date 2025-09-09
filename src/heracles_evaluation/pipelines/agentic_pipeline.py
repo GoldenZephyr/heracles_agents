@@ -28,7 +28,7 @@ def generate_prompt(
     prompt = copy.deepcopy(agent_config.agent_info.prompt_settings.base_prompt)
     if agent_config.agent_info.tool_interface == "custom":
         prompt.tool_description = "\n".join(
-            [t.to_custom() for t in agent_config.agent_info.tools]
+            [t.to_custom() for t in agent_config.agent_info.tools.values()]
         )
 
     try:
