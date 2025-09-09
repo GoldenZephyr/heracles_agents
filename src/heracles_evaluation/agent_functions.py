@@ -60,7 +60,7 @@ def is_function_call(agent, message):
 @dispatch
 def get_text_body(message):
     raise NotImplementedError(
-        f"get_body not implemented for message type {type(message)}."
+        f"get_body not implemented for message type {type(message)}. Message: {message}"
     )
 
 
@@ -116,7 +116,13 @@ def count_message_tokens(agent: LlmAgent, messages: list):
 @dispatch
 def count_message_tokens(agent: LlmAgent, message):
     model_name = agent.model_info.model
-    enc = tiktoken.encoding_for_model(model_name)
+    try:
+        enc = tiktoken.encoding_for_model(model_name)
+    except KeyError:
+        logger.warning(
+            f"No tiktoken encoder for model: {model_name}. Falling back to cl100k_base"
+        )
+        enc = tiktoken.get_encoding("cl100k_base")
     text = get_text_body(message)
     return len(enc.encode(text))
 

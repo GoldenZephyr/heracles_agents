@@ -14,6 +14,7 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.ollama.ollama_client import (
     OllamaClientConfig,
 )
+import tiktoken
 
 
 @dispatch
@@ -23,7 +24,7 @@ def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OllamaClientConfig
     p = copy.deepcopy(prompt)
 
     if agent.agent_info.tool_interface == "custom":
-        tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(1,2,3) </tool>.\n"
+        tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(arg1=1,arg2=2,arg3='3') </tool>.\n"
         for tool in agent.agent_info.tools.values():
             d = tool.to_custom()
             tool_command += d
@@ -120,3 +121,10 @@ def get_text_body(response: ChatResponse):
 @dispatch
 def get_text_body(tool_call: Message.ToolCall):
     return f"{tool_call.function.name}({tool_call.function.arguments})"
+
+
+@dispatch
+def count_message_tokens(agent: LlmAgent[OllamaClientConfig], message: dict):
+    print(message)
+    enc = tiktoken.get_encoding("cl100k_base")
+    return len(enc.encode(message["content"]))

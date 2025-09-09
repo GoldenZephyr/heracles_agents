@@ -96,7 +96,7 @@ def get_text_body(tool_call: ResponseFunctionToolCall):
 @dispatch
 def get_text_body(message: ResponseReasoningItem):
     if message.content is None:
-        return None
+        return ""
     return "\n".join(c.text for c in message.content)
 
 

@@ -211,7 +211,8 @@ def get_sldp_answer_tag_text():
     return """
 ### Denoting Final Answer:
 
-Format your final answer as an SLDP expression wrapped between <answer> and
-</answer> tags, such as <answer><1,2,3></answer>. Only a single pair of answer
-tags should appear in your solution.
+Format your final answer (*not* any intermediate tool calls) as an SLDP
+expression wrapped between <answer> and </answer> tags, such as
+<answer><1,2,3></answer>. Only a single pair of answer tags should appear in
+your solution.
 """
