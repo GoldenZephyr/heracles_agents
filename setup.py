@@ -22,10 +22,12 @@ setup(
         "openai": ["openai"],
         "anthropic": ["anthropic"],
         "ollama": ["ollama"],
+        "bedrock": ["boto3"],
         "all": [
             "openai",
             "anthropic",
             "ollama",
+            "bedrock",
         ],
     },
 )
