@@ -26,6 +26,9 @@ class ToolCallTransformer(Transformer):
     def string(self, s):
         return str(s[0][1:-1])
 
+    def triple_string(self, s):
+        return str(s[0][3:-3])
+
     def arg_name(self, n):
         return str(n[0])
 
@@ -58,6 +61,7 @@ def lark_parse_tool(string):
 
     tool_parser = Lark(
         tool_grammar,
+        parser="lalr",
     )
 
     T = ToolCallTransformer()
