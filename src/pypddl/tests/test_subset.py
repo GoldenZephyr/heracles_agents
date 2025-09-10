@@ -6,17 +6,17 @@ from pypddl.pddl_goal_types import clause_subset
 def assert_subset(formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
-    assert clause_subset(
-        parsed_formula, parsed_expected
-    ), f"Got {str(parsed_formula)}, Expected {str(parsed_expected)}"
+    assert clause_subset(parsed_formula, parsed_expected), (
+        f"Got {str(parsed_formula)}, Expected {str(parsed_expected)}"
+    )
 
 
 def assert_not_subset(formula, expected):
     parsed_expected = lark_parse_pddl_goal(expected)
     parsed_formula = lark_parse_pddl_goal(formula)
-    assert not clause_subset(
-        parsed_formula, parsed_expected
-    ), f"Got {str(parsed_formula)}, expected to not be subset of {str(parsed_expected)}"
+    assert not clause_subset(parsed_formula, parsed_expected), (
+        f"Got {str(parsed_formula)}, expected to not be subset of {str(parsed_expected)}"
+    )
 
 
 def test_single_variable():
