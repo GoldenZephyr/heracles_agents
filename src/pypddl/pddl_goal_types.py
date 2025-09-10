@@ -135,22 +135,45 @@ def clause_equals(a, b):
 def clause_equals(a: Disjunction | Conjunction, b: Disjunction | Conjunction):
     if type(a) is not type(b):
         return False
-    # Every a is in b
-    for ca in a.clauses:
-        if not any(clause_equals(ca, cb) for cb in b.clauses):
-            print(f"{ca} not in {b.clauses}")
-            return False
-    # Every b is in a
-    for cb in b.clauses:
-        if not any(clause_equals(ca, cb) for ca in a.clauses):
-            print(f"{cb} not in {a.clauses}")
-            return False
-    return True
+
+    return clause_subset(a, b) and clause_subset(b, a)
 
 
 @dispatch
 def clause_equals(a: NegatedClause, b: NegatedClause):
     return clause_equals(a.clause, b.clause)
+
+
+# NOTE: clause_subset is designed for use with DNF.
+# I'm not sure it will give meaningful answers in other cases
+
+
+@dispatch
+def clause_subset(a, b):
+    return literal_equals(a, b)
+
+
+@dispatch
+def clause_subset(a: NegatedClause, b: NegatedClause):
+    return clause_subset(a.clause, b.clause)
+
+
+@dispatch
+def clause_subset(a: Conjunction, b: Disjunction):
+    return any(clause_equals(a, cb) for cb in b.clauses)
+
+
+@dispatch
+def clause_subset(a: Disjunction | Conjunction, b: Disjunction | Conjunction):
+    """a subset b"""
+    if type(a) is not type(b):
+        return False
+    # Every a is in b
+    for ca in a.clauses:
+        if not any(clause_equals(ca, cb) for cb in b.clauses):
+            print(f"{ca} not in {b.clauses}")
+            return False
+    return True
 
 
 @dispatch
