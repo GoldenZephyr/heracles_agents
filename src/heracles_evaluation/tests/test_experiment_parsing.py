@@ -70,13 +70,23 @@ class TestExperimentParsing:
         self.mock_function = Mock()
 
         # Register canary pipeline
-        self.test_pipeline = PipelineDescription(
+        test_pipeline = PipelineDescription(
             name="canary",
             description="Test canary pipeline",
             phases=[PipelinePhase(name="main", description="Main phase")],
             function=self.mock_function,
         )
-        register_pipeline(self.test_pipeline)
+        register_pipeline(test_pipeline)
+
+
+        # Register agentic pipeline
+        test_pipeline = PipelineDescription(
+            name="agentic",
+            description="Test agentic pipeline",
+            phases=[PipelinePhase(name="main", description="Main phase")],
+            function=self.mock_function,
+        )
+        register_pipeline(test_pipeline)
 
     def teardown_method(self):
         """Clear the pipeline registry after each test."""
