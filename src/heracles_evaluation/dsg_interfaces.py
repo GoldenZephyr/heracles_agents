@@ -9,6 +9,8 @@ from pydantic_settings import BaseSettings
 class HeraclesDsgInterface(BaseSettings):
     dsg_interface_type: Literal["heracles"]
     uri: str
+    # optional number of objects to check that the right dsg is loaded
+    n_object_verification: Optional[int] = None
     username: SecretStr = Field(alias="HERACLES_NEO4J_USERNAME", exclude=True)
     password: SecretStr = Field(alias="HERACLES_NEO4J_PASSWORD", exclude=True)
 

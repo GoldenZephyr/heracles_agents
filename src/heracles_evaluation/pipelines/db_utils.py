@@ -11,6 +11,12 @@ def query_db(dsgdb_conf, cypher_string):
         atomic_queries=True,
         print_profiles=False,
     ) as db:
+        if dsgdb_conf.n_object_verification is not None:
+            v = db.query("MATCH (n: Object) RETURN COUNT(*) as count")
+            count = v[0]["count"]
+            assert (
+                count == dsgdb_conf.n_object_verification
+            ), f"Connected database has {count} objects ({dsgdb_conf.n_object_verification} expected)"
         try:
             query_result = str(db.query(cypher_string))
             return True, query_result

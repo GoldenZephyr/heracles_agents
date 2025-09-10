@@ -28,7 +28,8 @@ configurations:
                           bound_args:
                               dsgdb_conf:
                                   dsg_interface_type: heracles
-                                  uri: "neo4j://127.0.0.1:7687"
+                                  uri: "neo4j://127.0.0.1:7688"
+                                  n_object_verification: 314
 
                     tool_interface: anthropic
                     max_iterations: 6
