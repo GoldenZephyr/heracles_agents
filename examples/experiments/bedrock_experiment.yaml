@@ -13,8 +13,9 @@ configurations:
                     timeout: 20
 
                 model_info:
-                    #model: bedrock_claude-3-haiku
-                    model: bedrock_claude-4-sonnet
+                    model: bedrock_claude-3-haiku
+                    #model: bedrock_claude-4-sonnet
+                    #model: bedrock_claude-opus-4-1
                     temperature: 0.2
                     seed: 123
 
