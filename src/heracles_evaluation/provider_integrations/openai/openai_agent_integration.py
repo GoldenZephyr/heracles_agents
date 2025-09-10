@@ -1,4 +1,5 @@
 # ruff: noqa: F811
+import copy
 import json
 from typing import Callable
 
@@ -19,7 +20,6 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
-import copy
 
 
 @dispatch
