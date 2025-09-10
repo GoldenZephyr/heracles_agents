@@ -78,7 +78,6 @@ class TestExperimentParsing:
         )
         register_pipeline(test_pipeline)
 
-
         # Register agentic pipeline
         test_pipeline = PipelineDescription(
             name="agentic",
