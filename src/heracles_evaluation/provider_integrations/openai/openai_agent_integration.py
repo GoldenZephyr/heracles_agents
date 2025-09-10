@@ -10,16 +10,29 @@ from openai.types.responses.response_output_message import ResponseOutputMessage
 from openai.types.responses.response_reasoning_item import ResponseReasoningItem
 from plum import dispatch
 
+from heracles_evaluation.agent_functions import (
+    call_custom_tool_from_string,
+    extract_tag,
+)
 from heracles_evaluation.llm_agent import LlmAgent
 from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
+import copy
 
 
 @dispatch
 def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OpenaiClientConfig]):
-    return prompt.to_openai_json()
+    p = copy.deepcopy(prompt)
+    if agent.agent_info.tool_interface == "custom":
+        # TODO: centralize custom tool prompt logic
+        tool_command = "The following tools can be used to help formulate your answer. To call a tool, response with the function name and arguments between a tool tag, like this: <tool> my_function(arg1=1,arg2=2,arg3='3') </tool>.\n"
+        for tool in agent.agent_info.tools.values():
+            d = tool.to_custom()
+            tool_command += d
+        p.tool_description = tool_command
+    return p.to_openai_json()
 
 
 @dispatch
@@ -49,6 +62,15 @@ def call_function(
 
 
 @dispatch
+def call_function(
+    agent: LlmAgent[OpenaiClientConfig], tool_message: ResponseOutputMessage
+):
+    available_tools = agent.agent_info.tools
+    tool_string = extract_tag("tool", tool_message.content[0].text)
+    return call_custom_tool_from_string(available_tools, tool_string)
+
+
+@dispatch
 def make_tool_response(
     agent: LlmAgent[OpenaiClientConfig],
     tool_call_message: ResponseFunctionToolCall,
@@ -59,6 +81,16 @@ def make_tool_response(
         "call_id": tool_call_message.call_id,
         "output": str(result),
     }
+    return m
+
+
+@dispatch
+def make_tool_response(
+    agent: LlmAgent[OpenaiClientConfig],
+    tool_call_message: ResponseOutputMessage,
+    result,
+):
+    m = {"role": "user", "content": f"Output of tool call: {result}"}
     return m
 
 

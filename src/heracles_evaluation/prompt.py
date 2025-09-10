@@ -27,6 +27,21 @@ class InContextExample(BaseModel):
 
         return parts
 
+    def to_bedrock_json(self):
+        parts = []
+
+        if self.system:
+            logger.error(
+                "Bedrock does not support system tags for in-context examples!"
+            )
+
+        user_part = {"role": "user", "content": [{"text": self.user}]}
+        parts.append(user_part)
+        assistant_part = {"role": "assistant", "content": [{"text": self.assistant}]}
+        parts.append(assistant_part)
+
+        return parts
+
 
 class Prompt(BaseModel):
     system: str
@@ -159,7 +174,7 @@ class Prompt(BaseModel):
 
         if self.in_context_examples:
             for e in self.in_context_examples:
-                prompt += e.to_openai_json()
+                prompt += e.to_bedrock_json()
 
         if self.novel_instruction_preamble:
             prompt.append(
@@ -261,8 +276,8 @@ def get_sldp_answer_tag_text():
     return """
 ### Denoting Final Answer:
 
-Format your final answer (*not* any intermediate tool calls) as an SLDP
-expression wrapped between <answer> and </answer> tags, such as
-<answer><1,2,3></answer>. Only a single pair of answer tags should appear in
-your solution.
-"""
+ Format your final answer (*not* any intermediate tool calls) as an SLDP
+ expression wrapped between <answer> and </answer> tags, such as
+ <answer><1,2,3></answer>. Only a single pair of answer tags should appear in
+ your solution.
+ """

@@ -233,6 +233,14 @@ def get_summary_text(resp: dict):
             return resp["role"] + ": " + resp["content"]
     elif "type" in resp and resp["type"] == "function_call_output" and "output" in resp:
         return "Function result: " + resp["output"]
+    elif "toolResult" in resp:
+        # bedrock
+        return "Tool result: " + "\n".join(
+            r["text"] for r in resp["toolResult"]["content"]
+        )
+    elif "toolUse" in resp:
+        # bedrock
+        return "Function Call: " + get_bedrock_block_summary(resp)
     else:
         logger.warning(f"Don't know how to turn dict {resp} into elegant string")
         return str(resp)

@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings
 model_name_to_bedrock_model_id = {
     "bedrock_claude-3-haiku": "anthropic.claude-3-haiku-20240307-v1:0",
     "bedrock_claude-4-sonnet": "us.anthropic.claude-sonnet-4-20250514-v1:0",
+    "bedrock_claude-opus-4-1": "us.anthropic.claude-opus-4-1-20250805-v1:0",
 }
 
 
