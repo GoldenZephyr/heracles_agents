@@ -26,7 +26,8 @@ class BedrockClientConfig(BaseSettings):
         #    req["system"] = [{"text": system_prompt}]
         req["inferenceConfig"] = {}
         req["inferenceConfig"] = {"temperature": model_info.temperature}
-        req["toolConfig"] = {"tools": tools}
+        if len(tools) > 0:
+            req["toolConfig"] = {"tools": tools}
 
         response = self._client.converse(**req)
         return response
