@@ -132,6 +132,8 @@ def generate_tools_for_agent(agent_info):
             explicit_tools = [tool.to_anthropic() for tool in agent_info.tools.values()]
         case "ollama":
             explicit_tools = [tool.to_ollama() for tool in agent_info.tools.values()]
+        case "bedrock":
+            explicit_tools = [tool.to_bedrock() for tool in agent_info.tools.values()]
         case "custom":
             explicit_tools = []
         case "none":
@@ -195,6 +197,19 @@ def get_summary_text(resp):
     return get_text_body(resp)
 
 
+def get_bedrock_block_summary(m):
+    if "text" in m:
+        return m["text"]
+    elif "toolUse" in m:
+        summary = m["toolUse"]["name"] + "("
+        for k, v in m["toolUse"]["input"].items():
+            summary += f"{k}={v},"
+        summary += ")"
+        return summary
+    else:
+        raise NotImplementedError(f"Don't know how to summarize: {m}")
+
+
 @dispatch
 def get_summary_text(resp: dict):
     # TODO: Good example of why we need to parse all client responses into types.....
@@ -203,7 +218,9 @@ def get_summary_text(resp: dict):
             if "text" in resp["content"][0]:
                 # bedrock
                 return (
-                    resp["role"] + ":" + "\n".join(r["text"] for r in resp["content"])
+                    resp["role"]
+                    + ":"
+                    + "\n".join(get_bedrock_block_summary(r) for r in resp["content"])
                 )
             else:
                 # anthropic

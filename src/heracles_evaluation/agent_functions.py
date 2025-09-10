@@ -52,7 +52,6 @@ def extract_answer_tag(string):
 
 @dispatch
 def is_function_call(agent, message):
-    print("is_function_call called with message: ", message)
     raise NotImplementedError(
         f"is_function_call not implemented for agent type {type(agent)}, message type {type(message)}. Message: {message}"
     )
@@ -66,6 +65,12 @@ def get_text_body(message: dict):
         return message["text"]
     elif "content" in message:
         return message["content"]
+    elif "toolUse" in message:
+        t = message["toolUse"]["name"] + "("
+        for k, v in message["toolUse"]["input"].items():
+            t += f"{k}={v},"
+        t += ")"
+        return t
     else:
         raise NotImplementedError(f"get_text_body not implemented for dict: {message}")
 

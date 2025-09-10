@@ -60,6 +60,9 @@ class FunctionParameter:
             d.append(f"Allowed values: {str(self.enum_values)}")
         return d
 
+    def to_bedrock(self):
+        return self.to_openai_responses()
+
 
 class ToolDescription(BaseModel):
     """Description of a tool / function"""
@@ -106,6 +109,7 @@ class ToolDescription(BaseModel):
 
         return self
 
+    # TODO: ideally these live in provider integration
     def to_openai_responses(self):
         parameter_properties = {}
         for p in self.parameters:
@@ -169,6 +173,21 @@ class ToolDescription(BaseModel):
             },
         }
         return t
+
+    def to_bedrock(self):
+        parameter_properties = {}
+        for p in self.parameters:
+            parameter_properties |= p.to_bedrock()
+        required = [p.name for p in self.parameters if p.required]
+        s = {
+            "json": {
+                "type": "object",
+                "properties": parameter_properties,
+                "required": required,
+            }
+        }
+        t = {"name": self.name, "description": self.description, "inputSchema": s}
+        return {"toolSpec": t}
 
     def to_custom(self):
         parameter_descriptions = ""

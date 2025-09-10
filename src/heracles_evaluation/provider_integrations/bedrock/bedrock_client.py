@@ -20,13 +20,13 @@ class BedrockClientConfig(BaseSettings):
         self._client = boto3.client("bedrock-runtime", region_name="us-east-1")
 
     def call(self, model_info, tools, response_format, messages):
-        # TODO: tools
         model_id = model_name_to_bedrock_model_id[model_info.model]
         req = {"modelId": model_id, "messages": messages}
         # if system_prompt:
         #    req["system"] = [{"text": system_prompt}]
         req["inferenceConfig"] = {}
-        req["inferenceConfig"] = {"temperature": 0.7}
+        req["inferenceConfig"] = {"temperature": model_info.temperature}
+        req["toolConfig"] = {"tools": tools}
 
         response = self._client.converse(**req)
         return response
