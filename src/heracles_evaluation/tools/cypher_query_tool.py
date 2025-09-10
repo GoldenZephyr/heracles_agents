@@ -22,9 +22,9 @@ def query_db(cypher_string, dsgdb_conf: HeraclesDsgInterface = None):
         if dsgdb_conf.n_object_verification is not None:
             v = db.query("MATCH (n: Object) RETURN COUNT(*) as count")
             count = v[0]["count"]
-            assert (
-                count == dsgdb_conf.n_object_verification
-            ), f"Connected database has {count} objects ({dsgdb_conf.n_object_verification} expected)"
+            assert count == dsgdb_conf.n_object_verification, (
+                f"Connected database has {count} objects ({dsgdb_conf.n_object_verification} expected)"
+            )
         try:
             query_result = str(db.query(cypher_string))
             return query_result
