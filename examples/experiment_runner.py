@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO, force=True)
 # experiment_fn = "experiments/ollama_test.yaml"
 # experiment_fn = "experiments/structured_sldp.yaml"
 # experiment_fn = "experiments/master_experiment.yaml"
-experiment_fn = "experiments/pddl_experiment.yaml"
+experiment_fn = "experiments/openai_codegen_feedforward_test.yaml"
 with open(experiment_fn, "r") as fo:
     yml = yaml.safe_load(fo)
 

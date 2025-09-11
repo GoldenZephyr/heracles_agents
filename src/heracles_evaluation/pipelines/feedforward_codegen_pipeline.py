@@ -113,7 +113,7 @@ def feedforward_codegen(exp):
 
         sequences = [codgen_sequence, refinement_sequence]
 
-        n_input_tokens = cxt.total_input_tokens + cxt2.total_input_tokens
+        n_input_tokens = cxt.initial_input_tokens + cxt2.initial_input_tokens
         n_output_tokens = cxt.total_output_tokens + cxt2.total_output_tokens
 
         analysis = QuestionAnalysis(

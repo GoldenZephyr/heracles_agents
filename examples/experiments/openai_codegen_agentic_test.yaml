@@ -3,7 +3,7 @@ configurations:
     python-agentic:
         dsg_interface:
             dsg_interface_type: python
-            dsg_filepath: $HERACLES_EVALUATION_PATH/graphs/west_point_fused_map_wregions_labelspace.json
+            dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
             dsg_labels_filepath: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml
             dsg_api_filepath: $HERACLES_EVALUATION_PATH/examples/prompts/spark_dsg_api_prompt.yaml
             dsg_api_descriptions: true
@@ -34,7 +34,7 @@ configurations:
                             dsg_interface:
                                 dsg_interface_type: python
                                 dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
-                                dsg_labels_filepath: $HERACLES_EVALUATION_PATH/src/heracles/resources/ade20k_mit_label_space.yaml
+                                dsg_labels_filepath: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml
                                 dsg_api_filepath: $HERACLES_EVALUATION_PATH/examples/prompts/spark_dsg_api_prompt.yaml
                                 dsg_api_descriptions: true
                                 dsg_api_examples: true
