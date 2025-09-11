@@ -9,7 +9,6 @@ from pypddl.pddl_goal_parser import lark_parse_pddl_goal
 from sldp.sldp_lang import lark_parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, force=True)
 
 
 @dispatch

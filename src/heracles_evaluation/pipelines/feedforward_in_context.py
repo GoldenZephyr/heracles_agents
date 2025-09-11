@@ -21,7 +21,6 @@ from heracles_evaluation.pipelines.comparisons import evaluate_answer
 from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 class PromptingFailure(Exception):
@@ -131,7 +130,7 @@ def incontext_dsg(exp):
         analysis = QuestionAnalysis(
             correct=correct,
             valid_answer_format=valid_format,
-            input_tokens=cxt.total_input_tokens,
+            input_tokens=cxt.initial_input_tokens,
             output_tokens=cxt.total_output_tokens,
         )
         aq = AnalyzedQuestion(
@@ -162,6 +161,8 @@ if __name__ == "__main__":
 
     from heracles_evaluation.experiment_definition import ExperimentConfiguration
     from heracles_evaluation.summarize_results import display_experiment_results
+
+    logging.basicConfig(level=logging.INFO)
 
     with open("experiments/dsg_incontext_experiment.yaml", "r") as fo:
         yml = yaml.safe_load(fo)

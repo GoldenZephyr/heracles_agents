@@ -1,0 +1,654 @@
+api:
+  name: "spark_dsg"
+  version: "1.1.1"
+  description: "Python bindings for the spark-dsg (Dynamic Scene Graph) library, a hierarchical representation for robotic perception."
+  classes:
+    - name: "DynamicSceneGraph"
+      include: true
+      description: "The main container for a multi-layered, dynamic scene graph. It manages all layers, nodes, and edges."
+      constructor:
+        include: true
+        description: "Creates a new, empty DynamicSceneGraph (dsg)."
+        inputs:
+          - name: "layer_keys"
+            type: "list[LayerKey]"
+            description: "A list of layer keys to pre-allocate."
+          - name: "layer_names"
+            type: "dict[LayerId, str]"
+            description: "A map from layer ID to layer name."
+        example: |
+          import spark_dsg as dsg
+          # Create an empty graph
+          graph = dsg.DynamicSceneGraph()
+      methods:
+        - name: "save"
+          include: false
+          description: "Saves the scene graph to a binary file."
+          inputs:
+            - name: "filepath"
+              type: "str or pathlib.Path"
+              description: "The path to the output file."
+            - name: "include_mesh"
+              type: "bool"
+              description: "Whether to save the full mesh with the graph (optional, default=True)."
+          output:
+            type: "None"
+            description: ""
+          example: |
+            graph.save("my_scene_graph.dsg")
+        - name: "load"
+          include: true
+          description: "A static method to load a scene graph from a file."
+          inputs:
+            - name: "filepath"
+              type: "str or pathlib.Path"
+              description: "The path to the scene graph file."
+          output:
+            type: "DynamicSceneGraph"
+            description: "The loaded scene graph object."
+          example: |
+            graph = dsg.DynamicSceneGraph.load("my_scene_graph.dsg")
+        - name: "has_layer"
+          include: true
+          description: "Checks if a layer exists in the graph."
+          inputs:
+            - name: "layer_id"
+              type: "int or str"
+              description: "The integer ID or string name of the layer."
+            - name: "partition_id"
+              type: "int"
+              description: "The partition ID (optional, default=0)."
+          output:
+            type: "bool"
+            description: "True if the layer exists, False otherwise."
+          example: |
+            exists = graph.has_layer(dsg.DsgLayers.OBJECTS)
+        - name: "get_layer"
+          include: true
+          description: "Gets a read-only view of a specific layer."
+          inputs:
+            - name: "layer_id"
+              type: "int or str"
+              description: "The integer ID or string name of the layer to retrieve."
+            - name: "partition_id"
+              type: "int"
+              description: "The partition ID (optional, default=0)."
+          output:
+            type: "LayerView"
+            description: "A view of the requested layer. Throws an error if the layer does not exist."
+          example: |
+            objects_layer = graph.get_layer(dsg.DsgLayers.OBJECTS)
+        - name: "has_node"
+          include: true
+          description: "Checks if a node exists anywhere in the graph."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The unique identifier of the node."
+          output:
+            type: "bool"
+            description: "True if the node exists, False otherwise."
+          example: ""
+        - name: "get_node"
+          include: true
+          description: "Gets a specific node from the graph."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The unique identifier of the node."
+          output:
+            type: "SceneGraphNode"
+            description: "The requested node. Throws an error if the node does not exist."
+          example: ""
+        - name: "has_edge"
+          include: true
+          description: "Checks if an edge exists between two nodes."
+          inputs:
+            - name: "source_node"
+              type: "NodeSymbol"
+              description: "The ID of the source node."
+            - name: "target_node"
+              type: "NodeSymbol"
+              description: "The ID of the target node."
+          output:
+            type: "bool"
+            description: "True if the edge exists, False otherwise."
+          example: ""
+        - name: "get_edge"
+          include: true
+          description: "Gets the edge between two nodes."
+          inputs:
+            - name: "source_node"
+              type: "NodeSymbol"
+              description: "The ID of the source node."
+            - name: "target_node"
+              type: "NodeSymbol"
+              description: "The ID of the target node."
+          output:
+            type: "SceneGraphEdge"
+            description: "The requested edge. Throws an error if the edge does not exist."
+          example: ""
+        - name: "get_position"
+          include: true
+          description: "Gets the 3D position of a node."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The ID of the node."
+          output:
+            type: "numpy.ndarray[3]"
+            description: "The (x, y, z) position of the node."
+          example: ""
+      properties:
+        - name: "nodes"
+          include: true
+          type: "iterator[SceneGraphNode]"
+          description: "An iterator over all nodes in the graph (including partitions)."
+          example: |
+            for node in graph.nodes:
+                print(node.id)
+        - name: "unpartitioned_nodes"
+          include: false
+          type: "iterator[SceneGraphNode]"
+          description: "An iterator over nodes in the graph, excluding layer partitions."
+        - name: "edges"
+          include: true
+          type: "iterator[SceneGraphEdge]"
+          description: "An iterator over all edges in the graph (including partitions)."
+          example: |
+            for edge in graph.edges:
+                print(f"{edge.source} -> {edge.target}")
+        - name: "unpartitioned_edges"
+          include: false
+          type: "iterator[SceneGraphEdge]"
+          description: "An iterator over edges in the graph, excluding those connected to layer partitions."
+        - name: "layers"
+          include: true
+          type: "iterator[LayerView]"
+          description: "An iterator over all non-partitioned layers in the graph."
+          example: |
+            for layer in graph.layers:
+                print(f"Layer {layer.id} has {layer.num_nodes()} nodes.")
+        - name: "num_nodes"
+          include: true
+          type: "int"
+          description: "The total number of nodes in the graph."
+        - name: "num_edges"
+          include: true
+          type: "int"
+          description: "The total number of edges in the graph."
+        - name: "num_layers"
+          include: true
+          type: "int"
+          description: "The total number of layers in the graph."
+        - name: "mesh"
+          include: true
+          type: "Mesh"
+          description: "The 3D mesh associated with the scene graph."
+          access: "read-write"
+
+    - name: "LayerView"
+      include: true
+      description: "A read-only view of a single layer within the DynamicSceneGraph."
+      properties:
+        - name: "id"
+          include: true
+          type: "int"
+          description: "The unique integer identifier for this layer."
+          access: "read-only"
+        - name: "partition"
+          include: true
+          type: "int"
+          description: "The partition identifier for this layer."
+          access: "read-only"
+        - name: "nodes"
+          include: true
+          type: "iterator[SceneGraphNode]"
+          description: "An iterator over all nodes in this layer."
+        - name: "edges"
+          include: true
+          type: "iterator[SceneGraphEdge]"
+          description: "An iterator over all intra-layer edges in this layer."
+      methods:
+        - name: "num_nodes"
+          include: true
+          description: "Gets the number of nodes in this layer."
+          output:
+            type: "int"
+        - name: "num_edges"
+          include: true
+          description: "Gets the number of intra-layer edges in this layer."
+          output:
+            type: "int"
+        - name: "has_node"
+          include: true
+          description: "Checks if a node exists in this layer."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The ID of the node."
+          output:
+            type: "bool"
+            description: "True if the node exists, False otherwise."
+        - name: "get_node"
+          include: true
+          description: "Gets a node from this layer."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The ID of the node."
+          output:
+            type: "SceneGraphNode"
+            description: "The requested node. Throws an error if not found."
+        - name: "has_edge"
+          include: true
+          description: "Checks if an edge exists in this layer."
+          inputs:
+            - name: "source_node"
+              type: "NodeSymbol"
+              description: "The ID of the source node."
+            - name: "target_node"
+              type: "NodeSymbol"
+              description: "The ID of the target node."
+          output:
+            type: "bool"
+            description: "True if the edge exists, False otherwise."
+        - name: "get_edge"
+          include: true
+          description: "Gets an edge from this layer."
+          inputs:
+            - name: "source_node"
+              type: "NodeSymbol"
+              description: "The ID of the source node."
+            - name: "target_node"
+              type: "NodeSymbol"
+              description: "The ID of the target node."
+          output:
+            type: "SceneGraphEdge"
+            description: "The requested edge. Throws an error if not found."
+        - name: "get_position"
+          include: true
+          description: "Gets the 3D position of a node in this layer."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The ID of the node."
+          output:
+            type: "numpy.ndarray[3]"
+            description: "The (x, y, z) position of the node."
+
+    - name: "SceneGraphNode"
+      include: true
+      description: "Represents a single node in the scene graph."
+      properties:
+        - name: "id"
+          include: true
+          type: "NodeSymbol"
+          description: "The unique identifier for the node."
+          access: "read-only"
+        - name: "layer"
+          include: true
+          type: "int"
+          description: "The ID of the layer this node belongs to."
+          access: "read-only"
+        - name: "attributes"
+          include: true
+          type: "NodeAttributes"
+          description: "A container for the node's attributes (e.g., position). The actual type may be a subclass like SemanticNodeAttributes."
+          access: "read-write"
+      methods:
+        - name: "has_parent"
+          include: true
+          description: "Checks if the node has a parent."
+          output:
+            type: "bool"
+        - name: "has_siblings"
+          include: true
+          description: "Checks if the node has siblings."
+          output:
+            type: "bool"
+        - name: "has_children"
+          include: true
+          description: "Checks if the node has children."
+          output:
+            type: "bool"
+        - name: "get_parent"
+          include: true
+          description: "Gets the parent of the node, if one exists."
+          output:
+            type: "NodeSymbol or None"
+        - name: "siblings"
+          include: true
+          description: "Gets a list of the node's siblings."
+          output:
+            type: "list[NodeSymbol]"
+        - name: "children"
+          include: true
+          description: "Gets a list of the node's children."
+          output:
+            type: "list[NodeSymbol]"
+
+    - name: "SceneGraphEdge"
+      include: true
+      description: "Represents a directed edge between two nodes."
+      properties:
+        - name: "source"
+          include: true
+          type: "NodeSymbol"
+          description: "The ID of the node where the edge originates."
+          access: "read-only"
+        - name: "target"
+          include: true
+          type: "NodeSymbol"
+          description: "The ID of the node where the edge terminates."
+          access: "read-only"
+        - name: "info"
+          include: true
+          type: "EdgeAttributes"
+          description: "A container for the edge's attributes (e.g., weight)."
+          access: "read-write"
+
+    - name: "NodeSymbol"
+      include: true
+      description: "A unique identifier for a node, composed of a character prefix and a numerical ID. E.g., 'p1' for place 1."
+      constructor:
+        include: true
+        description: "Creates a new NodeSymbol."
+        inputs:
+          - name: "key"
+            type: "char"
+            description: "The character prefix for the category (e.g., 'p')."
+          - name: "index"
+            type: "int"
+            description: "The numerical index for the node."
+        example: |
+          node_id = dsg.NodeSymbol('p', 10)
+      properties:
+        - name: "category"
+          include: true
+          type: "str"
+          description: "The character prefix of the symbol (e.g., 'p')."
+          access: "read-only"
+        - name: "category_id"
+          include: true
+          type: "int"
+          description: "The numerical part of the symbol (e.g., 10)."
+          access: "read-only"
+        - name: "value"
+          include: true
+          type: "int"
+          description: "The full integer representation of the symbol."
+          access: "read-only"
+      methods:
+        - name: "str"
+          include: true
+          description: "Gets the string representation of the symbol."
+          inputs:
+            - name: "literal"
+              type: "bool"
+              description: "If true, show category name instead of char (optional, default=True)."
+          output:
+            type: "str"
+            description: "The string label (e.g., 'p10')."
+          example: |
+            symbol = dsg.NodeSymbol('p', 10)
+            label = symbol.str() # 'p10'
+
+    - name: "NodeAttributes"
+      include: true
+      description: "The base class for attributes associated with a node."
+      constructor:
+        include: true
+        description: "Creates default node attributes."
+        inputs: []
+        example: ""
+      properties:
+        - name: "position"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The 3D position (x, y, z) of the node."
+          access: "read-write"
+        - name: "is_active"
+          include: true
+          type: "bool"
+          description: "Whether the node is considered part of the active window."
+          access: "read-write"
+        - name: "last_update_time_ns"
+          include: true
+          type: "int"
+          description: "Timestamp of the last update in nanoseconds."
+          access: "read-write"
+
+    - name: "SemanticNodeAttributes"
+      include: true
+      description: "Attributes for nodes with semantic meaning. Inherits from `NodeAttributes`."
+      constructor:
+        include: true
+        description: "Creates default semantic node attributes."
+        inputs: []
+      properties:
+        - name: "name"
+          include: true
+          type: "str"
+          description: "A human-readable name for the node (e.g., 'object_1')."
+          access: "read-write"
+        - name: "color"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The RGB color of the node as a uint8 array."
+          access: "read-write"
+        - name: "bounding_box"
+          include: true
+          type: "BoundingBox"
+          description: "The bounding box of the node."
+          access: "read-write"
+        - name: "semantic_label"
+          include: true
+          type: "int"
+          description: "The semantic label ID for the node (e.g., from a segmentation model)."
+          access: "read-write"
+
+    - name: "ObjectNodeAttributes"
+      include: true
+      description: "Attributes for object nodes. Inherits from `SemanticNodeAttributes`."
+      constructor:
+        include: true
+        description: "Creates default object node attributes."
+        inputs: []
+      properties:
+        - name: "registered"
+          include: true
+          type: "bool"
+          description: "Whether the object has been registered against a database."
+          access: "read-write"
+        - name: "world_R_object"
+          include: true
+          type: "Quaternion"
+          description: "The orientation of the object in the world frame."
+          access: "read-write"
+
+    - name: "EdgeAttributes"
+      include: true
+      description: "A container for attributes associated with an edge."
+      constructor:
+        include: true
+        description: "Creates default edge attributes."
+        inputs: []
+        example: ""
+      properties:
+        - name: "weighted"
+          include: true
+          type: "bool"
+          description: "Indicates if the edge has a meaningful weight."
+          access: "read-write"
+        - name: "weight"
+          include: true
+          type: "float"
+          description: "The weight of the edge, often used for pathfinding."
+          access: "read-write"
+
+    - name: "Color"
+      include: true
+      description: "Represents an RGBA color."
+      constructor:
+        include: true
+        description: "Creates a new Color object with r, g, b, a components (0-255)."
+        inputs: []
+        example: |
+          c = dsg.Color()
+          c.r = 255
+          c.g = 0
+          c.b = 0
+          c.a = 255
+      properties:
+        - name: "r"
+          include: true
+          type: "int"
+          description: "Red component."
+          access: "read-write"
+        - name: "g"
+          include: true
+          type: "int"
+          description: "Green component."
+          access: "read-write"
+        - name: "b"
+          include: true
+          type: "int"
+          description: "Blue component."
+          access: "read-write"
+        - name: "a"
+          include: true
+          type: "int"
+          description: "Alpha component."
+          access: "read-write"
+
+    - name: "BoundingBox"
+      include: true
+      description: "Represents a 3D bounding box, which can be axis-aligned (AABB) or oriented (OBB)."
+      constructor:
+        include: true
+        description: "Creates a new BoundingBox. Multiple constructors are available for different box types."
+        inputs: []
+        example: |
+          import numpy as np
+          # Create an AABB from min and max corners
+          box = dsg.BoundingBox(np.array([-1, -1, -1], dtype=np.float32), np.array([1, 1, 1], dtype=np.float32))
+      properties:
+        - name: "min"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The minimum corner of the box in the world frame."
+          access: "read-only"
+        - name: "max"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The maximum corner of the box in the world frame."
+          access: "read-only"
+        - name: "type"
+          include: true
+          type: "BoundingBoxType"
+          description: "The type of bounding box (e.g., AABB, OBB)."
+          access: "read-write"
+        - name: "dimensions"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The (x, y, z) dimensions of the box."
+          access: "read-write"
+        - name: "world_P_center"
+          include: true
+          type: "numpy.ndarray[3]"
+          description: "The position of the box's center in the world frame."
+          access: "read-write"
+        - name: "world_R_center"
+          include: true
+          type: "numpy.ndarray[3,3]"
+          description: "The rotation matrix of the box's center in the world frame."
+          access: "read-write"
+      enums:
+        - name: "BoundingBoxType"
+          include: true
+          values:
+            - "INVALID"
+            - "AABB" # Axis-aligned
+            - "OBB"  # Oriented
+            - "RAABB" # Rotated-Axis-aligned
+
+    - name: "Mesh"
+      include: true
+      description: "Stores 3D mesh data, including vertices, colors, and faces."
+      constructor:
+        include: true
+        description: "Creates a new, empty Mesh."
+        inputs: []
+        example: |
+          mesh = dsg.Mesh()
+      methods:
+        - name: "get_vertices"
+          include: true
+          description: "Gets the vertex data as a 6xN matrix."
+          output:
+            type: "numpy.ndarray[6, N]"
+            description: "A float64 array where rows 0-2 are position (x,y,z) and rows 3-5 are color (r,g,b)."
+        - name: "set_vertices"
+          include: true
+          description: "Sets the vertex data from a 6xN matrix."
+          inputs:
+            - name: "vertices"
+              type: "numpy.ndarray[6, N]"
+              description: "A float64 array where rows 0-2 are position (x,y,z) and rows 3-5 are color (r,g,b)."
+        - name: "get_faces"
+          include: true
+          description: "Gets the mesh faces as a 3xM matrix."
+          output:
+            type: "numpy.ndarray[3, M]"
+            description: "An int32 array of triangle indices."
+        - name: "set_faces"
+          include: true
+          description: "Sets the mesh faces from a 3xM matrix."
+          inputs:
+            - name: "faces"
+              type: "numpy.ndarray[3, M]"
+              description: "An int32 array of triangle indices."
+
+    - name: "Quaternion"
+      include: true
+      description: "A representation of a rotation in 3D space."
+      constructor:
+        include: true
+        description: "Creates a new Quaternion."
+        inputs:
+          - name: "w"
+            type: "float"
+            description: "The real part."
+          - name: "x"
+            type: "float"
+            description: "The first imaginary part."
+          - name: "y"
+            type: "float"
+            description: "The second imaginary part."
+          - name: "z"
+            type: "float"
+            description: "The third imaginary part."
+        example: |
+          # Identity rotation
+          q = dsg.Quaternion(1.0, 0.0, 0.0, 0.0)
+
+  enums:
+    - name: "DsgLayers"
+      include: false
+      description: "Standard integer identifiers for common semantic layers in the scene graph."
+      values:
+        - name: "SEGMENTS"
+          description: "Layer for mesh segments or supervoxels."
+        - name: "OBJECTS"
+          description: "Layer for individual objects."
+        - name: "AGENTS"
+          description: "Layer for dynamic agents, like robots or people."
+        - name: "PLACES"
+          description: "Layer for places or regions, like a kitchen or hallway."
+        - name: "MESH_PLACES"
+          description: "Layer for places defined by a collection of mesh vertices."
+        - name: "ROOMS"
+          description: "Layer for rooms."
+        - name: "BUILDINGS"
+          description: "Layer for entire buildings or structures."

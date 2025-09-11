@@ -3,7 +3,7 @@ import os
 from typing import List, Optional
 
 import yaml
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, PrivateAttr, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,11 @@ class Prompt(BaseModel):
     answer_semantic_guidance: Optional[str] = None
     answer_formatting_guidance: Optional[str] = None
 
+    _api_prompt: PrivateAttr() = None
+
+    def set_api_prompt(self, api_prompt):
+        self._api_prompt = api_prompt
+
     def to_openai_json(self, novel_instruction=None):
         # NOTE: Currently for openai we set a bunch of things as `developer`.
         # Anthropic doesn't quite have the same notion of developer.
@@ -68,6 +73,10 @@ class Prompt(BaseModel):
                 "novel_instruction must be set either at Prompt initialization or as an argument to `to_openai_json`"
             )
         prompt = [{"role": "developer", "content": self.system}]
+
+        if self._api_prompt:
+            logger.info(f"Using API prompt: {self._api_prompt}")
+            prompt.append({"role": "developer", "content": self._api_prompt})
 
         if self.tool_description:
             prompt.append({"role": "developer", "content": self.tool_description})

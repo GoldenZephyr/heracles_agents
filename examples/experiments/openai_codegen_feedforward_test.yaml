@@ -1,0 +1,51 @@
+metadata: {}
+configurations:
+    python-feedforward:
+        dsg_interface:
+            dsg_interface_type: python
+            dsg_filepath: ${HERACLES_EVALUATION_PATH}/graphs/west_point_fused_map_wregions_labelspace.json
+            dsg_labels_filepath: ${HERACLES_EVALUATION_PATH}/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml
+            dsg_api_filepath: ${HERACLES_EVALUATION_PATH}/examples/prompts/spark_dsg_api_prompt.yaml
+            dsg_api_descriptions: true
+            dsg_api_examples: true
+
+        pipeline: feedforward_codegen
+        questions: ${HERACLES_EVALUATION_PATH}/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        phases:
+            generate-code:
+                client:
+                    client_type: openai
+                    # auth key is supplied by HERACLES_ANTHROPIC_API_KEY
+                    timeout: 20
+
+                model_info:
+                    model: gpt-4.1
+                    temperature: 0.2
+                    seed: 123
+
+                agent_info:
+                    prompt_settings:
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_codegen_feedforward_prompt.yaml
+                    tools: []
+                        #- name: codegen_execute
+                    max_iterations: 1
+                    tool_interface: openai
+
+            refine:
+                client:
+                    client_type: openai
+                    timeout: 20
+
+                model_info:
+                    model: gpt-4.1-mini
+                    temperature: 0.2
+                    seed: 123
+
+                agent_info:
+                    prompt_settings:
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_codegen_feedforward_refinement_prompt.yaml
+                        output_type: SLDP
+                        sldp_answer_type_hint: true
+                    tools: []
+                    tool_interface: openai
+                    max_iterations: 1

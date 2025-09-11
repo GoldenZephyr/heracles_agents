@@ -1,6 +1,7 @@
 # Turn off warnings for duplicated function definitions
 # ruff: noqa: F401
 import heracles_evaluation.pipelines.agentic_pipeline
+import heracles_evaluation.pipelines.feedforward_codegen_pipeline
 import heracles_evaluation.pipelines.feedforward_cypher_pipeline
 import heracles_evaluation.pipelines.feedforward_in_context
 import heracles_evaluation.pipelines.test_task
@@ -11,5 +12,6 @@ import heracles_evaluation.provider_integrations.openai.openai_agent_integration
 import heracles_evaluation.tools.answer_tool
 import heracles_evaluation.tools.calculator_tool
 import heracles_evaluation.tools.canary_favog_tool
+import heracles_evaluation.tools.codegen_tool
 import heracles_evaluation.tools.cypher_query_tool
 import heracles_evaluation.tools.sldp_answer_tool

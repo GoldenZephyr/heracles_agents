@@ -14,7 +14,6 @@ from pydantic import BaseModel, Field
 from heracles_evaluation.agent_functions import (
     call_function,
     count_message_tokens,
-    count_tool_description_tokens,
     extract_answer,
     extract_answer_tag,
     generate_prompt_for_agent,
@@ -251,11 +250,12 @@ class AgentContext:
         self.agent = agent
         self.history = []
         self.n_tool_calls = 0
-        self.total_input_tokens = 0
+        self.initial_input_tokens = 0
         self.total_output_tokens = 0
 
     def initialize_agent(self, prompt):
         self.history = generate_prompt_for_agent(prompt, self.agent)
+        self.initial_input_tokens = count_message_tokens(self.agent, self.history)
 
         logger.info(f"Agent inintialized with: \n{get_summary_text(self.history)}")
 
@@ -268,12 +268,6 @@ class AgentContext:
         # TODO: what's a reasonable way to set the response format in general?
         # Needs to align with prompt, most likely
         response_format = "text"
-
-        prompt_tokens = count_message_tokens(self.agent, history)
-        tool_description_tokens = count_tool_description_tokens(
-            self.agent, explicit_tools
-        )
-        self.total_input_tokens += prompt_tokens + tool_description_tokens
 
         n_ratelimit_retries = 5
         wait_time_s = 60

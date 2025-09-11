@@ -23,7 +23,6 @@ from heracles_evaluation.summarize_results import display_experiment_results
 from sldp.sldp_lang import parse_sldp, sldp_equals
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def canary_pipeline(exp):
@@ -89,6 +88,7 @@ d = PipelineDescription(
 register_pipeline(d)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     with open("experiments/canary_experiment.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
 

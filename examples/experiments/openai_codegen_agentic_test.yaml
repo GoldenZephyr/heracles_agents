@@ -1,0 +1,43 @@
+metadata: {}
+configurations:
+    python-agentic:
+        dsg_interface:
+            dsg_interface_type: python
+            dsg_filepath: $HERACLES_EVALUATION_PATH/graphs/west_point_fused_map_wregions_labelspace.json
+            dsg_labels_filepath: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml
+            dsg_api_filepath: $HERACLES_EVALUATION_PATH/examples/prompts/spark_dsg_api_prompt.yaml
+            dsg_api_descriptions: true
+            dsg_api_examples: true
+
+        pipeline: agentic
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        phases:
+            main:
+                client:
+                    client_type: openai
+                    # auth key is supplied by HERACLES_ANTHROPIC_API_KEY
+                    timeout: 20
+
+                model_info:
+                    model: gpt-4.1
+                    temperature: 0.2
+                    seed: 123
+
+                agent_info:
+                    prompt_settings:
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/agent_system_codegen_prompt_full_info.yaml
+                        output_type: SLDP
+                        sldp_answer_type_hint: true
+                    tools:
+                        - name: codegen_execute
+                          bound_args:
+                            dsg_interface:
+                                dsg_interface_type: python
+                                dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
+                                dsg_labels_filepath: $HERACLES_EVALUATION_PATH/src/heracles/resources/ade20k_mit_label_space.yaml
+                                dsg_api_filepath: $HERACLES_EVALUATION_PATH/examples/prompts/spark_dsg_api_prompt.yaml
+                                dsg_api_descriptions: true
+                                dsg_api_examples: true
+
+                    max_iterations: 5
+                    tool_interface: openai

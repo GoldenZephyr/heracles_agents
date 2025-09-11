@@ -19,13 +19,17 @@ from heracles_evaluation.pipelines.comparisons import evaluate_answer
 from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def generate_prompt(
-    question: EvalQuestion, agent_config: LlmAgent, task_state_context: dict[str] = {}
+    question: EvalQuestion,
+    agent_config: LlmAgent,
+    task_state_context: dict[str] = {},
+    api_prompt: str = None,
 ):
     prompt = copy.deepcopy(agent_config.agent_info.prompt_settings.base_prompt)
+    if api_prompt:
+        prompt.set_api_prompt(api_prompt)
     if agent_config.agent_info.tool_interface == "custom":
         prompt.tool_description = "\n".join(
             [t.to_custom() for t in agent_config.agent_info.tools.values()]
@@ -50,11 +54,15 @@ def generate_prompt(
 
 def agentic_pipeline(exp):
     analyzed_questions = []
+    api_string = None
+    if exp.dsg_interface.dsg_interface_type == "python":
+        api_string = exp.dsg_interface.get_dsg_api_prompt()
+
     for question in exp.questions:
         logger.info(f"\n=======================\nQuestion: {question.question}\n")
         cxt = AgentContext(exp.phases["main"])
 
-        prompt = generate_prompt(question, exp.phases["main"])
+        prompt = generate_prompt(question, exp.phases["main"], api_prompt=api_string)
         logger.info(f"\nLLM Prompt: {prompt}\n")
 
         cxt.initialize_agent(prompt)
@@ -74,7 +82,7 @@ def agentic_pipeline(exp):
         analysis = QuestionAnalysis(
             correct=correct,
             valid_answer_format=valid_format,
-            input_tokens=cxt.total_input_tokens,
+            input_tokens=cxt.initial_input_tokens,
             output_tokens=cxt.total_output_tokens,
         )
         aq = AnalyzedQuestion(

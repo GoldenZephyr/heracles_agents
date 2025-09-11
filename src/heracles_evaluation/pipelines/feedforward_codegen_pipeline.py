@@ -1,5 +1,6 @@
 import copy
 import logging
+import os
 
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
@@ -15,17 +16,24 @@ from heracles_evaluation.llm_interface import (
     LlmAgent,
     QuestionAnalysis,
 )
+from heracles_evaluation.pipelines.codegen_utils import execute_generated_code, load_dsg
 from heracles_evaluation.pipelines.comparisons import evaluate_answer
-from heracles_evaluation.pipelines.db_utils import query_db
 from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
 
 
 def generate_prompt(
-    question: EvalQuestion, agent_config: LlmAgent, task_state_context: dict[str] = {}
+    question: EvalQuestion,
+    agent_config: LlmAgent,
+    task_state_context: dict[str] = {},
+    api_prompt: str = None,
 ):
     prompt = copy.deepcopy(agent_config.agent_info.prompt_settings.base_prompt)
+
+    if api_prompt:
+        prompt.set_api_prompt(api_prompt)
+
     if agent_config.agent_info.tool_interface == "custom":
         prompt.tool_description = "\n".join(
             [t.to_custom() for t in agent_config.agent_info.tools]
@@ -48,29 +56,45 @@ def generate_prompt(
     return prompt
 
 
-def feedforward_cypher(exp):
+# TODO update this function here
+def feedforward_codegen(exp):
     analyzed_questions = []
+    # Note this won't work for inserting into the scene graph. To do that a copy.deepcopy will be needed in the loop (not including for efficiency, since loading the scene graph is slow)
+    # TODO modify experiment config to include this)
+    dsg_filepath = os.path.expandvars(exp.dsg_interface.dsg_filepath)
+    dsg_labels_filepath = (
+        os.path.expandvars(exp.dsg_interface.dsg_labels_filepath)
+        if hasattr(exp.dsg_interface, "dsg_labels_filepath")
+        and exp.dsg_interface.dsg_labels_filepath
+        else None
+    )
+    scene_graph = load_dsg(dsg_filepath, dsg_labels_filepath)
+    # Set api in prompt
+    api_string = exp.dsg_interface.get_dsg_api_prompt()
     for question in exp.questions:
         logger.info(f"\n=======================\nQuestion: {question.question}\n")
-        cxt = AgentContext(exp.phases["generate-cypher"])
+        cxt = AgentContext(exp.phases["generate-code"])
 
-        prompt = generate_prompt(question, exp.phases["generate-cypher"])
+        prompt = generate_prompt(
+            question, exp.phases["generate-code"], api_prompt=api_string
+        )
 
         cxt.initialize_agent(prompt)
         success, answer = cxt.run()
         logger.info(f"\nLLM Intermediate Answer: {answer}\n")
 
-        cypher_generation_sequence = AgentSequence(
-            description="cypher-producing-agent", responses=cxt.get_agent_responses()
+        codgen_sequence = AgentSequence(
+            description="codegen-agent", responses=cxt.get_agent_responses()
         )
 
-        success, query_result = query_db(exp.dsg_interface, answer)
+        # TODO udpate this
+        success, code_results = execute_generated_code(answer, scene_graph)
 
         cxt2 = AgentContext(exp.phases["refine"])
         refinement_prompt = generate_prompt(
             question,
             exp.phases["refine"],
-            {"cypher_results": query_result, "cypher_query": answer},
+            {"python_results": code_results, "python_code": answer},
         )
 
         cxt2.initialize_agent(refinement_prompt)
@@ -87,9 +111,9 @@ def feedforward_cypher(exp):
             description="refinement-agent", responses=cxt2.get_agent_responses()
         )
 
-        sequences = [cypher_generation_sequence, refinement_sequence]
+        sequences = [codgen_sequence, refinement_sequence]
 
-        n_input_tokens = cxt.initial_input_tokens + cxt2.initial_input_tokens
+        n_input_tokens = cxt.total_input_tokens + cxt2.total_input_tokens
         n_output_tokens = cxt.total_output_tokens + cxt2.total_output_tokens
 
         analysis = QuestionAnalysis(
@@ -107,36 +131,17 @@ def feedforward_cypher(exp):
     return aqs
 
 
-cypher_phase = PipelinePhase(
-    name="generate-cypher", description="Map question to Cypher query"
+codegen_phase = PipelinePhase(
+    name="generate-code", description="Map question to Python code"
 )
 refine_phase = PipelinePhase(
-    name="refine", description="Map result of cypher query to final answer"
+    name="refine", description="Map result of executed code to final answer"
 )
 d = PipelineDescription(
-    name="feedforward_cypher",
-    description="Single cypher query, then refinement",
-    phases=[cypher_phase, refine_phase],
-    function=feedforward_cypher,
+    name="feedforward_codegen",
+    description="Single codegen query, then refinement",
+    phases=[codegen_phase, refine_phase],
+    function=feedforward_codegen,
 )
 
 register_pipeline(d)
-
-if __name__ == "__main__":
-    import yaml
-
-    from heracles_evaluation.experiment_definition import ExperimentConfiguration
-    from heracles_evaluation.summarize_results import display_experiment_results
-
-    logging.basicConfig(level=logging.INFO)
-
-    with open("experiments/dsg_feedforward_experiment.yaml", "r") as fo:
-        yml = yaml.safe_load(fo)
-    experiment = ExperimentConfiguration(**yml)
-    logger.debug(f"Loaded experiment configuration: {experiment}")
-
-    aqs = feedforward_cypher(experiment)
-    with open("output/dsgdb_feedforward_out.yaml", "w") as fo:
-        fo.write(yaml.dump(aqs.model_dump()))
-
-    display_experiment_results(aqs)
