@@ -1,8 +1,6 @@
 import copy
 import logging
 
-import spark_dsg
-
 from heracles_evaluation.experiment_definition import (
     PipelineDescription,
     PipelinePhase,
@@ -18,64 +16,10 @@ from heracles_evaluation.llm_interface import (
     QuestionAnalysis,
 )
 from heracles_evaluation.pipelines.comparisons import evaluate_answer
+from heracles_evaluation.pipelines.in_context_utils import scene_graph_to_prompt
 from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
-
-
-class PromptingFailure(Exception):
-    pass
-
-
-def get_region_parent_of_object(object_node, scene_graph):
-    # Get the parent of the object (Place)
-    parent_place_id = object_node.get_parent()
-    if not parent_place_id:
-        return "none"
-    parent_place_node = scene_graph.get_node(parent_place_id)
-    parent_region_id = parent_place_node.get_parent()
-    if not parent_region_id:
-        return "none"
-    parent_region_node = scene_graph.get_node(parent_region_id)
-    return parent_region_node.id.str(True)
-
-
-def object_to_prompt(object_node, scene_graph):
-    attrs = object_node.attributes
-    symbol = object_node.id.str(True)
-    object_labelspace = scene_graph.get_labelspace(2, 0)
-    if not object_labelspace:
-        raise PromptingFailure("No available object labelspace")
-    semantic_type = object_labelspace.get_category(attrs.semantic_label)
-    position = f"({attrs.position[0]},{attrs.position[1]})"
-    parent_region = get_region_parent_of_object(object_node, scene_graph)
-    object_prompt = f"\n-\t(id={symbol}, type={semantic_type}, pos={position}, parent_region={parent_region})"
-    return object_prompt
-
-
-def region_to_prompt(region_node, scene_graph):
-    attrs = region_node.attributes
-    symbol = region_node.id.str(True)
-    region_labelspace = scene_graph.get_labelspace(4, 0)
-    if not region_labelspace:
-        raise PromptingFailure("No available region labelspace")
-    semantic_type = region_labelspace.get_category(attrs.semantic_label)
-    region_prompt = f"\n-\t(id={symbol}, type={semantic_type})"
-    return region_prompt
-
-
-def scene_graph_to_prompt(scene_graph):
-    # Add the objects
-    objects_prompt = ""
-    for object_node in scene_graph.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes:
-        objects_prompt += object_to_prompt(object_node, scene_graph)
-    # Add the regions
-    regions_prompt = ""
-    for region_node in scene_graph.get_layer(spark_dsg.DsgLayers.ROOMS).nodes:
-        regions_prompt += region_to_prompt(region_node, scene_graph)
-    # Construct the prompt
-    scene_graph_prompt = f"<Scene Graph>\nObjects: {objects_prompt}\nRegions: {regions_prompt}</Scene Graph>"
-    return scene_graph_prompt
 
 
 def generate_prompt(
