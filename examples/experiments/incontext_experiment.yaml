@@ -1,36 +1,10 @@
 metadata: {}
 configurations:
-    in_context_qa:
-        dsg_interface:
-            dsg_interface_type: in_context
-            dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
-        pipeline: in_context_qa
-        phases:
-            main:
-                client:
-                    client_type: ollama
-
-                model_info:
-                    model: gemma3:27b
-                    #model: llama3.1
-                    temperature: 0.02
-
-                agent_info:
-                    prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/incontext_dsg_prompt.yaml
-                        output_type: SLDP
-                        sldp_answer_type_hint: true
-                    tools: {}
-                    tool_interface: none
-                    max_iterations: 1
-
-        #questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/nina_questions.yaml
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
     in_context_qa_openai:
         dsg_interface:
             dsg_interface_type: in_context
             dsg_filepath: $HERACLES_EVALUATION_PATH/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
-        pipeline: in_context_qa
+        pipeline: feedforward_in_context
         phases:
             main:
                 client:
@@ -52,40 +26,4 @@ configurations:
                     tool_interface: none
                     max_iterations: 1
 
-        #questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/nina_questions.yaml
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
-
-    agentic-cypher-qa:
-        dsg_interface:
-            dsg_interface_type: none
-
-        pipeline: agentic_cypher_qa
-        phases:
-            main:
-                client:
-                    client_type: openai
-                    # auth key is supplied by HERACLES_OPENAI_API_KEY
-                    timeout: 20
-
-                model_info:
-                    model: gpt-5-mini
-                    temperature: 1.0
-                    seed: 123
-
-                agent_info:
-                    prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/agent_system_prompt_full_info.yaml
-                        output_type: SLDP
-                        sldp_answer_type_hint: true
-                    tools:
-                        - name: run_cypher_query
-                          bound_args:
-                              dsgdb_conf:
-                                  dsg_interface_type: heracles
-                                  uri: "neo4j://127.0.0.1:7687"
-
-                    tool_interface: openai
-                    max_iterations: 6
-
-        #questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/nina_questions.yaml
         questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
