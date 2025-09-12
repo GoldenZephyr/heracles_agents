@@ -1,0 +1,31 @@
+interface_description: |
+  <python_api>
+  Your output should be executable python code (def solve_task(G) ) that takes in a 3D scene graph G. The result should be the information needed to answer the user's query.
+  All nodes in the graph have a CASE SENSITIVE node symbol and the letter part must be capitalized. For example, object 1 should be referenced as O1.
+  Assume all python imports are present. Only give the python function and any helper functions you need. They will be automatically run.
+  Ensure NodeSymbols are returned rather than bitmaps/uint64 when referencing symbols. Symbols should always be capital letters!
+  Make sure to check the full hierarchical structure when looking at children and parent relationships.
+
+  Here are examples of how to use the API to answer questions:
+  1.Task: Get a list of all objects in the scene graph G
+  Solution:
+  <python>
+  def solve_task(G):
+      # Returns a list of all objects as dictionaries in the scene graph G
+      objects = [for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes]
+      return objects
+  </python>
+  2. Find all the foo in the graph G
+  <python>
+  def solve_task(G):
+      # Returns a list of all foo (as dictionaries) in the scene graph G
+      labelspace = G.metadata.get()["labelspace"]
+        return [
+        labelspace[str(o.attributes.semantic_label)]
+        for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes
+        if "foo" in labelspace[str(o.attributes.semantic_label)].lower()
+        ]
+  ]
+  </python>
+  Please consider efficiency when writing your code. Use list comprehensions and avoid unnecessary loops.
+  </python_api>

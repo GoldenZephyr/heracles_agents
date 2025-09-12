@@ -19,7 +19,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/agent_system_prompt_full_info.yaml
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/cypher/agent_system_cypher_prompt_full_info.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools:

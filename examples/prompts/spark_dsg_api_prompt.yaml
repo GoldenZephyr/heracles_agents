@@ -1,7 +1,7 @@
 api:
   name: "spark_dsg"
   version: "1.1.1"
-  description: "Python bindings for the spark-dsg (Dynamic Scene Graph) library, a hierarchical representation for robotic perception."
+  description: "Python bindings for the spark-dsg (Dynamic Scene Graph) library, a hierarchical representation for robotic perception. (import spark_dsg)"
   classes:
     - name: "DynamicSceneGraph"
       include: true
@@ -47,7 +47,7 @@ api:
             type: "DynamicSceneGraph"
             description: "The loaded scene graph object."
           example: |
-            graph = dsg.DynamicSceneGraph.load("my_scene_graph.dsg")
+            graph = spark_dsg.DynamicSceneGraph.load("my_scene_graph.dsg")
         - name: "has_layer"
           include: true
           description: "Checks if a layer exists in the graph."
@@ -62,7 +62,7 @@ api:
             type: "bool"
             description: "True if the layer exists, False otherwise."
           example: |
-            exists = graph.has_layer(dsg.DsgLayers.OBJECTS)
+            exists = graph.has_layer(spark_dsg.DsgLayers.OBJECTS)
         - name: "get_layer"
           include: true
           description: "Gets a read-only view of a specific layer."
@@ -77,7 +77,7 @@ api:
             type: "LayerView"
             description: "A view of the requested layer. Throws an error if the layer does not exist."
           example: |
-            objects_layer = graph.get_layer(dsg.DsgLayers.OBJECTS)
+            objects_layer = graph.get_layer(spark_dsg).DsgLayers.OBJECTS)
         - name: "has_node"
           include: true
           description: "Checks if a node exists anywhere in the graph."
@@ -350,24 +350,24 @@ api:
 
     - name: "NodeSymbol"
       include: true
-      description: "A unique identifier for a node, composed of a character prefix and a numerical ID. E.g., 'p1' for place 1."
+      description: "A unique identifier for a node, composed of a character prefix and a numerical ID. E.g., 'P1' for place 1. (CASE SENSITIVE use CAPS)"
       constructor:
         include: true
         description: "Creates a new NodeSymbol."
         inputs:
           - name: "key"
             type: "char"
-            description: "The character prefix for the category (e.g., 'p')."
+            description: "The character prefix for the category (e.g., 'P')."
           - name: "index"
             type: "int"
             description: "The numerical index for the node."
         example: |
-          node_id = dsg.NodeSymbol('p', 10)
+          node_id = dsg.NodeSymbol('P', 10)
       properties:
         - name: "category"
           include: true
           type: "str"
-          description: "The character prefix of the symbol (e.g., 'p')."
+          description: "The character prefix of the symbol (e.g., 'P')."
           access: "read-only"
         - name: "category_id"
           include: true
@@ -389,10 +389,10 @@ api:
               description: "If true, show category name instead of char (optional, default=True)."
           output:
             type: "str"
-            description: "The string label (e.g., 'p10')."
+            description: "The string label (e.g., 'P10')."
           example: |
-            symbol = dsg.NodeSymbol('p', 10)
-            label = symbol.str() # 'p10'
+            symbol = dsg.NodeSymbol('P', 10)
+            label = symbol.str() # 'P10'
 
     - name: "NodeAttributes"
       include: true
@@ -635,20 +635,18 @@ api:
 
   enums:
     - name: "DsgLayers"
-      include: false
+      include: true
       description: "Standard integer identifiers for common semantic layers in the scene graph."
       values:
         - name: "SEGMENTS"
           description: "Layer for mesh segments or supervoxels."
         - name: "OBJECTS"
           description: "Layer for individual objects."
-        - name: "AGENTS"
-          description: "Layer for dynamic agents, like robots or people."
         - name: "PLACES"
-          description: "Layer for places or regions, like a kitchen or hallway."
+          description: "Layer for places or regions."
         - name: "MESH_PLACES"
-          description: "Layer for places defined by a collection of mesh vertices."
+          description: "Layer for places defined by a collection of mesh vertices with potential semantic labels"
         - name: "ROOMS"
-          description: "Layer for rooms."
+          description: "Layer for rooms/regions."
         - name: "BUILDINGS"
           description: "Layer for entire buildings or structures."

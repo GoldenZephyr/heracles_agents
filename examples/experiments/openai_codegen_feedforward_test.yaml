@@ -3,7 +3,7 @@ configurations:
     python-feedforward:
         dsg_interface:
             dsg_interface_type: python
-            dsg_filepath: ${HERACLES_EVALUATION_PATH}/examples/scene_graphs/west_point_fused_map_wregions_labelspace.json
+            dsg_filepath: ${HERACLES_EVALUATION_PATH}/examples/scene_graphs/west_point_fused_map_wregions_labelspace_resaved.json
             dsg_labels_filepath: ${HERACLES_EVALUATION_PATH}/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml
             dsg_api_filepath: ${HERACLES_EVALUATION_PATH}/examples/prompts/spark_dsg_api_prompt.yaml
             dsg_api_descriptions: true
@@ -19,13 +19,13 @@ configurations:
                     timeout: 20
 
                 model_info:
-                    model: gpt-4.1
+                    model: gpt-4.1-mini
                     temperature: 0.2
                     seed: 123
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_codegen_feedforward_prompt.yaml
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/codegen/dsg_codegen_feedforward_prompt.yaml
                     tools: []
                         #- name: codegen_execute
                     max_iterations: 1
@@ -43,7 +43,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_codegen_feedforward_refinement_prompt.yaml
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/codegen/dsg_codegen_feedforward_refinement_prompt.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools: []

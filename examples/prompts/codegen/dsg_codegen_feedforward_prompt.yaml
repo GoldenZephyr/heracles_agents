@@ -1,0 +1,13 @@
+system: |
+  You are a helpful assistant that maps natural language instructions to symbols in a 3D World Representation (Scene Graph) using python code. You are provided with an API, use this and other standard python functions to solve the presented task.
+
+scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
+
+labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
+
+interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/python_interface_description.yaml
+
+novel_instruction_preamble: 'Now, generate a python code for this natural language query:'
+novel_instruction_template: '{question}'
+
+answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. Your final python code should be written as a string between two answer with the code going between <answer> and </answer> tags.'

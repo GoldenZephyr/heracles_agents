@@ -45,6 +45,9 @@ class InContextExample(BaseModel):
 
 class Prompt(BaseModel):
     system: str
+    interface_description: Optional[str] = None
+    scene_graph_description: Optional[str] = None
+    domain_description: Optional[str] = None
     tool_description: Optional[str] = None
     in_context_examples_preamble: Optional[str] = None
     in_context_examples: Optional[List[InContextExample]] = None
@@ -58,6 +61,26 @@ class Prompt(BaseModel):
 
     def set_api_prompt(self, api_prompt):
         self._api_prompt = api_prompt
+
+    @field_validator(
+        "scene_graph_description",
+        "interface_description",
+        "domain_description",
+        mode="before",
+    )
+    @classmethod
+    def load_description_from_yaml(cls, value: Optional[str], info):
+        """
+        If the field points to a YAML file, load it and extract the content
+        under the corresponding field name. Otherwise return the value as-is.
+        """
+        if isinstance(value, str):
+            path = os.path.expandvars(value)
+            if os.path.isfile(path) and path.endswith((".yaml", ".yml")):
+                with open(path, "r") as f:
+                    data = yaml.safe_load(f)
+                return data.get(info.field_name, None)
+        return value
 
     def to_openai_json(self, novel_instruction=None):
         # NOTE: Currently for openai we set a bunch of things as `developer`.
@@ -74,8 +97,19 @@ class Prompt(BaseModel):
             )
         prompt = [{"role": "developer", "content": self.system}]
 
+        if self.scene_graph_description:
+            prompt.append(
+                {"role": "developer", "content": self.scene_graph_description}
+            )
+
+        if self.interface_description:
+            prompt.append({"role": "developer", "content": self.interface_description})
+
+        if self.domain_description:
+            prompt.append({"role": "developer", "content": self.domain_description})
+
         if self._api_prompt:
-            logger.info(f"Using API prompt: {self._api_prompt}")
+            logger.debug(f"Using API prompt: {self._api_prompt}")
             prompt.append({"role": "developer", "content": self._api_prompt})
 
         if self.tool_description:
@@ -126,6 +160,19 @@ class Prompt(BaseModel):
             )
         prompt = [{"role": "user", "content": self.system}]
 
+        if self.scene_graph_description:
+            prompt.append({"role": "user", "content": self.scene_graph_description})
+
+        if self.interface_description:
+            prompt.append({"role": "user", "content": self.interface_description})
+
+        if self.domain_description:
+            prompt.append({"role": "user", "content": self.domain_description})
+
+        if self._api_prompt:
+            logger.debug(f"Using API prompt: {self._api_prompt}")
+            prompt.append({"role": "user", "content": self._api_prompt})
+
         if self.tool_description:
             prompt.append({"role": "user", "content": self.tool_description})
 
@@ -167,6 +214,25 @@ class Prompt(BaseModel):
                 "novel_instruction must be set either at Prompt initialization or as an argument to `to_anthropic_json`"
             )
         prompt = [{"role": "user", "content": [{"text": self.system}]}]
+
+        if self.scene_graph_description:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.scene_graph_description}]}
+            )
+
+        if self.interface_description:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.interface_description}]}
+            )
+
+        if self.domain_description:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.domain_description}]}
+            )
+
+        if self._api_prompt:
+            logger.debug(f"Using API prompt: {self._api_prompt}")
+            prompt.append({"role": "user", "content": [{"text": self._api_prompt}]})
 
         if self.tool_description:
             prompt.append(

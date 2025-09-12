@@ -1,0 +1,10 @@
+scene_graph_description: |
+  <Scene Graph Description>
+  A 3D scene graph is a hierarchical graph consisting of layers that each contain nodes. Graphs have the 2D Place layer, the Object layer, and the Region layer.
+  3D Places Layer (PLACES): A 3D  places layer in the scene graph which contains places that are reachable locations in the world. Each Place node has a unique ID (P<id>).
+  2D Place Layer (MESH_PLACES): The 2D Place layer (MESH_PLACES) contains Places that are reachable locations in the world with a possible semantic class (type). Each Place node has a unique ID (P<id>).
+  Object Layer (OBJECTS): The Object layer contains Objects that exist in the world. Each Object has a unique ID (O<id>), a semantic class (type), an x,y position (pos), and a parent. The parent can be a place or a room/region, indicating which place or region/room the Object belongs to.
+  Each Object will be represented in the form: (id, type, pose, parent_region).
+  Room/Region Layer (ROOMS): The Room/Region Layer contains Regions that exist in the world. Each Region has a unique ID (R<id>) and a semantic class (type). Each Region will be represented in the form: (R<id>, type).
+  Regions/Rooms are at the top level of the hierarchy, Places (2D and 3D) (a graph can have 1, or both) are below Regions/Rooms, and Objects are below Places. To get an Object in a Region/Room, you must look at the Places in that Region/Room first.
+  </Scene Graph Description>

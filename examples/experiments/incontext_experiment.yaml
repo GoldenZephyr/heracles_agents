@@ -19,7 +19,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/incontext_dsg_prompt.yaml
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/incontext/incontext_dsg_prompt.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools: {}
