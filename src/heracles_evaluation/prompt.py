@@ -47,6 +47,7 @@ class Prompt(BaseModel):
     system: str
     interface_description: Optional[str] = None
     scene_graph_description: Optional[str] = None
+    labelspace_description: Optional[str] = None
     domain_description: Optional[str] = None
     tool_description: Optional[str] = None
     in_context_examples_preamble: Optional[str] = None
@@ -66,6 +67,7 @@ class Prompt(BaseModel):
         "scene_graph_description",
         "interface_description",
         "domain_description",
+        "labelspace_description",
         mode="before",
     )
     @classmethod
@@ -76,7 +78,9 @@ class Prompt(BaseModel):
         """
         if isinstance(value, str):
             path = os.path.expandvars(value)
-            if os.path.isfile(path) and path.endswith((".yaml", ".yml")):
+            if path.endswith((".yaml", ".yml")):
+                if not os.path.isfile(path):
+                    raise ValueError(f"Description YAML path does not exist: {path}")
                 with open(path, "r") as f:
                     data = yaml.safe_load(f)
                 return data.get(info.field_name, None)
@@ -101,6 +105,9 @@ class Prompt(BaseModel):
             prompt.append(
                 {"role": "developer", "content": self.scene_graph_description}
             )
+
+        if self.labelspace_description:
+            prompt.append({"role": "developer", "content": self.labelspace_description})
 
         if self.interface_description:
             prompt.append({"role": "developer", "content": self.interface_description})
@@ -163,6 +170,9 @@ class Prompt(BaseModel):
         if self.scene_graph_description:
             prompt.append({"role": "user", "content": self.scene_graph_description})
 
+        if self.labelspace_description:
+            prompt.append({"role": "user", "content": self.labelspace_description})
+
         if self.interface_description:
             prompt.append({"role": "user", "content": self.interface_description})
 
@@ -218,6 +228,11 @@ class Prompt(BaseModel):
         if self.scene_graph_description:
             prompt.append(
                 {"role": "user", "content": [{"text": self.scene_graph_description}]}
+            )
+
+        if self.labelspace_description:
+            prompt.append(
+                {"role": "user", "content": [{"text": self.labelspace_description}]}
             )
 
         if self.interface_description:
@@ -330,6 +345,11 @@ are equal if the sets of their keys are equal and the value for each key
 matches between dictionaries, and two points are equal if they are  within some
 tolerance. Of course primitive numbers and strings can also be compared for
 equality. We support arbitrary compositions of these containers.
+
+We expect nodes in the graph to be represented without any parentheses. For example O(1) should be represented as O1.
+We also expect no additional information than what is explicitly asked for in the question.
+E.g., if the question asks for a list of node IDs, the answer should be a list of node IDs and not a list of nodes with their properties
+or if the question asks for locations a list of points should be provided and not a list of nodes with their locations.
 
 ### Syntax
 
