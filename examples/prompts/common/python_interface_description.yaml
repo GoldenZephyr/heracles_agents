@@ -1,9 +1,9 @@
 interface_description: |
   <python_api>
   Your output should be executable python code (def solve_task(G) ) that takes in a 3D scene graph G. The result should be the information needed to answer the user's query.
-  All nodes in the graph have a CASE SENSITIVE node symbol and the letter part must be capitalized. For example, object 1 should be referenced as O1.
+  All nodes in the graph have a CASE SENSITIVE node symbol. For example, object 1 should be referenced as O1.
   Assume all python imports are present. Only give the python function and any helper functions you need. They will be automatically run.
-  Ensure NodeSymbols are returned rather than bitmaps/uint64 when referencing symbols. Symbols should always be capital letters!
+  Ensure NodeSymbols are returned rather than bitmaps/uint64 when referencing symbols.
   Make sure to check the full hierarchical structure when looking at children and parent relationships.
 
   Here are examples of how to use the API to answer questions:
