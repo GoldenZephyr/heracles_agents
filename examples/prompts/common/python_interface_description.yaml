@@ -7,7 +7,7 @@ interface_description: |
   Make sure to check the full hierarchical structure when looking at children and parent relationships.
 
   Here are examples of how to use the API to answer questions:
-  1.Task: Get a list of all objects in the scene graph G
+  1. Task: Get a list of all objects in the scene graph G
   Solution:
   <python>
   def solve_task(G):

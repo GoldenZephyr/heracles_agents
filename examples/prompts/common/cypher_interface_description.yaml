@@ -1,7 +1,6 @@
 interface_description: |
   Labels in Database:
       - Object: a node representing an object in the world.
-        Object Properties:
           - nodeSymbol: a unique string identifier
           - class: a string identifying the object's semantic class or type
           - center: the 3D position of the object, as a POINT type

@@ -1,25 +1,24 @@
 pddl_domain_description: |
   <PDDL Domain>
       The PDDL domain consists of the following predicates described below. These predicates get parameterized by symbols from a 3D scene graph.
-      (visited-place ?p): This predicate indicates that a robot must visit Place '?p' at some point, where '?p' is a placeholder for a Place ID.
-      (at-place ?p): This predicate indicates that a robot must be at Place '?p', where '?p' is a placeholder for a Place ID.
-      (visited-object ?o): This predicate indicates that a robot must visit Object '?o' at some point, where '?o' is a placeholder for an Object ID.
-      (at-object ?o): This predicate indicates that a robot must be at Object '?o', where '?o' is a placeholder for an Object ID.
-      (safe ?o): This predicate indicates that a robot must inspect Object '?o', where '?o' is a placeholder for an Object ID.
-      (visited-room ?r): This predicate indicates that a robot must visit Room '?r' at some point, where '?r' is a placeholder for a Room ID.
-      (in-room ?r): This predicate indicates that a robot must be at Room '?r', where '?r' is a placeholder for a Room ID.
+      (visited-place ?P): This predicate indicates that a robot must visit Place '?P' at some point, where '?P' is a placeholder for a Place ID.
+      (at-place ?P): This predicate indicates that a robot must be at Place '?P', where '?P' is a placeholder for a Place ID.
+      (visited-object ?O): This predicate indicates that a robot must visit Object '?O' at some point, where '?O' is a placeholder for an Object ID.
+      (at-object ?O): This predicate indicates that a robot must be at Object '?O', where '?O' is a placeholder for an Object ID.
+      (safe ?O): This predicate indicates that a robot must inspect Object '?O', where '?O' is a placeholder for an Object ID.
+      (visited-room ?R): This predicate indicates that a robot must visit Room '?R' at some point, where '?R' is a placeholder for a Room ID.
+      (in-room ?R): This predicate indicates that a robot must be at Room '?R', where '?R' is a placeholder for a Room ID.
       The 'at' and 'visited' predicates are useful for specifying locations for robots to go.
+      When an instruction indicates an order, you should use (at-place ?P), (at-object ?O), or (in-room ?R) to specify the final goal and (visited-place ?P), (visited-object ?O), or (visited-room ?R) to specify the intermediate goals.
 
-      (holding ?o): This predicates indicates the a robot must be holding an Object '?o', where '?o' is a placeholder for an Object ID.
+      (holding ?O): This predicates indicates the a robot must be holding an Object '?O', where '?O' is a placeholder for an Object ID.
       The 'holding' predicate is useful for specifying that a robot should pick up an object.
 
-      (object-in-place ?o ?p): This predicate indicates that an Object '?o' must be located inside a Place '?p', where '?o' is a placeholder for an Object ID and '?p' is a placeholder for a Place ID.
+      (object-in-place ?O ?P): This predicate indicates that an Object '?O' must be located inside a Place '?P', where '?O' is a placeholder for an Object ID and '?P' is a placeholder for a Place ID.
       The 'object-in-place' predicate is useful for specifying that a robot should place an object somewhere. If the robot should move an object from one place to another, you should use the 'object-in-place' predicate for the goal instead of the 'holding' predicate.
 
       You can compose PDDL goal predicates into more complex goals using the following operators:
-      not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-place r1))' means Room 'r1' should not be visited.
-      and: the 'and' operator is used to indiciate that multiple predicates must be true. For example '(and (visited-place r1) (visited-object o1))' means both Room 'r1' and Object 'o1' must be visited.
-      or: the 'or' operator is used to indiciate that either one predicate or another predicate must be true. For example '(or (visited-place r1) (visited-object o1))' means that either Room 'r1' or Object 'o1' must be visited.
-
-      When an instruction indicates an order, you should use (at-place ?p), (at-object ?o), or (in-room ?r) to specify the final state.
+      not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-place R1))' means Room 'R1' should not be visited.
+      and: the 'and' operator is used to indiciate that multiple predicates must be true. For example '(and (visited-place R1) (visited-object O1))' means both Room 'R1' and Object 'O1' must be visited.
+      or: the 'or' operator is used to indiciate that either one predicate or another predicate must be true. For example '(or (visited-place R1) (visited-object O1))' means that either Room 'R1' or Object 'O1' must be visited.
   </PDDL Domain>
