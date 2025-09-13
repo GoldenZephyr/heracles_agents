@@ -82,9 +82,15 @@ class Prompt(BaseModel):
             if path.endswith((".yaml", ".yml")):
                 if not os.path.isfile(path):
                     raise ValueError(f"Description YAML path does not exist: {path}")
+                logger.info(f"Loading {path}")
                 with open(path, "r") as f:
                     data = yaml.safe_load(f)
-                return data.get(info.field_name, None)
+                loaded_data = data.get(info.field_name, None)
+                if loaded_data is None:
+                    logger.error(
+                        f"Failed to load {info.field_name}. Only found {list(data.keys())}"
+                    )
+                return loaded_data
         return value
 
     def to_openai_json(self, novel_instruction=None):
