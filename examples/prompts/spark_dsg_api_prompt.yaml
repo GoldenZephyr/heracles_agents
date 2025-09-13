@@ -1,15 +1,18 @@
 api:
   name: "spark_dsg"
   version: "1.1.1"
-  description: "Python bindings for the spark-dsg (Dynamic Scene Graph) library, a hierarchical representation for robotic perception. (import spark_dsg)"
+  description: "Python interface (Dynamic Scene Graph) library, a hierarchical representation for robotic perception. (import spark_dsg)"
   classes:
     - name: "DynamicSceneGraph"
       include: true
       description: "The main container for a multi-layered, dynamic scene graph. It manages all layers, nodes, and edges."
       constructor:
         include: true
-        description: "Creates a new, empty DynamicSceneGraph (dsg)."
+        description: "Creates a new DynamicSceneGraph (dsg). Can be initialized empty, or with a predefined set of layers."
         inputs:
+          - name: "empty"
+            type: "bool"
+            description: "If true, initializes an empty graph without default layers (optional, default=False)."
           - name: "layer_keys"
             type: "list[LayerKey]"
             description: "A list of layer keys to pre-allocate."
@@ -18,8 +21,10 @@ api:
             description: "A map from layer ID to layer name."
         example: |
           import spark_dsg as dsg
-          # Create an empty graph
-          graph = dsg.DynamicSceneGraph()
+          # Create a graph with default layers
+          graph = spark_dsg.DynamicSceneGraph()
+          # Create a completely empty graph
+          empty_graph = spark_dsg.DynamicSceneGraph(empty=True)
       methods:
         - name: "save"
           include: false
@@ -37,7 +42,7 @@ api:
           example: |
             graph.save("my_scene_graph.dsg")
         - name: "load"
-          include: true
+          include: false
           description: "A static method to load a scene graph from a file."
           inputs:
             - name: "filepath"
@@ -77,7 +82,7 @@ api:
             type: "LayerView"
             description: "A view of the requested layer. Throws an error if the layer does not exist."
           example: |
-            objects_layer = graph.get_layer(spark_dsg).DsgLayers.OBJECTS)
+            objects_layer = graph.get_layer(spark_dsg.DsgLayers.OBJECTS)
         - name: "has_node"
           include: true
           description: "Checks if a node exists anywhere in the graph."
@@ -100,6 +105,16 @@ api:
             type: "SceneGraphNode"
             description: "The requested node. Throws an error if the node does not exist."
           example: ""
+        - name: "find_node"
+          include: true
+          description: "Finds a specific node in the graph, returning None if not found."
+          inputs:
+            - name: "node_id"
+              type: "NodeSymbol"
+              description: "The unique identifier of the node."
+          output:
+            type: "SceneGraphNode or None"
+            description: "The requested node, or None if it does not exist."
         - name: "has_edge"
           include: true
           description: "Checks if an edge exists between two nodes."
@@ -128,6 +143,19 @@ api:
             type: "SceneGraphEdge"
             description: "The requested edge. Throws an error if the edge does not exist."
           example: ""
+        - name: "find_edge"
+          include: true
+          description: "Finds the edge between two nodes, returning None if not found."
+          inputs:
+            - name: "source_node"
+              type: "NodeSymbol"
+              description: "The ID of the source node."
+            - name: "target_node"
+              type: "NodeSymbol"
+              description: "The ID of the target node."
+          output:
+            type: "SceneGraphEdge or None"
+            description: "The requested edge, or None if it does not exist."
         - name: "get_position"
           include: true
           description: "Gets the 3D position of a node."
@@ -139,6 +167,39 @@ api:
             type: "numpy.ndarray[3]"
             description: "The (x, y, z) position of the node."
           example: ""
+        - name: "num_nodes"
+          include: true
+          description: "Gets the total number of nodes in the graph."
+          inputs:
+            - name: "include_partitions"
+              type: "bool"
+              description: "Whether to include nodes in partitioned layers (optional, default=True)."
+          output:
+            type: "int"
+        - name: "num_edges"
+          include: true
+          description: "Gets the total number of edges in the graph."
+          inputs:
+            - name: "include_partitions"
+              type: "bool"
+              description: "Whether to include edges connected to partitioned layers (optional, default=True)."
+          output:
+            type: "int"
+        - name: "empty"
+          include: true
+          description: "Checks if the graph has any nodes."
+          output:
+            type: "bool"
+        - name: "clear"
+          include: true
+          description: "Removes all nodes, edges, and layers from the graph."
+          output:
+            type: "None"
+        - name: "clone"
+          include: true
+          description: "Creates a deep copy of the scene graph."
+          output:
+            type: "DynamicSceneGraph"
       properties:
         - name: "nodes"
           include: true
@@ -148,7 +209,7 @@ api:
             for node in graph.nodes:
                 print(node.id)
         - name: "unpartitioned_nodes"
-          include: false
+          include: true
           type: "iterator[SceneGraphNode]"
           description: "An iterator over nodes in the graph, excluding layer partitions."
         - name: "edges"
@@ -159,7 +220,7 @@ api:
             for edge in graph.edges:
                 print(f"{edge.source} -> {edge.target}")
         - name: "unpartitioned_edges"
-          include: false
+          include: true
           type: "iterator[SceneGraphEdge]"
           description: "An iterator over edges in the graph, excluding those connected to layer partitions."
         - name: "layers"
@@ -169,14 +230,6 @@ api:
           example: |
             for layer in graph.layers:
                 print(f"Layer {layer.id} has {layer.num_nodes()} nodes.")
-        - name: "num_nodes"
-          include: true
-          type: "int"
-          description: "The total number of nodes in the graph."
-        - name: "num_edges"
-          include: true
-          type: "int"
-          description: "The total number of edges in the graph."
         - name: "num_layers"
           include: true
           type: "int"
@@ -327,6 +380,16 @@ api:
           description: "Gets a list of the node's children."
           output:
             type: "list[NodeSymbol]"
+        - name: "parents"
+          include: true
+          description: "Gets a list of the node's parents (can be more than one)."
+          output:
+            type: "list[NodeSymbol]"
+        - name: "connections"
+          include: true
+          description: "Gets a list of all nodes connected to this one (parents and children)."
+          output:
+            type: "list[NodeSymbol]"
 
     - name: "SceneGraphEdge"
       include: true
@@ -350,24 +413,28 @@ api:
 
     - name: "NodeSymbol"
       include: true
-      description: "A unique identifier for a node, composed of a character prefix and a numerical ID. E.g., 'P1' for place 1. (CASE SENSITIVE use CAPS)"
+      description: "A unique identifier for a node, composed of a character prefix and a numerical ID. E.g., 'p1' for place 1. (Case Sensitive)"
       constructor:
         include: true
         description: "Creates a new NodeSymbol."
         inputs:
           - name: "key"
             type: "char"
-            description: "The character prefix for the category (e.g., 'P')."
+            description: "The character prefix for the category (e.g., 'p')."
           - name: "index"
             type: "int"
             description: "The numerical index for the node."
+          - name: "value"
+            type: "int"
+            description: "A raw integer value to construct the symbol from."
         example: |
-          node_id = dsg.NodeSymbol('P', 10)
+          node_id = spark_dsg.NodeSymbol('p', 10)
+          node_id_from_val = spark_dsg.NodeSymbol(node_id.value)
       properties:
         - name: "category"
           include: true
           type: "str"
-          description: "The character prefix of the symbol (e.g., 'P')."
+          description: "The character prefix of the symbol (e.g., 'p')."
           access: "read-only"
         - name: "category_id"
           include: true
@@ -389,10 +456,10 @@ api:
               description: "If true, show category name instead of char (optional, default=True)."
           output:
             type: "str"
-            description: "The string label (e.g., 'P10')."
+            description: "The string label (e.g., 'p10')."
           example: |
-            symbol = dsg.NodeSymbol('P', 10)
-            label = symbol.str() # 'P10'
+            symbol = spark_dsg.NodeSymbol('p', 10)
+            label = symbol.str() # 'p10'
 
     - name: "NodeAttributes"
       include: true
@@ -412,6 +479,11 @@ api:
           include: true
           type: "bool"
           description: "Whether the node is considered part of the active window."
+          access: "read-write"
+        - name: "is_predicted"
+          include: true
+          type: "bool"
+          description: "Whether the node is a predicted entity."
           access: "read-write"
         - name: "last_update_time_ns"
           include: true
@@ -447,6 +519,11 @@ api:
           type: "int"
           description: "The semantic label ID for the node (e.g., from a segmentation model)."
           access: "read-write"
+        - name: "semantic_feature"
+          include: true
+          type: "numpy.ndarray"
+          description: "An arbitrary semantic feature vector for the node."
+          access: "read-write"
 
     - name: "ObjectNodeAttributes"
       include: true
@@ -465,6 +542,35 @@ api:
           include: true
           type: "Quaternion"
           description: "The orientation of the object in the world frame."
+          access: "read-write"
+        - name: "mesh_connections"
+          include: true
+          type: "list[int]"
+          description: "List of vertex indices from the scene mesh that belong to this object."
+          access: "read-write"
+
+    - name: "AgentNodeAttributes"
+      include: false
+      description: "Attributes for agent nodes (e.g., robot poses). Inherits from `NodeAttributes`."
+      constructor:
+        include: true
+        description: "Creates default agent node attributes."
+        inputs: []
+      properties:
+        - name: "world_R_body"
+          include: true
+          type: "Quaternion"
+          description: "The orientation of the agent's body in the world frame."
+          access: "read-write"
+        - name: "timestamp"
+          include: true
+          type: "datetime.timedelta"
+          description: "Timestamp of the agent's pose."
+          access: "read-write"
+        - name: "external_key"
+          include: true
+          type: "int"
+          description: "An external key, often used for associating with other data (e.g., PGO)."
           access: "read-write"
 
     - name: "EdgeAttributes"
@@ -488,14 +594,14 @@ api:
           access: "read-write"
 
     - name: "Color"
-      include: true
+      include: false
       description: "Represents an RGBA color."
       constructor:
         include: true
         description: "Creates a new Color object with r, g, b, a components (0-255)."
         inputs: []
         example: |
-          c = dsg.Color()
+          c = spark_dsg.Color()
           c.r = 255
           c.g = 0
           c.b = 0
@@ -532,7 +638,7 @@ api:
         example: |
           import numpy as np
           # Create an AABB from min and max corners
-          box = dsg.BoundingBox(np.array([-1, -1, -1], dtype=np.float32), np.array([1, 1, 1], dtype=np.float32))
+          box = spark_dsg.BoundingBox(np.array([-1, -1, -1], dtype=np.float32), np.array([1, 1, 1], dtype=np.float32))
       properties:
         - name: "min"
           include: true
@@ -564,6 +670,31 @@ api:
           type: "numpy.ndarray[3,3]"
           description: "The rotation matrix of the box's center in the world frame."
           access: "read-write"
+      methods:
+        - name: "is_valid"
+          include: true
+          description: "Checks if the bounding box is valid."
+          output:
+            type: "bool"
+        - name: "volume"
+          include: true
+          description: "Computes the volume of the bounding box."
+          output:
+            type: "float"
+        - name: "corners"
+          include: true
+          description: "Gets the 8 corners of the bounding box in the world frame."
+          output:
+            type: "list[numpy.ndarray[3]]"
+        - name: "intersects"
+          include: true
+          description: "Checks if this bounding box intersects with another."
+          inputs:
+            - name: "other"
+              type: "BoundingBox"
+              description: "The other bounding box to check against."
+          output:
+            type: "bool"
       enums:
         - name: "BoundingBoxType"
           include: true
@@ -574,14 +705,26 @@ api:
             - "RAABB" # Rotated-Axis-aligned
 
     - name: "Mesh"
-      include: true
+      include: false
       description: "Stores 3D mesh data, including vertices, colors, and faces."
       constructor:
         include: true
         description: "Creates a new, empty Mesh."
-        inputs: []
+        inputs:
+          - name: "has_colors"
+            type: "bool"
+            description: "Whether the mesh stores per-vertex colors."
+          - name: "has_timestamps"
+            type: "bool"
+            description: "Whether the mesh stores per-vertex timestamps."
+          - name: "has_labels"
+            type: "bool"
+            description: "Whether the mesh stores per-vertex semantic labels."
+          - name: "has_first_seen_stamps"
+            type: "bool"
+            description: "Whether the mesh stores per-vertex first-seen timestamps."
         example: |
-          mesh = dsg.Mesh()
+          mesh = spark_dsg.Mesh(has_colors=True, has_labels=True)
       methods:
         - name: "get_vertices"
           include: true
@@ -609,6 +752,21 @@ api:
             - name: "faces"
               type: "numpy.ndarray[3, M]"
               description: "An int32 array of triangle indices."
+        - name: "empty"
+          include: true
+          description: "Checks if the mesh has any vertices."
+          output:
+            type: "bool"
+        - name: "clear"
+          include: true
+          description: "Removes all vertices and faces from the mesh."
+          output:
+            type: "None"
+        - name: "clone"
+          include: true
+          description: "Creates a deep copy of the mesh."
+          output:
+            type: "Mesh"
 
     - name: "Quaternion"
       include: true
@@ -631,7 +789,28 @@ api:
             description: "The third imaginary part."
         example: |
           # Identity rotation
-          q = dsg.Quaternion(1.0, 0.0, 0.0, 0.0)
+          q = spark_dsg.Quaternion(1.0, 0.0, 0.0, 0.0)
+      properties:
+        - name: "w"
+          include: true
+          type: "float"
+          description: "The w (real) component of the quaternion."
+          access: "read-write"
+        - name: "x"
+          include: true
+          type: "float"
+          description: "The x component of the quaternion."
+          access: "read-write"
+        - name: "y"
+          include: true
+          type: "float"
+          description: "The y component of the quaternion."
+          access: "read-write"
+        - name: "z"
+          include: true
+          type: "float"
+          description: "The z component of the quaternion."
+          access: "read-write"
 
   enums:
     - name: "DsgLayers"
@@ -642,11 +821,13 @@ api:
           description: "Layer for mesh segments or supervoxels."
         - name: "OBJECTS"
           description: "Layer for individual objects."
+        - name: "AGENTS"
+          description: "Layer for dynamic agents, like robots or people."
         - name: "PLACES"
-          description: "Layer for places or regions."
+          description: "Layer for places (3D)"
         - name: "MESH_PLACES"
-          description: "Layer for places defined by a collection of mesh vertices with potential semantic labels"
+          description: "Layer for places defined by a collection of mesh vertices. (2D Places)"
         - name: "ROOMS"
-          description: "Layer for rooms/regions."
+          description: "Layer for rooms."
         - name: "BUILDINGS"
           description: "Layer for entire buildings or structures."
