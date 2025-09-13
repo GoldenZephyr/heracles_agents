@@ -1,0 +1,37 @@
+in_context_examples:
+  - user: |
+      Instruction: Go to object 1.
+    assistant: "<answer>(visited-object O1)</answer>"
+  - user: |
+      Instruction: Head to place 100.
+    assistant: "<answer>(visited-place P100)</answer>"
+  - user: |
+      Instruction: Move over to the trash.
+    assistant: "<answer>(visited-object O15)</answer>"
+  - user: |
+      Instruction: Drive over to the trash and inspect the box.
+    assistant: "<answer>(and (visited-object O15) (safe O120))</answer>"
+  - user: |
+      Instruction: First pick up the box and then head over to the trash.
+    assistant: "<answer>(and (holding O120) (at-object O15))</answer>"
+  - user: |
+      Instruction: Walk over to the trash or move the box to mesh place 11.
+    assistant: "<answer>(or (visited-object O15) (object-in-place O120 P11))</answer>"
+  - user: |
+      Instruction: Inspect the box and move to the trash.
+    assistant: "<answer>(and (safe O120) (visited-object O15))</answer>"
+  - user: |
+      Instruction: Could you move to each pole on the sidewalk?
+    assistant: "<answer>(and (visited-object O155) (visited-object O160) (visited-object O185))</answer>"
+  - user: |
+      Instruction: Head on over to the rightmost vehicle.
+    assistant: "<answer>(visited-object O198)</answer>"
+  - user: |
+      Instruction: Inspect the sign to the left.
+    assistant: "<answer>(safe O128)</answer>"
+  - user: |
+      Instruction: Check out the farthest sign.
+    assistant: "<answer>(safe O128)</answer>"
+  - user: |
+      Instruction: Make the sign on the left safe and move over to the nearest bicycle.
+    assistant: "<answer>(and (safe O128) (visited-object O173))</answer>"

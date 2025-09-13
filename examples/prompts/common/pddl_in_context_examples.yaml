@@ -1,37 +1,33 @@
 in_context_examples:
-  - user: |
-      Instruction: Go to object 1.
-    assistant: "<answer>(visited-object O1)</answer>"
+  # direct-symbol + visited-place
   - user: |
       Instruction: Head to place 100.
     assistant: "<answer>(visited-place P100)</answer>"
+  # visited-object
   - user: |
       Instruction: Move over to the trash.
     assistant: "<answer>(visited-object O15)</answer>"
+  # visited-room
   - user: |
-      Instruction: Drive over to the trash and inspect the box.
-    assistant: "<answer>(and (visited-object O15) (safe O120))</answer>"
+      Instruction: Go to room 1.
+    assistant: "<answer>(visited-room R1)</answer>"
+  # safe
   - user: |
-      Instruction: First inspect the box and then head over to the trash.
-    assistant: "<answer>(and (safe O120) (at-object O15))</answer>"
+      Instruction: Inspect the trash.
+    assistant: "<answer>(safe O15)</answer>"
+  # holding
   - user: |
-      Instruction: Walk over to the trash or inspect the box.
-    assistant: "<answer>(or (visited-object O15) (safe O120))</answer>"
+      Instruction: Pick up the box
+    assistant: "<answer>(holding O120)</answer>"
+  # object-in-place
   - user: |
-      Instruction: Inspect the box and move to the trash.
-    assistant: "<answer>(and (safe O120) (visited-object O15))</answer>"
+      Instruction: Move the box to mesh place 11.
+    assistant: "<answer>(object-in-place O120 P11)</answer>"
+  # Conjunction + holding + at-object
   - user: |
-      Instruction: Could you move to each pole on the sidewalk?
-    assistant: "<answer>(and (visited-object O155) (visited-object O160) (visited-object O185))</answer>"
+      Instruction: First pick up the box and then head over to the trash.
+    assistant: "<answer>(and (holding O120) (at-object O15))</answer>"
+  # Disjunction
   - user: |
-      Instruction: Head on over to the rightmost vehicle.
-    assistant: "<answer>(visited-object O198)</answer>"
-  - user: |
-      Instruction: Inspect the sign to the left.
-    assistant: "<answer>(safe O128)</answer>"
-  - user: |
-      Instruction: Check out the farthest sign.
-    assistant: "<answer>(safe O128)</answer>"
-  - user: |
-      Instruction: Make the sign on the left safe and over to the nearest bicycle.
-    assistant: "<answer>(and (safe O128) (visited-object O173))</answer>"
+      Instruction: Could you move one of the poles on the sidewalk?
+    assistant: "<answer>(or (visited-object O155) (visited-object O160) (visited-object O185))</answer>"
