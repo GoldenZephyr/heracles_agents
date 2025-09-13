@@ -1,0 +1,6 @@
+interface_description: |
+  <scene_graph_notes>
+  Object Layer: The Object layer contains Objects that exist in the world. Each Object has a unique ID (id), a semantic class (type), an x,y position (pos), and a set of parent Regions (parent_regions). The parent Regions indicates which Regions the Object belongs to. Each Object will be represented in the form: (id, type, pos, parent_regions).
+  Place Layer: The Place layer contains Places that are reachable locations in the world. Each Place node has a unique ID.
+  Region Layer: The Region Layer contains Regions that exist in the world. Each Region has a unique ID (id) and a semantic class (type). Each Region will be represented in the form: (id, type).
+  </scene_graph_notes>

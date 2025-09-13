@@ -20,6 +20,7 @@ class HeraclesDsgInterface(BaseSettings):
 class InContextDsgInterfaceConfig(BaseModel):
     dsg_interface_type: Literal["in_context"]
     dsg_filepath: Optional[str] = None
+    dsg_place_layer_name: Optional[str] = None
     _dsg: PrivateAttr() = None
 
     @model_validator(mode="after")
@@ -31,6 +32,9 @@ class InContextDsgInterfaceConfig(BaseModel):
 
     def get_dsg(self):
         return self._dsg
+
+    def get_place_layer_name(self):
+        return self.dsg_place_layer_name
 
 
 class NoDsgInterface(BaseModel):

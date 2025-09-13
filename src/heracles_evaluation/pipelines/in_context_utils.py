@@ -96,7 +96,6 @@ def region_to_string_full(region_node, scene_graph):
 
 def place_to_string_full(place_node, scene_graph):
     """Method to compose a string encoding of a mesh place: unique id, sibling place unique ids, parent region/room unique ids"""
-    # attrs = place_node.attributes NOTE: no place positions?
     symbol = place_node.id.str(True)
     # Get the siblings
     sibling_node_ids = set()
@@ -128,8 +127,6 @@ def object_to_string_full(object_node, scene_graph):
         raise PromptingFailure("No available object labelspace")
     semantic_type = object_labelspace.get_category(attrs.semantic_label)
     position = f"({attrs.position[0]:.2f},{attrs.position[1]:.2f})"
-    bbox_pos = f"({attrs.bounding_box.world_P_center[0]:.2f},{attrs.bounding_box.world_P_center[1]:.2f},{attrs.bounding_box.world_P_center[2]:.2f})"
-    bbox_dim = f"({attrs.bounding_box.dimensions[0]:.2f},{attrs.bounding_box.dimensions[1]:.2f},{attrs.bounding_box.dimensions[2]:.2f})"
     parent_place_node_ids = set()
     parent_place_gtsam_ids = object_node.parents()
     for parent_place_gtsam_id in parent_place_gtsam_ids:
@@ -138,11 +135,11 @@ def object_to_string_full(object_node, scene_graph):
     if not parent_place_node_ids:
         parent_place_node_ids = "none"
     # Compose the string
-    object_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position}, bbox_pos={bbox_pos}, bbox_dim={bbox_dim}, parent_places={parent_place_node_ids})"
+    object_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position}, parent_places={parent_place_node_ids})"
     return object_string
 
 
-def scene_graph_to_prompt_full(scene_graph):
+def scene_graph_to_prompt_full(scene_graph, place_layer_name):
     """Method to produce a text encoding of a spark_dsg DynamicSceneGraph. This includes 2D places."""
     # Add the objects: unique id, semantic label, position, bounding box, parent 2D place uid
     objects_string = ""
@@ -150,7 +147,7 @@ def scene_graph_to_prompt_full(scene_graph):
         objects_string += object_to_string_full(object_node, scene_graph)
     # Add the places: unique id, sibling ids, parent region unique id
     places_string = ""
-    for place_node in scene_graph.get_layer(spark_dsg.DsgLayers.PLACES).nodes:
+    for place_node in scene_graph.get_layer(place_layer_name).nodes:
         places_string += place_to_string_full(place_node, scene_graph)
     # Add the regions: unique id, semantic label, position
     regions_string = ""

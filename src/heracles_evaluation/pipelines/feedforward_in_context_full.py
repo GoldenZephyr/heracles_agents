@@ -16,7 +16,7 @@ from heracles_evaluation.llm_interface import (
     QuestionAnalysis,
 )
 from heracles_evaluation.pipelines.comparisons import evaluate_answer
-from heracles_evaluation.pipelines.in_context_utils import scene_graph_to_prompt
+from heracles_evaluation.pipelines.in_context_utils import scene_graph_to_prompt_full
 from heracles_evaluation.pipelines.prompt_utils import get_answer_formatting_guidance
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,10 @@ def generate_prompt(
 ):
     prompt = copy.deepcopy(agent_config.agent_info.prompt_settings.base_prompt)
 
-    dsg_desciption = scene_graph_to_prompt(incontext_dsg_interface.get_dsg())
+    dsg_desciption = scene_graph_to_prompt_full(
+        incontext_dsg_interface.get_dsg(),
+        incontext_dsg_interface.get_place_layer_name(),
+    )
     try:
         prompt.novel_instruction = prompt.novel_instruction_template.format(
             question=question.question, dsg_description=dsg_desciption
@@ -92,7 +95,7 @@ main_phase = PipelinePhase(
 )
 
 d = PipelineDescription(
-    name="feedforward_in_context",
+    name="feedforward_in_context_full",
     description="in-context scene graph",
     phases=[main_phase],
     function=incontext_dsg,
@@ -108,13 +111,13 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.INFO)
 
-    with open("experiments/dsg_incontext_experiment.yaml", "r") as fo:
+    with open("experiments/incontext_full_experiment.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
     experiment = ExperimentConfiguration(**yml)
     logger.debug(f"Loaded experiment configuration: {experiment}")
 
     aqs = incontext_dsg(experiment)
-    with open("output/dsgdb_feedforward_out.yaml", "w") as fo:
+    with open("output/feedforward_incontext_full_out.yaml", "w") as fo:
         fo.write(yaml.dump(aqs.model_dump()))
 
     display_experiment_results(aqs)
