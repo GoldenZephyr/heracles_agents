@@ -1,43 +1,6 @@
-#<Robots>
-#Euclid: Euclid is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'euclid'.
-#Hamilton: Hamilton is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hamilton'.
-#Hilbert: Hilbert is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'hilbert'.
-#Apollo: Apollo is a quadraped robot. It is able to move around the world and inspect objects. It has the following unique id: 'apollo'.
-#</Robots>
-
-#Labels in Database:
-#    - Object: a node representing an object in the world.
-#      Object Properties:
-#        - nodeSymbol: a unique string identifier
-#        - class: a string identifying the object's semantic class or type
-#        - center: the 3D position of the object, as a POINT type
-#    - MeshPlace: a node representing a 2D segment of space the robot might be able to move to.
-#        - nodeSymbol: a unique string identifier
-#        - class: a string identifying the place's semantic class or type
-#        - center: the 3D position of the mesh place, as a POINT type
-#    - Place: a node representing a 3D region of free space
-#        - nodeSymbol: a unique string identifier
-#        - center: the 3D position of the place, as a POINT type
-#    - Room: a node representing a room or higher-level region
-#        - nodeSymbol: a unique string identifier
-#        - center: the 3D position of the room, as a POINT type
-#
-#Object, MeshPlace, Place, and Room are all Cypher labels attached to nodes.
-#
-#Places and Mesh Places represent a higher level of the hierarchy compared to objects, but lower level than rooms.
-#
-#There are two kinds of existing edges. First is (a)-[:CONTAINS]->(b), which connects nodes between different layers and means that b is contained within a. Nodes in higher levels of the hierarchy may contain nodes in lower levels of the hierarchy, but nodes in the lower level of the hierarchy will not contain higher-level nodes. The other kind of edges represent connectivity within a layer: [:OBJECT_CONNECTED], [:PLACE_CONNECTED], [:MESH_PLACE_CONNECTED], [:ROOM_CONNECTED].
-#
-#Note that in the current version of cypher, `distance` has been replaced by `point.distance`.
-#
-#Also, do not use any apoc functions in your queries, because apoc is not installed so those queries will crash. Use chain of thought to think along the way.
-
-
-
-
 system: |
-  You are a helpful assistant who is an expert at mapping from natural language queries to Cypher queries for a Neo4j graph database. 
-  You will be presented with a command, a previously-generated query written in Cypher (a graph database query language), and the results of that query. 
+  You are a helpful assistant who is an expert at mapping from natural language queries to Cypher queries for a Neo4j graph database.
+  You will be presented with a command, a previously-generated query written in Cypher (a graph database query language), and the results of that query.
   Your job is to answer the original question given the query results.
 
 domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
