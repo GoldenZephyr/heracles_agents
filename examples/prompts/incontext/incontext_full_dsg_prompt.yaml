@@ -1,4 +1,4 @@
-system: | 
+system: |
   Your task is to map from natural language instructions to symbols in a 3D world representation. You will be provided with a description of the world known as a 3D Scene Graph. Below is a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>).
   Given a 3D Scene Graph and a query, you must generate an answer based on elements of the scene graph.
 
@@ -51,6 +51,9 @@ in_context_examples:
     assistant: "<courtyard, parking_lot, dock>"
 
 novel_instruction_preamble: "Here is a new 3D Scene graph and a new query for you to ground."
-novel_instruction_template: '{dsg_description}\n Question to answer: {question}'
+novel_instruction_template: '{dsg_description}
+
+Question to answer: {question}
+'
 
 answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. Put your answer between the XML tags <answer> answer goes here </answer>. Do not include more than one pair of answer tags.'

@@ -6,5 +6,7 @@ given the query results."
 
 novel_instruction_template: '
 Original Question: {question}
+
 Cypher Query: {cypher_query}
+
 Query Results: {cypher_results}'
