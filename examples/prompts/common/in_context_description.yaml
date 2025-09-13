@@ -1,6 +1,6 @@
 interface_description: |
   <scene_graph_notes>
   Object Layer: The Object layer contains Objects that exist in the world. Each Object has a unique ID (id), a semantic class (type), an x,y position (pos), and a set of parent Places (parent_places). The parent Places indicates which Places the Object belongs to. Each Object will be represented in the form: (id, type, pos, parent_places).
-  Place Layer: The Place layer contains Places that are reachable locations in the world. Each Place node has a unique ID (id), a set of sibling Places (siblings) and a set of parent Regions (parent_regions). Each Place will be represented in the form (id, parent_regions).
-  Region Layer: The Region Layer contains Regions that exist in the world. Each Region has a unique ID (id), a semantic class (type), and an x,y position (pos). Each Region will be represented in the form: (id, type, pos).
+  Place / Mesh Place Layer: The Place / Mesh Place layer contains Places that are reachable locations in the world. Each Place node has a unique ID (id), a set of sibling Places (siblings) and a set of parent Rooms (parent_rooms). Each Place will be represented in the form (id, parent_rooms).
+  Room Layer: The Room Layer contains Rooms that exist in the world. Each Room has a unique ID (id), a semantic class (type), and an x,y position (pos). Each Room will be represented in the form: (id, type, pos).
   </scene_graph_notes>

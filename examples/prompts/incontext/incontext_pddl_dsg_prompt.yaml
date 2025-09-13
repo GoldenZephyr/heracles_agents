@@ -14,15 +14,15 @@ domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_dom
 in_context_examples_preamble: "Here are some examples of mapping from natural language instructions to PDDL goals paired with robot IDs. Each example uses the 3D scene graph below. Note that this 3D scene graph is just for these examples and you should NOT use this when answering the new instruction.
 <Example 3D Scene Graph>
 Objects:
-- (id=O0, type=tree, pos=(-3.14,1.13), parent_regions={'R0'})
-- (id=O1, type=vehicle, pos=(3.34,3.53), parent_regions={'R0'})
-- (id=O2, type=door, pos=(3.33,3.48), parent_regions={'R0'})
-- (id=O3, type=tree, pos=(4.47,-4.72), parent_regions={'R2'})
-- (id=O4, type=vehicle, pos=(-2.51,6.63), parent_regions={'R1'})
-- (id=O5, type=boat, pos=(1.34,3.28), parent_regions={'R1'})
-- (id=O6, type=seating, pos=(1.37,3.03), parent_regions={'R1'})
-- (id=O7, type=tree, pos=(9.10,-2.01), parent_regions={'R2'})
-Regions:
+- (id=O0, type=tree, pos=(-3.14,1.13), parent_rooms={'R0'})
+- (id=O1, type=vehicle, pos=(3.34,3.53), parent_rooms={'R0'})
+- (id=O2, type=door, pos=(3.33,3.48), parent_rooms={'R0'})
+- (id=O3, type=tree, pos=(4.47,-4.72), parent_rooms={'R2'})
+- (id=O4, type=vehicle, pos=(-2.51,6.63), parent_rooms={'R1'})
+- (id=O5, type=boat, pos=(1.34,3.28), parent_rooms={'R1'})
+- (id=O6, type=seating, pos=(1.37,3.03), parent_rooms={'R1'})
+- (id=O7, type=tree, pos=(9.10,-2.01), parent_rooms={'R2'})
+Rooms:
 - (id=R0, type=parking_lot)
 - (id=R1, type=dock)
 - (id=R2, type=courtyard)
@@ -36,7 +36,7 @@ in_context_examples:
     assistant: "(visited-object O1)"
   - user: "Head to place 100."
     assistant: "(visited-place P100)"
-  - user: "Head to region 21."
+  - user: "Head to room 21."
     assistant: "(visited-place R21)"
   - user: "Drive over to the door and visit the boat."
     assistant: "(and (visited-object O2) (visited-object O5))"

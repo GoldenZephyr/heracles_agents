@@ -1,6 +1,6 @@
 pddl_domain_description: |
   <PDDL Domain>
-      The PDDL domain consists of the following predicates described below.
+      The PDDL domain consists of the following predicates described below. These predicates get parameterized by symbols from a 3D scene graph.
       (visited-place ?p): This predicate indicates that a robot must visit Place '?p' at some point, where '?p' is a placeholder for a Place ID.
       (at-place ?p): This predicate indicates that a robot must be at Place '?p', where '?p' is a placeholder for a Place ID.
       (visited-object ?o): This predicate indicates that a robot must visit Object '?o' at some point, where '?o' is a placeholder for an Object ID.
@@ -20,4 +20,6 @@ pddl_domain_description: |
       not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-place r1))' means Region 'r1' should not be visited.
       and: the 'and' operator is used to indiciate that multiple predicates must be true. For example '(and (visited-place r1) (visited-object o1))' means both Region 'r1' and Object 'o1' must be visited.
       or: the 'or' operator is used to indiciate that either one predicate or another predicate must be true. For example '(or (visited-place r1) (visited-object o1))' means that either Region 'r1' or Object 'o1' must be visited.
+
+      When an instruction indicates an order, you should use (at-place ?p), (at-object ?o), or (in-region ?r) to specify the final state.
   </PDDL Domain>

@@ -23,14 +23,14 @@ Objects:
 - (id=O6, type=seating, pos=(1.37,3.03), parent_places={'p2'})
 - (id=O7, type=tree, pos=(9.10,-2.01), parent_places={'p6'})
 Places:
-- (id=p0, siblings={'p1','p4'}, parent_regions={'R0'})
-- (id=p1, siblings={'p0','p4'}, parent_regions={'R0'})
-- (id=p2, siblings={'p3'}, parent_regions={'R1'})
-- (id=p3, siblings={'p2'}, parent_regions={'R1'})
-- (id=p4, siblings={'p0','p1'}, parent_regions={'R0'})
-- (id=p5, siblings={'p6'}, parent_regions={'R2'})
-- (id=p6, siblings={'p5'}, parent_regions={'R2'})
-Regions:
+- (id=p0, siblings={'p1','p4'}, parent_rooms={'R0'})
+- (id=p1, siblings={'p0','p4'}, parent_rooms={'R0'})
+- (id=p2, siblings={'p3'}, parent_rooms={'R1'})
+- (id=p3, siblings={'p2'}, parent_rooms={'R1'})
+- (id=p4, siblings={'p0','p1'}, parent_rooms={'R0'})
+- (id=p5, siblings={'p6'}, parent_rooms={'R2'})
+- (id=p6, siblings={'p5'}, parent_rooms={'R2'})
+Rooms:
 - (id=R0, type=parking_lot, pos=(1.17,2.71))
 - (id=R1, type=dock, pos=(0.67,4.31))
 - (id=R2, type=courtyard, pos=(6.79,2.31))
@@ -44,7 +44,7 @@ in_context_examples:
     assistant: "(visited-object O1)"
   - user: "Head to place 100."
     assistant: "(visited-place P100)"
-  - user: "Head to region 21."
+  - user: "Head to room 21."
     assistant: "(visited-place R21)"
   - user: "Drive over to the door and visit the boat."
     assistant: "(and (visited-object O2) (visited-object O5))"
