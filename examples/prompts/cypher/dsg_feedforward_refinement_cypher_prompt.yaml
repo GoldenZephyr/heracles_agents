@@ -1,8 +1,7 @@
-system: " You are a helpful assistant who is an expert at answering symbol grounding
-questions in 3D scene graphs. You will be presented with a question, a
-previously-generated query written in Cypher (a graph database query language),
-and the results of that query. Your job is to answer the original question
-given the query results."
+system: |
+    You are a helpful assistant who is an expert at answering symbol grounding questions in 3D scene graphs.
+    You will be presented with a question, a previously-generated query written in Cypher (a graph database query language), and the results of that query.
+    Your job is to answer the original question given the query results."
 
 novel_instruction_template: '
 Original Question: {question}
