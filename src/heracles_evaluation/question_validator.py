@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
+from sldp.lark_parser import lark_parse_sldp
 
 console = Console()
 app = typer.Typer(help="Explore EvalQuestions from a YAML file.")
@@ -20,9 +21,18 @@ def load_yaml(path: Path) -> list[EvalQuestion]:
     return [EvalQuestion(**item) for item in data["questions"]]
 
 
-def validate_solution(answer: str) -> bool:
+def validate_pddl_solution(answer: str) -> bool:
     try:
         lark_parse_pddl_goal(answer)
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
+
+
+def validate_sldp_solution(answer: str) -> bool:
+    try:
+        lark_parse_sldp(answer)
         return True
     except Exception as ex:
         print(ex)
@@ -56,7 +66,14 @@ def render_table(
             else:
                 r += []
         if validate:
-            is_valid = validate_solution(q.solution)
+            if q.correctness_comparator.comparison_type == "PDDL":
+                is_valid = validate_pddl_solution(q.solution)
+            elif q.correctness_comparator.comparison_type == "SLDP":
+                is_valid = validate_sldp_solution(q.solution)
+            else:
+                raise Exception(
+                    f"Unknown comparison type {q.correctness_comparator.comparison_type}"
+                )
             r += ("✅" if is_valid else "❌",)
         table.add_row(*r)
         # table.add_row(
