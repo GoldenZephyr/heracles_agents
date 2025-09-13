@@ -54,6 +54,7 @@ class EvalQuestion(BaseModel):
     question: str
     solution: str
     uid: str | int
+    tags: Optional[list[str]] = None
     correctness_comparator: ComparisonType = Field(discriminator="comparison_type")
 
 
