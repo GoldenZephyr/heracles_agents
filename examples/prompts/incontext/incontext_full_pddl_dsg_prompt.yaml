@@ -67,6 +67,9 @@ in_context_examples:
     assistant: "(and (visited-place R0) (visited-place R1))"
 
 novel_instruction_preamble: "Here is a new 3D Scene graph and a new instruction for you to translate."
-novel_instruction_template: '{dsg_description}\n Instruction to translate: {question}'
+
+novel_instruction_template: '{dsg_description}\n 
+
+Instruction to translate: {question}'
 
 #answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. You response MUST be dictionary of the form: {\"robot id\": \"PDDL goal\", \"robot id\": \"PDDL goal\"}. The arguments to the predicates MUST NOT include parenthesis. For example, \"(visited-place R(1))\" is NOT correct and should instead be \"(visited-place R1)\". Put your answer between the XML tags <answer> answer goes here </answer>.'

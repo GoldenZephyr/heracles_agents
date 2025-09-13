@@ -19,5 +19,7 @@ in_context_examples: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_in
 novel_instruction_preamble: 'Now, generate a PDDL goal for this command:'
 novel_instruction_template: '
 Original Command: {question}
+
 Cypher Query: {cypher_query}
+
 Query Results: {cypher_results}'

@@ -8,7 +8,7 @@ system: |
 interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/cypher_interface_description.yaml
 scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
 labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
-domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
+pddl_domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
 
 
 novel_instruction_preamble: 'Now, generate a cypher query to help ground this command:'

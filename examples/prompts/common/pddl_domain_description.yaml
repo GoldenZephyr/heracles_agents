@@ -1,4 +1,4 @@
-pddl_domain_description: |
+domain_description: |
   <PDDL Domain>
       The PDDL domain consists of the following predicates described below. These predicates get parameterized by symbols from a 3D scene graph.
       (visited-place ?P): This predicate indicates that a robot must visit Place '?P' at some point, where '?P' is a placeholder for a Place ID.
