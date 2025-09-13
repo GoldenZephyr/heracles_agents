@@ -10,76 +10,9 @@ scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/sce
 labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
 domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
 
-in_context_examples_preamble: "The following is a set of examples of mapping instructions to PDDL goals using an example Cypher query and database response."
+in_context_examples_preamble: "The following is a set of examples of mapping instructions to PDDL goals (assuming the results of a Cypher query)."
 
-in_context_examples:
-    - user: "
-    Instruction: Go to object 1.
-    <Cypher> MATCH (o:Object) WHERE o.nodeSymbol = 'object 1' RETURN o.nodeSymbol AS objectNodeSymbol, o.class AS objectClass </Cypher>
-    <Response> [] </Response>"
-      assistant: "<answer>(visited-object O1)</answer>"
-    - user: "
-    Instruction: Head to place 100.
-    <Cypher> MATCH (p:Place {nodeSymbol: 'P100'}) RETURN p.nodeSymbol AS nodeSymbol, p.class AS class, p.center AS center </Cypher>
-    <Response> [] </Response>
-    "
-      assistant: "<answer>(visited-place P100)</answer>"
-    - user: "
-    Instruction: Move over to the trash.
-    <Cypher> MATCH (o:Object) WHERE toLower(o.class) CONTAINS 'trash' MATCH (r:Room)-[:CONTAINS*]->(o) RETURN o.nodeSymbol AS objectSymbol, o.class AS objectClass, r.nodeSymbol AS roomSymbol </Cypher>
-    <Response> [{'objectSymbol': 'O15', 'objectClass': 'trash', 'roomSymbol': 'R1'}] </Response>
-    "
-      assistant: "<answer>(visited-object O15)</answer>"
-    - user: "
-    Instruction: Drive over to the trash and inspect the box.
-    <Cypher> MATCH (trash:Object) WHERE trash.class = 'trash' OPTIONAL MATCH (room1:Room)-[:CONTAINS*]->(trash) WITH trash, room1 MATCH (box:Object) WHERE box.class = 'box' OPTIONAL MATCH (room2:Room)-[:CONTAINS*]->(box) RETURN trash.nodeSymbol AS trash_node, trash.class AS trash_class, room1.nodeSymbol AS trash_room, box.nodeSymbol AS box_node, box.class AS box_class, room2.nodeSymbol AS box_room </Cypher>
-    <Response> [{'trash_node': 'O15', 'trash_class': 'trash', 'trash_room': 'R1', 'box_node': 'O120', 'box_class': 'box', 'box_room': 'R4'}] </Response>"
-      assistant: "<answer>(and (visited-object O15) (safe O120))</answer>"
-    - user: "
-    Instruction: First inspect the box and then head over to the trash.
-    <Cypher> MATCH (box_obj:Object) WHERE toLower(box_obj.class) = 'box' WITH collect({nodeSymbol: box_obj.nodeSymbol, class: box_obj.class}) AS boxes MATCH (trash_obj:Object) WHERE toLower(trash_obj.class) IN ['trash', 'trashcan', 'trash_can'] RETURN boxes, collect({nodeSymbol: trash_obj.nodeSymbol, class: trash_obj.class}) AS trash_objects </Cypher>
-    <Response> [{'boxes': [{'nodeSymbol': 'O120', 'class': 'box'}], 'trash_objects': [{'nodeSymbol': 'O15', 'class': 'trash'}]}] </Response>
-    "
-      assistant: "<answer>(and (safe O120) (at-object O15))</answer>"
-    - user: "
-    Instruction: Walk over to the trash or inspect the box.
-    <Cypher> MATCH (trash:Object) WHERE trash.class IN ['trash', 'trashcan', 'wastebin', 'bin', 'garbage']\nWITH collect(DISTINCT {nodeSymbol: trash.nodeSymbol, class: trash.class}) AS trash_objects\nMATCH (box:Object) WHERE box.class = 'box'\nRETURN trash_objects AS trash, collect(DISTINCT {nodeSymbol: box.nodeSymbol, class: box.class}) AS boxes </Cypher>
-    <Response> [{'trash': [{'nodeSymbol': 'O15', 'class': 'trash'}], 'boxes': [{'nodeSymbol': 'O120', 'class': 'box'}]}] </Response>"
-      assistant: "<answer>(or (visited-object O15) (safe O120))</answer>"
-    - user: "
-    Instruction: Inspect the box and move to the trash.
-    <Cypher> MATCH (box:Object) WHERE toLower(box.class) CONTAINS 'box' WITH box MATCH (trash:Object) WHERE toLower(trash.class) CONTAINS 'trash' RETURN box.nodeSymbol AS box_nodeSymbol, box.class AS box_class, trash.nodeSymbol AS trash_nodeSymbol, trash.class AS trash_class </Cypher>
-    <Response> [{'box_nodeSymbol': 'O120', 'box_class': 'box', 'trash_nodeSymbol': 'O15', 'trash_class': 'trash'}] </Response>
-    "
-      assistant: "<answer> (and (safe O120) (visited-object O15)) </answer>"
-    - user: "
-    Instruction: Could you move to each pole on the sidewalk?
-    <Cypher> MATCH (room:Room {class: 'sidewalk'})-[:CONTAINS*]->(pole:Object {class: 'pole'}) RETURN pole.nodeSymbol AS nodeSymbol, pole.center AS center </Cypher>
-    <Response> [{'nodeSymbol': 'O155', 'class': 'pole', 'center': POINT(-13.372735751494197 5.585232723760241 0.6639770362668365)}, {'nodeSymbol': 'O160', 'class': 'pole', 'center': POINT(-14.893591119608748 5.613263051444237 0.8853903095656579)}, {'nodeSymbol': 'O185', 'class': 'pole', 'center': POINT(-14.477091885995174 5.666396141052246 0.652402546958647)}] </Response>
-    "
-      assistant: "<answer>(and (visited-object O155) (visited-object O160) (visited-object O185))</answer>"
-    - user: "
-    Instruction: Head on over to the rightmost vehicle.
-    <Cypher> MATCH (s:Object) WHERE s.class = 'sign' RETURN s.nodeSymbol, s.class, s.center ORDER BY s.center.x DESC LIMIT 1 </Cypher>
-    <Response> [{'s.nodeSymbol': 'O198', 's.class': 'sign', 's.center': POINT(-3.1908055466904672 4.990251331924065 0.6318913576813344)}] </Response>
-    "
-      assistant: "<answer>(visited-object O198)</answer>"
-    - user: "
-    Instruction: Inspect the sign to the left.
-    <Cypher> MATCH (o:Object) WHERE o.class = 'sign' RETURN o.nodeSymbol, o.class, o.center </Cypher>
-    <Response> [{'o.nodeSymbol': 'O128', 'o.class': 'sign', 'o.center': POINT(-4.228752903370042 5.018121605710045 0.9866369661580713)}, {'o.nodeSymbol': 'O198', 'o.class': 'sign', 'o.center': POINT(-3.1908055466904672 4.990251331924065 0.6318913576813344)}] </ Response"
-      assistant: "<answer>(safe O128)</answer>"
-    - user: "
-    Instruction: Check out the farthest sign.
-    <Cypher> MATCH (o:Object) WHERE o.class = 'sign' WITH o, point.distance(point({x:0, y:0, z:0}), o.center) AS dist RETURN o.nodeSymbol, o.class, o.center, dist ORDER BY dist DESC LIMIT 1 </Cypher>
-    <Response> [{'o.nodeSymbol': 'O128', 'o.class': 'sign', 'o.center': POINT(-4.228752903370042 5.018121605710045 0.9866369661580713), 'dist': 6.636064200295542}] </Response>"
-      assistant: "<answer>(safe O128)</answer>"
-    - user: "
-    Instruction: Make the sign on the left safe and over to the nearest bicycle.
-    <Cypher> [{'sign_nodeSymbol': 'O128', 'sign_class': 'sign', 'sign_center': POINT(-4.228752903370042 5.018121605710045 0.9866369661580713), 'bicycles': [{'center': POINT(-36.2314958739699 6.14430774722183 1.679814662849694), 'nodeSymbol': 'O173', 'class': 'bicycle'}, {'center': POINT(-36.22734379123997 7.36796628075677 1.5899053238533638), 'nodeSymbol': 'O175', 'class': 'bicycle'}]}] </Cypher>
-    <Response> [{'sign_nodeSymbol': 'O128', 'sign_class': 'sign', 'sign_center': POINT(-4.228752903370042 5.018121605710045 0.9866369661580713), 'bicycles': [{'center': POINT(-36.2314958739699 6.14430774722183 1.679814662849694), 'nodeSymbol': 'O173', 'class': 'bicycle'}, {'center': POINT(-36.22734379123997 7.36796628075677 1.5899053238533638), 'nodeSymbol': 'O175', 'class': 'bicycle'}]}] </Response>
-    "
-      assistant: "<answer>(and (safe O128) (visited-object O173))</answer>"
+in_context_examples: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_in_context_examples.yaml
 
 novel_instruction_preamble: 'Now, generate a PDDL goal for this command:'
 novel_instruction_template: '{question}'

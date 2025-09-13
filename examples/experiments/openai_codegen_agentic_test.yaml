@@ -10,7 +10,7 @@ configurations:
             dsg_api_examples: true
 
         pipeline: agentic
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/pddl_questions.yaml
         phases:
             main:
                 client:
@@ -25,9 +25,9 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/codegen/agent_system_codegen_prompt_full_info.yaml
-                        output_type: SLDP
-                        sldp_answer_type_hint: true
+                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/codegen/pddl_agent_system_codegen_prompt.yaml
+                        output_type: PDDL
+                        #sldp_answer_type_hint: true
                     tools:
                         - name: codegen_execute
                           bound_args:

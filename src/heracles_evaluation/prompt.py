@@ -68,6 +68,7 @@ class Prompt(BaseModel):
         "interface_description",
         "domain_description",
         "labelspace_description",
+        "in_context_examples",
         mode="before",
     )
     @classmethod
@@ -131,6 +132,9 @@ class Prompt(BaseModel):
             )
 
         if self.in_context_examples:
+            logger.info(
+                f"Adding {len(self.in_context_examples)} in-context examples to prompt"
+            )
             for e in self.in_context_examples:
                 prompt += e.to_openai_json()
 
