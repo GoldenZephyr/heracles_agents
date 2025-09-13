@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-import yaml
-import typer
 from pathlib import Path
 from typing import Optional
 
+import typer
+import yaml
+from llm_interface import EvalQuestion
 from rich.console import Console
 from rich.table import Table
 
-
-from llm_interface import EvalQuestion
 from pypddl.pddl_goal_parser import lark_parse_pddl_goal
-
 
 console = Console()
 app = typer.Typer(help="Explore EvalQuestions from a YAML file.")
@@ -32,7 +30,10 @@ def validate_solution(answer: str) -> bool:
 
 
 def render_table(
-    questions: list[EvalQuestion], show_solutions: bool = False, show_tags=False, validate: bool = False
+    questions: list[EvalQuestion],
+    show_solutions: bool = False,
+    show_tags=False,
+    validate: bool = False,
 ):
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("UID", style="cyan")
@@ -75,7 +76,9 @@ def list(
     solutions: bool = typer.Option(False, "--solutions", help="Show solutions"),
     show_tags: bool = typer.Option(False, "--show-tags", help="Show tags"),
     tag: Optional[str] = typer.Option(None, "--tag", "-t", help="Filter by tag"),
-    validate: bool = typer.Option(False, "--validate", "-v", help="Validate solutions with PDDL parser"),
+    validate: bool = typer.Option(
+        False, "--validate", "-v", help="Validate solutions with PDDL parser"
+    ),
 ):
     """List all questions (optionally with solutions or filtered by tag)."""
     questions = load_yaml(file)
@@ -83,7 +86,9 @@ def list(
     if tag:
         questions = [q for q in questions if tag in (q.tags or [])]
 
-    render_table(questions, show_solutions=solutions, show_tags=show_tags, validate=validate)
+    render_table(
+        questions, show_solutions=solutions, show_tags=show_tags, validate=validate
+    )
 
 
 @app.command()
