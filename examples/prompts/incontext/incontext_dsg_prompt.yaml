@@ -1,6 +1,12 @@
 system: | 
-  Your task is to map from natural language instructions to symbols in a 3D world representation. You will be provided with a description of the world known as a 3D Scene Graph. Below is a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>).
+  Your task is to map from natural language instructions to symbols in a 3D world representation.
+  You will be provided with a description of the world known as a 3D Scene Graph.
+  Below is a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>).
   Given a 3D Scene Graph and a query, you must generate an answer based on elements of the scene graph.
+  When producing a final answer, be concise.
+  Unless otherwise specified, you should return the node symbols of things you are asked about.
+  Do not return more information than is explicitly requested.
+  Node symbols should NOT have parenthesis or quotes.
 
 
 scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml

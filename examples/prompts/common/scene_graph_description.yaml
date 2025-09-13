@@ -1,9 +1,9 @@
 scene_graph_description: |
   <Scene Graph Description>
-  A 3D scene graph is a hierarchical graph consisting of layers that each contain nodes. Graphs have the 2D Place layer, the Object layer, and the Room layer.
-  3D Places Layer (PLACES): The 3D Places layer in the scene graph contains places that are reachable locations in the world. Each Place node has a unique ID (p<id>). Note that the unique ID uses lowercase for the 3D Places layer.
-  2D Places Layer (MESH_PLACES): The 2D Places layer contains Places that are reachable locations in the world with a possible semantic class (type). Each Place node has a unique ID (P<id>). Note that the unique ID uses uppercase for the 2D Places layer.
-  Object Layer (OBJECTS): The Object layer contains Objects that exist in the world. Each Object has a unique ID (O<id>), a semantic class (type), an x,y position (pos), and a parent. The parent can be a place or a room, indicating which place or room the Object belongs to. Each Object will be represented in the form: (id, type, pose, parent_room).
-  Room Layer (ROOMS): The Room Layer contains Rooms that exist in the world. Each Room has a unique ID (R<id>) and a semantic class (type). Each Room will be represented in the form: (R<id>, type).
-  Rooms are at the top level of the hierarchy, Places (2D and 3D) (a graph can have 1, or both) are below Rooms, and Objects are below Places. To get an Object in a Room, you must look at the Places in that Room first.
+  A 3D scene graph is a hierarchical graph consisting of layers that each contain nodes. Graphs have the 2D Places layer, the 3D Places layer, the Objects layer, and the Rooms layer.
+  3D Places Layer (PLACES): The 3D Places layer in the scene graph contains places that are reachable locations in the world. Each Place node has a unique ID (p<id>). Note that the unique ID uses a lowercase 'p' for the 3D Places layer.
+  2D Places Layer (MESH_PLACES): The 2D Places layer contains Places that are reachable locations in the world with a possible semantic class (type). Each Place node has a unique ID (P<id>). Note that the unique ID uses an uppercase 'P' for the 2D Places layer.
+  Objects Layer (OBJECTS): The Objects layer contains Objects that exist in the world. Each Object has a unique ID (O<id>), a semantic class (type), an x,y position (pos), and a parent. The parent can be a place or a room, indicating which place or room the Object belongs to. Each Object will be represented in the form: (id, type, pose, parent_room).
+  Rooms Layer (ROOMS): The Rooms Layer contains Rooms that exist in the world. Each Room has a unique ID (R<id>) and a semantic class (type). Each Room will be represented in the form: (R<id>, type).
+  A graph can have either a 2D Places Layer, or a 3D Places Layer, or both. Rooms are at the top level of the hierarchy, Places (2D and 3D) are below Rooms, and Objects are below Places. To get an Object in a Room, you must look at the Places in that Room first.
   </Scene Graph Description>
