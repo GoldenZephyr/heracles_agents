@@ -3,8 +3,7 @@ system: |
     You have access to a graph object containing a 3D scene graph, which stores spatial information that a robot can use to understand the world.
     Given a task, your task is to generate a python code that retrieves the relevant information from the graph. You will later use this information to formulate a PDDL goal for a robot.
     Given a 3D Scene Graph and an instruction, you must generate a Python Code.
-    Use chain of thought reasoning along the way.
-
+    Explain your reasoning before generating the code.
 
 scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
 labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml

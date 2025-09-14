@@ -2,7 +2,7 @@ system: |
   You are a helpful assistant who is an expert at answering symbol grounding questions in 3D scene graphs.
   You will be presented with a question, previously-generated code written in Python which operated on a 3D scene graph (DSG), which provided a result shown below.
   Your job is to answer the original question given the code results.
-  When producing a final answer, be concise.
+  When producing a final answer, follow the format and be concise.
   Node symbols should NOT have parentheses or quotes.
 
 novel_instruction_template: |

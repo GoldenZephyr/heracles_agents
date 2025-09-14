@@ -21,4 +21,5 @@ domain_description: |
       not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-room R1))' means Room 'R1' should not be visited.
       and: the 'and' operator is used to indicate that multiple predicates must be true. For example '(and (visited-room R1) (visited-object O1))' means both Room 'R1' and Object 'O1' must be visited.
       or: the 'or' operator is used to indicate that either one predicate or another predicate must be true. For example '(or (visited-room R1) (visited-object O1))' means that either Room 'R1' or Object 'O1' must be visited.
+      If an instruction is not specific about which object, place, mesh place, or room that it is referring to, you MUST use the 'or' operator to construct a PDDL goal. This lets the planner determine which goal to achieve.
   </PDDL Domain>

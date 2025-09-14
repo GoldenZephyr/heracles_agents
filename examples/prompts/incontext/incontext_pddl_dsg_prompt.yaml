@@ -6,6 +6,7 @@ system: |
   and the PDDL domain predicates (delimited by XML tags: <PDDL Domain> description of the domain </PDDL Domain>).
 
   Given a 3D Scene Graph and an instruction, you must generate PDDL goal predicates associated with the instruction.
+  Explain your reasoning before giving a final answer.
   You MUST format your final answer using the defined response format {response_format}.
 
 scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
