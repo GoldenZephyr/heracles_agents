@@ -18,7 +18,7 @@ domain_description: |
       The 'object-in-place' predicate is useful for specifying that a robot should place an object somewhere. If the robot should move an object from one place to another, you should use the 'object-in-place' predicate for the goal instead of the 'holding' predicate.
 
       You can compose PDDL goal predicates into more complex goals using the following operators:
-      not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-place R1))' means Room 'R1' should not be visited.
-      and: the 'and' operator is used to indicate that multiple predicates must be true. For example '(and (visited-place R1) (visited-object O1))' means both Room 'R1' and Object 'O1' must be visited.
-      or: the 'or' operator is used to indicate that either one predicate or another predicate must be true. For example '(or (visited-place R1) (visited-object O1))' means that either Room 'R1' or Object 'O1' must be visited.
+      not: the 'not' operator negates the truth value of the predicate. For example '(not (visited-room R1))' means Room 'R1' should not be visited.
+      and: the 'and' operator is used to indicate that multiple predicates must be true. For example '(and (visited-room R1) (visited-object O1))' means both Room 'R1' and Object 'O1' must be visited.
+      or: the 'or' operator is used to indicate that either one predicate or another predicate must be true. For example '(or (visited-room R1) (visited-object O1))' means that either Room 'R1' or Object 'O1' must be visited.
   </PDDL Domain>

@@ -29,5 +29,5 @@ in_context_examples:
     assistant: "<answer>(and (holding O120) (at-object O15))</answer>"
   # Disjunction
   - user: |
-      Instruction: Could you move one of the poles on the sidewalk?
+      Instruction: Could you move to one of the poles on the sidewalk?
     assistant: "<answer>(or (visited-object O155) (visited-object O160) (visited-object O185))</answer>"

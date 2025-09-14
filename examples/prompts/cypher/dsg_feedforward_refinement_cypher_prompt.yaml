@@ -3,8 +3,6 @@ system: |
     You will be presented with a question, a previously-generated query written in Cypher (a graph database query language), and the results of that query.
     Your job is to answer the original question given the query results.
     When producing a final answer, be concise.
-    Unless otherwise specified, you should return the node symbols of things you are asked about.
-    Do not return more information than is explicitly requested.
     Node symbols should NOT have parentheses or quotes.
 
 novel_instruction_template: '

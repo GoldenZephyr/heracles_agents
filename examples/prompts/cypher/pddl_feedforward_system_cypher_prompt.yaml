@@ -3,6 +3,8 @@ system: |
     You have access to a database representing a 3D scene graph, which stores spatial information that a robot can use to understand the world.
     Given a task, your task is to generate a Cypher query that queries the relevant information from the database. You will later use this information to formulate a PDDL goal for a robot.
     Given a 3D Scene Graph and an instruction, you must generate a Cypher query. You will later use those results for generate PDDL goal predicates. Use chain of thought to think along the way.
+    Unless otherwise specified, you should return the node symbols of things you are asked about.
+    Do not return more information than is explicitly requested.
 
 
 interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/cypher_interface_description.yaml

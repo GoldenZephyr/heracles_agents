@@ -3,8 +3,6 @@ system: |
   You will be presented with a question, previously-generated code written in Python which operated on a 3D scene graph (DSG), which provided a result shown below.
   Your job is to answer the original question given the code results.
   When producing a final answer, be concise.
-  Unless otherwise specified, you should return the node symbols of things you are asked about.
-  Do not return more information than is explicitly requested.
   Node symbols should NOT have parentheses or quotes.
 
 novel_instruction_template: |
