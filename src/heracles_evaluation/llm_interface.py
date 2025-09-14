@@ -30,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 BedrockRuntime = boto3.client("bedrock-runtime", "us-east-1")
 ThrottlingException = BedrockRuntime.exceptions.ThrottlingException
+ModelTimeoutException = BedrockRuntime.exceptions.ModelTimeoutException
+ServiceUnavailableException = BedrockRuntime.exceptions.ServiceUnavailableException
 
 
 class SldpComparison(BaseModel):
@@ -293,6 +295,23 @@ class AgentContext:
                 )
                 time.sleep(wait_time_s)
                 continue
+
+            except ModelTimeoutException as ex:
+                print(ex)
+                logging.warning(
+                    f"Bedrock model timeout. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
+
+            except ServiceUnavailableException as ex:
+                print(ex)
+                logging.warning(
+                    f"Bedrock service unavailable. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
+
             except openai.APITimeoutError as ex:
                 # TODO: each client should catch their own rate limit errors and then emit a shared single error type that we catch here
                 print(ex)
