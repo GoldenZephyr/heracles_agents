@@ -97,6 +97,7 @@ def feedforward_cypher(exp):
             valid_answer_format=valid_format,
             input_tokens=n_input_tokens,
             output_tokens=n_output_tokens,
+            n_tool_calls=cxt.n_tool_calls + cxt2.n_tool_calls,  # Should be 0...
         )
         aq = AnalyzedQuestion(
             question=question, answer=answer, sequences=sequences, analysis=analysis

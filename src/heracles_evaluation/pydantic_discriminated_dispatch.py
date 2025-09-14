@@ -80,7 +80,6 @@ def has_plum_generics(K):
                     def validator(v, handler, info, constructor=value_type):
                         constructed_args = {}
                         for key, val in v.items():
-                            print("val: ", val)
                             if type(val) is dict:
                                 constructed_args[key] = constructor(**val)
                             else:

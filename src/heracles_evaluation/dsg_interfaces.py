@@ -20,7 +20,7 @@ class HeraclesDsgInterface(BaseSettings):
 class InContextDsgInterfaceConfig(BaseModel):
     dsg_interface_type: Literal["in_context"]
     dsg_filepath: Optional[str] = None
-    dsg_place_layer_name: Optional[str] = None
+    dsg_place_layer_name: str
     _dsg: PrivateAttr() = None
 
     @model_validator(mode="after")

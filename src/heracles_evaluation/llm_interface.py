@@ -101,6 +101,7 @@ class QuestionAnalysis(BaseModel):
     correct: bool
     input_tokens: int
     output_tokens: int
+    n_tool_calls: int
 
 
 class AnalyzedQuestion(BaseModel):

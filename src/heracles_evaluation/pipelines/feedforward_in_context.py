@@ -76,6 +76,7 @@ def incontext_dsg(exp):
             valid_answer_format=valid_format,
             input_tokens=cxt.initial_input_tokens,
             output_tokens=cxt.total_output_tokens,
+            n_tool_calls=cxt.n_tool_calls,
         )
         aq = AnalyzedQuestion(
             question=question, answer=answer, sequences=[sequence], analysis=analysis
