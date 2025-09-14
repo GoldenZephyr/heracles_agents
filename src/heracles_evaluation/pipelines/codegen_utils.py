@@ -7,6 +7,8 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
+dsg_cache = {}
+
 
 def load_dsg(dsg_filepath, label_path=None):
     """
@@ -18,6 +20,12 @@ def load_dsg(dsg_filepath, label_path=None):
     Returns:
         DynamicSceneGraph: The loaded DSG object, potentially augmented with label and layer metadata.
     """
+    if dsg_filepath in dsg_cache:
+        print(f"\n\n Found {dsg_filepath} already loaded! Using cached version\n\n")
+        logger.info(
+            f"\n\n Found {dsg_filepath} already loaded! Using cached version\n\n"
+        )
+        return dsg_cache[dsg_filepath]
     G = spark_dsg.DynamicSceneGraph.load(dsg_filepath)
     logger.info(f"DSG loaded from {dsg_filepath}")
 
@@ -58,6 +66,8 @@ def load_dsg(dsg_filepath, label_path=None):
 
         G.metadata.add({"LayerIdToLayerStr": layers})
         logger.info(f"Labels loaded from {label_path}")
+
+    #dsg_cache[dsg_filepath] = G # TODO: can enalbe when we don't worry about mutating DSG
     return G
 
 
