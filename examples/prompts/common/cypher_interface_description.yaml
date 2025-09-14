@@ -13,6 +13,7 @@ interface_description: |
           - center: the 3D position of the place, as a POINT type
       - Room: a node representing a room or higher-level region
           - nodeSymbol: a unique string identifier
+          - class: a string identifying the room's semantic class or type
           - center: the 3D position of the room, as a POINT type
 
   Object, MeshPlace, Place, and Room are all Cypher labels attached to nodes.

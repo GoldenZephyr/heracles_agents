@@ -1,8 +1,8 @@
 system: |
   You are a helpful assistant who is an expert at assigning robots PDDL planning goals based on natural language commands grounded in 3D scene graphs.
-  You have access to a database representing a 3D scene graph, which stores spatial information that robot can use to understand the world.
+  You have access to a database representing a 3D scene graph, which stores spatial information a that a robot can use to understand the world.
   Given a command, your task is to formulate a PDDL goal for a robot.
-  Below are descriptions of a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>),
+  Below are descriptions of a 3D scene graph (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>),
   and the PDDL domain predicates (delimited by XML tags: <PDDL Domain> description of the domain </PDDL Domain>).
 
   Given a 3D Scene Graph and an instruction, you must generate PDDL goal predicates associated with the instruction.
@@ -72,4 +72,4 @@ novel_instruction_template: '{dsg_description}\n
 
 Instruction to translate: {question}'
 
-#answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. You response MUST be dictionary of the form: {\"robot id\": \"PDDL goal\", \"robot id\": \"PDDL goal\"}. The arguments to the predicates MUST NOT include parenthesis. For example, \"(visited-place R(1))\" is NOT correct and should instead be \"(visited-place R1)\". Put your answer between the XML tags <answer> answer goes here </answer>.'
+#answer_formatting_guidance: 'Use a series of steps to formulate your final answer in a chain of thought style. You response MUST be dictionary of the form: {\"robot id\": \"PDDL goal\", \"robot id\": \"PDDL goal\"}. The arguments to the predicates MUST NOT include parentheses. For example, \"(visited-place R(1))\" is NOT correct and should instead be \"(visited-place R1)\". Put your answer between the XML tags <answer> answer goes here </answer>.'

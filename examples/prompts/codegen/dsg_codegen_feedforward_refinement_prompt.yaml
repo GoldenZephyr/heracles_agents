@@ -5,7 +5,7 @@ system: |
   When producing a final answer, be concise.
   Unless otherwise specified, you should return the node symbols of things you are asked about.
   Do not return more information than is explicitly requested.
-  Node symbols should NOT have parenthesis or quotes.
+  Node symbols should NOT have parentheses or quotes.
 
 novel_instruction_template: |
   Original Question: {question}

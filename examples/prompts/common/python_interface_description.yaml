@@ -12,7 +12,7 @@ interface_description: |
   <python>
   def solve_task(G):
       # Returns a list of all objects as dictionaries in the scene graph G
-      objects = [for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes]
+      objects = [o for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes]
       return objects
   </python>
   2. Find all the foo in the graph G
@@ -20,12 +20,11 @@ interface_description: |
   def solve_task(G):
       # Returns a list of all foo (as dictionaries) in the scene graph G
       labelspace = G.metadata.get()["labelspace"]
-        return [
-        labelspace[str(o.attributes.semantic_label)]
-        for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes
-        if "foo" in labelspace[str(o.attributes.semantic_label)].lower()
-        ]
-  ]
+      return [
+          labelspace[str(o.attributes.semantic_label)]
+          for o in G.get_layer(spark_dsg.DsgLayers.OBJECTS).nodes
+          if "foo" in labelspace[str(o.attributes.semantic_label)].lower()
+      ]
   </python>
   Please consider efficiency when writing your code. Use list comprehensions and avoid unnecessary loops.
   </python_api>
