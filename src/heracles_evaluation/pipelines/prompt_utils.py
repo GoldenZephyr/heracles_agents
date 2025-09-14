@@ -20,6 +20,11 @@ def get_answer_formatting_guidance_helper(prompt_settings, question):
             format_instruction += get_sldp_answer_tag_text()
             if prompt_settings.sldp_answer_type_hint:
                 sldp_type = get_sldp_type(question.solution)
+                sldp_type_lower = sldp_type.lower()
+                if sldp_type_lower == "string":
+                    sldp_type = "primitive string"
+                elif sldp_type_lower == "number":
+                    sldp_type = "primitive number"
                 format_instruction += f"\n Your answer should be an SLDP {sldp_type}"
             return format_instruction
         case "SLDP_TOOL":

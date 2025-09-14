@@ -26,5 +26,7 @@ interface_description: |
           if "foo" in labelspace[str(o.attributes.semantic_label)].lower()
       ]
   </python>
-  Please consider efficiency when writing your code. Use list comprehensions and avoid unnecessary loops.
+  Please consider efficiency when writing your code. Use list comprehensions and avoid unnecessary loops. 
+      Your python code block must only contain the def solve_task(G): function definition and any necessary helper functions. 
+      Do NOT include any calls to the function outside of its definition.
   </python_api>

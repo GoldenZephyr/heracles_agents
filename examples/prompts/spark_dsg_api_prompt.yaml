@@ -73,11 +73,8 @@ api:
           description: "Gets a read-only view of a specific layer."
           inputs:
             - name: "layer_id"
-              type: "int or str"
-              description: "The integer ID or string name of the layer to retrieve."
-            - name: "partition_id"
-              type: "int"
-              description: "The partition ID (optional, default=0)."
+              type: "str"
+              description: "The string name of the layer to retrieve. (e.g (spark_dsg.DsgLayers.OBJECTS)"
           output:
             type: "LayerView"
             description: "A view of the requested layer. Throws an error if the layer does not exist."
@@ -158,7 +155,8 @@ api:
             description: "The requested edge, or None if it does not exist."
         - name: "get_position"
           include: true
-          description: "Gets the 3D position of a node."
+          description: "Gets the 3D position of a node. Important: This function expects the raw integer value of the NodeSymbol.
+               Always pass `node.id.value` instead of `node.id`."
           inputs:
             - name: "node_id"
               type: "NodeSymbol"
@@ -387,7 +385,10 @@ api:
             type: "list[NodeSymbol]"
         - name: "connections"
           include: true
-          description: "Gets a list of all nodes connected to this one (parents and children)."
+          description: |
+            Gets a list of all nodes connected to this one (parents and children).
+            Note: `connections()` returns all connected nodes, including parents and children, which may be in different layers.
+            To find adjacent nodes within the same layer (e.g., neighboring rooms), you must iterate through that layer's edges.
           output:
             type: "list[NodeSymbol]"
 
@@ -815,14 +816,17 @@ api:
   enums:
     - name: "DsgLayers"
       include: true
-      description: "Standard integer identifiers for common semantic layers in the scene graph."
+      description: |
+        Standard integer identifiers for common semantic layers in the scene graph.
+        Important: This is a class within the spark_dsg module, not an attribute of a 
+        DynamicSceneGraph instance. Always reference it as `spark_dsg.DsgLayers`
+        Incorrect: G.DsgLayers.OBJECTS
+        Correct:   spark_dsg.DsgLayers.OBJECTS
       values:
         - name: "SEGMENTS"
           description: "Layer for mesh segments or supervoxels."
         - name: "OBJECTS"
           description: "Layer for individual objects."
-        - name: "AGENTS"
-          description: "Layer for dynamic agents, like robots or people."
         - name: "PLACES"
           description: "Layer for places (3D)"
         - name: "MESH_PLACES"

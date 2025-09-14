@@ -1,4 +1,6 @@
 labelspace_description: |
+  <Labelspace Description>
+  These are the labels available in the scene graph at each layer. Synonyms should be mapped to a label in the the list.
   <object_labels>
     tree
     vehicle
@@ -50,3 +52,4 @@ labelspace_description: |
     surface
     flora
   </mesh_places_labels>
+  </Labelspace Description>
