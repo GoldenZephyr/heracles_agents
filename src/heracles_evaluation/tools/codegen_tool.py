@@ -19,7 +19,7 @@ def execute_generated_code_timed(
             execute_generated_code, args=(python_code, dsg_interface), timeout=60
         )
     except FunctionTimeoutError:
-        return "Your code timed out."
+        return "Your code timed out. In 60 seconds."
 
 
 def execute_generated_code(python_code: str, dsg_interface: PythonDsgInterface = None):

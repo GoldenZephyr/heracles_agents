@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 import spark_dsg
 import yaml
+from heracles_evaluation.tools.timeouts import run_with_timeout, FunctionTimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -240,6 +241,15 @@ def format_callable_api(
         parts.append(f"    # Example:\n{indented_example}")
 
     return "\n".join(parts)
+
+
+def execute_generated_code_timed(python_code: str, scene_graph):
+    try:
+        return run_with_timeout(
+            execute_generated_code, args=(python_code, scene_graph), timeout=60
+        )
+    except FunctionTimeoutError:
+        return "Your code timed out. In 60 seconds."
 
 
 def execute_generated_code(python_code: str, scene_graph: spark_dsg.DynamicSceneGraph):
