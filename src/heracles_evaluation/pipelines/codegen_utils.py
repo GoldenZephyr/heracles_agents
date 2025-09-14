@@ -67,7 +67,7 @@ def load_dsg(dsg_filepath, label_path=None):
         G.metadata.add({"LayerIdToLayerStr": layers})
         logger.info(f"Labels loaded from {label_path}")
 
-    #dsg_cache[dsg_filepath] = G # TODO: can enalbe when we don't worry about mutating DSG
+    # dsg_cache[dsg_filepath] = G # TODO: can enalbe when we don't worry about mutating DSG
     return G
 
 

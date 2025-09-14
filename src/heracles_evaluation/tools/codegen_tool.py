@@ -6,8 +6,20 @@ import spark_dsg
 from heracles_evaluation.dsg_interfaces import PythonDsgInterface
 from heracles_evaluation.tool_interface import FunctionParameter, ToolDescription
 from heracles_evaluation.tool_registry import ToolRegistry, register_tool
+from heracles_evaluation.tools.timeouts import FunctionTimeoutError, run_with_timeout
 
 logger = logging.getLogger(__name__)
+
+
+def execute_generated_code_timed(
+    python_code: str, dsg_interface: PythonDsgInterface = None
+):
+    try:
+        return run_with_timeout(
+            execute_generated_code, args=(python_code, dsg_interface), timeout=60
+        )
+    except FunctionTimeoutError:
+        return "Your code timed out."
 
 
 def execute_generated_code(python_code: str, dsg_interface: PythonDsgInterface = None):
@@ -49,7 +61,7 @@ codegen_tool = ToolDescription(
     parameters=[
         FunctionParameter("python_code", str, "Python code to execute"),
     ],
-    function=execute_generated_code,
+    function=execute_generated_code_timed,
 )
 
 register_tool(codegen_tool)

@@ -44,7 +44,7 @@ def generate_prompt(
         print(ex)
         raise ex
 
-    prompt.answer_semantic_guidance = "Make you answer as concise as possible"
+    prompt.answer_semantic_guidance = "Make your answer as concise as possible"
     prompt.answer_formatting_guidance = get_answer_formatting_guidance(
         agent_config, question
     )

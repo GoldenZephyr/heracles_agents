@@ -32,13 +32,24 @@ class OpenaiClientConfig(BaseSettings):
                     f"Unknown response_format requested for LLM: {response_format}"
                 )
 
-        response = self._client.responses.create(
-            model=model_info.model,
-            temperature=model_info.temperature,
-            # seed=model_info.seed,
-            text=fmt,
-            tools=tools,
-            input=messages,
-            parallel_tool_calls=False,
-        )
+        if "gpt-5" in model_info.model:
+            response = self._client.responses.create(
+                model=model_info.model,
+                # seed=model_info.seed,
+                text=fmt,
+                tools=tools,
+                input=messages,
+                parallel_tool_calls=False,
+                reasoning={"effort": "minimal"},
+            )
+        else:
+            response = self._client.responses.create(
+                model=model_info.model,
+                temperature=model_info.temperature,
+                # seed=model_info.seed,
+                text=fmt,
+                tools=tools,
+                input=messages,
+                parallel_tool_calls=False,
+            )
         return response
