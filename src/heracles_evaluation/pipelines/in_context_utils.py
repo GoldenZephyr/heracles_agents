@@ -15,6 +15,10 @@ class PromptingFailure(Exception):
 """ Methods for encoding a scene graph with ONLY Objects and Regions/Rooms """
 
 
+def get_position_string(attrs):
+    return f"({attrs.position[0]:.2f},{attrs.position[1]:.2f},{attrs.position[2]:.2f})"
+
+
 def get_room_parents_of_object(object_node, scene_graph):
     """Method to return the string of the object node's grandparent room; this requires traversing the intermediate place layer"""
     # Get the parents; returns a set of gtsam ids
@@ -55,7 +59,7 @@ def object_to_string_room_parent(object_node, scene_graph):
     if not object_labelspace:
         raise PromptingFailure("No available object labelspace")
     semantic_type = object_labelspace.get_category(attrs.semantic_label)
-    position = f"({attrs.position[0]:.2f},{attrs.position[1]:.2f})"
+    position = get_position_string(attrs)
     parent_rooms = get_room_parents_of_object(object_node, scene_graph)
     object_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position}, parent_rooms={parent_rooms})"
     return object_string
@@ -91,7 +95,7 @@ def room_to_string_full(room_node, scene_graph):
     if not room_labelspace:
         raise PromptingFailure("No available room labelspace")
     semantic_type = room_labelspace.get_category(attrs.semantic_label)
-    position = f"({attrs.position[0]:.2f}, {attrs.position[1]:.2f})"
+    position = get_position_string(attrs)
     room_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position})"
     return room_string
 
@@ -128,7 +132,7 @@ def object_to_string_full(object_node, scene_graph):
     if not object_labelspace:
         raise PromptingFailure("No available object labelspace")
     semantic_type = object_labelspace.get_category(attrs.semantic_label)
-    position = f"({attrs.position[0]:.2f},{attrs.position[1]:.2f})"
+    position = get_position_string(attrs)
     parent_place_node_ids = set()
     parent_place_gtsam_ids = object_node.parents()
     for parent_place_gtsam_id in parent_place_gtsam_ids:

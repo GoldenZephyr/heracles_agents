@@ -1,5 +1,5 @@
 
-system: | 
+system: |
   Your task is to map from natural language instructions to symbols in a 3D world representation.
   You will be provided with a description of the world known as a 3D Scene Graph.
   Below is a description of 3D scene graphs (delimited by XML tags: <Scene Graph Description> description of 3D Scene Graphs </Scene Graph Description>).
@@ -17,14 +17,14 @@ interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/in_co
 in_context_examples_preamble: "Here are some examples of mapping from natural language instructions to grounded objects. Each example uses the 3D scene graph below. Note that this 3D scene graph is just for these examples and you should NOT use this when answering the new instruction.
 <Example 3D Scene Graph>
 Objects:
-- (id=O0, type=tree, pos=(-3.14,1.13), parent_places={'p4'})
-- (id=O1, type=vehicle, pos=(3.34,3.53), parent_places={'p0'})
-- (id=O2, type=door, pos=(3.33,3.48), parent_places={'p4'})
-- (id=O3, type=tree, pos=(4.47,-4.72), parent_places={'p5'})
-- (id=O4, type=vehicle, pos=(-2.51,6.63), parent_places={'p3'})
-- (id=O5, type=boat, pos=(1.34,3.28), parent_places={'p2'})
-- (id=O6, type=seating, pos=(1.37,3.03), parent_places={'p2'})
-- (id=O7, type=tree, pos=(9.10,-2.01), parent_places={'p6'})
+- (id=O0, type=tree, pos=(-3.14,1.13,0.1), parent_places={'p4'})
+- (id=O1, type=vehicle, pos=(3.34,3.53,0.1), parent_places={'p0'})
+- (id=O2, type=door, pos=(3.33,3.48,0.2), parent_places={'p4'})
+- (id=O3, type=tree, pos=(4.47,-4.72,-0.1), parent_places={'p5'})
+- (id=O4, type=vehicle, pos=(-2.51,6.63, 0.2), parent_places={'p3'})
+- (id=O5, type=boat, pos=(1.34,3.28,-0.2), parent_places={'p2'})
+- (id=O6, type=seating, pos=(1.37,3.03,0.01), parent_places={'p2'})
+- (id=O7, type=tree, pos=(9.10,-2.01,0.04), parent_places={'p6'})
 Places:
 - (id=p0, siblings={'p1','p4'}, parent_rooms={'R0'})
 - (id=p1, siblings={'p0','p4'}, parent_rooms={'R0'})
@@ -34,9 +34,9 @@ Places:
 - (id=p5, siblings={'p6'}, parent_rooms={'R2'})
 - (id=p6, siblings={'p5'}, parent_rooms={'R2'})
 Rooms:
-- (id=R0, type=parking_lot, pos=(1.17,2.71))
-- (id=R1, type=dock, pos=(0.67,4.31))
-- (id=R2, type=courtyard, pos=(6.79,2.31))
+- (id=R0, type=parking_lot, pos=(1.17,2.71,0.01))
+- (id=R1, type=dock, pos=(0.67,4.31,0.09))
+- (id=R2, type=courtyard, pos=(6.79,2.31,-0.01))
 </Example 3D Scene Graph>
 "
 
