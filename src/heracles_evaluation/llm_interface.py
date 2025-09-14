@@ -293,6 +293,22 @@ class AgentContext:
                 )
                 time.sleep(wait_time_s)
                 continue
+            except openai.APITimeoutError as ex:
+                # TODO: each client should catch their own rate limit errors and then emit a shared single error type that we catch here
+                print(ex)
+                logging.warning(
+                    f"Hit OpenAI Timeout error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
+            except openai.APIStatusError as ex:
+                # TODO: each client should catch their own rate limit errors and then emit a shared single error type that we catch here
+                print(ex)
+                logging.warning(
+                    f"Hit OpenAI API error. Waiting {wait_time_s} seconds. Will retry ({idx} / {n_ratelimit_retries}"
+                )
+                time.sleep(wait_time_s)
+                continue
 
             break
         return response

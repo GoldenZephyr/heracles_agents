@@ -8,3 +8,4 @@ output/
 scene_graphs/
 graphs/
 scratch/
+*.zip
