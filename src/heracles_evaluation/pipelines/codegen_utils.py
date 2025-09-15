@@ -4,7 +4,8 @@ from typing import Any, Dict
 
 import spark_dsg
 import yaml
-from heracles_evaluation.tools.timeouts import run_with_timeout, FunctionTimeoutError
+
+from heracles_evaluation.tools.timeouts import FunctionTimeoutError, run_with_timeout
 
 logger = logging.getLogger(__name__)
 

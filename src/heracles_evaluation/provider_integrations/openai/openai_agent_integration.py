@@ -1,6 +1,7 @@
 # ruff: noqa: F811
 import copy
 import json
+import logging
 from typing import Callable
 
 import tiktoken
@@ -21,8 +22,8 @@ from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
 
-import logging
 logger = logging.getLogger(__name__)
+
 
 @dispatch
 def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OpenaiClientConfig]):

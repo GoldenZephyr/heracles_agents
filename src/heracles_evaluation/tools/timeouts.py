@@ -1,6 +1,6 @@
+import logging
 import multiprocessing as mp
 import traceback
-import logging
 
 logger = logging.getLogger(__name__)
 
