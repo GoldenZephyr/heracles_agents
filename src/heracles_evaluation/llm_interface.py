@@ -238,9 +238,13 @@ def get_summary_text(resp: dict):
         return "Function result: " + resp["output"]
     elif "toolResult" in resp:
         # bedrock
-        return "Tool result: " + "\n".join(
-            r["text"] for r in resp["toolResult"]["content"]
-        )
+        try:
+            return "Tool result: " + "\n".join(
+                r["text"] for r in resp["toolResult"]["content"]
+            )
+        except:
+            logger.error("bedrock logging format error")
+            return "Tool result: " + str(resp["toolResult"])
     elif "toolUse" in resp:
         # bedrock
         return "Function Call: " + get_bedrock_block_summary(resp)

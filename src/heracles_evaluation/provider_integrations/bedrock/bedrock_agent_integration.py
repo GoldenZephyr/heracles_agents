@@ -71,6 +71,8 @@ def make_tool_response(
     result,
 ):
     if "toolUse" in tool_call_message:
+        if not isinstance(result, str):
+            result = str(result)
         m = {
             "role": "user",
             "content": [
@@ -100,7 +102,10 @@ def extract_answer(
     extractor: Callable,
     message: dict,
 ):
-    return extractor(message["content"][0]["text"])
+    try:
+        return extractor(message["content"][0]["text"])
+    except:
+        return ""
 
 
 #
