@@ -9,3 +9,4 @@ scene_graphs/
 graphs/
 scratch/
 *.zip
+*.log
