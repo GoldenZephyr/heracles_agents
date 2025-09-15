@@ -96,7 +96,15 @@ def room_to_string_full(room_node, scene_graph):
         raise PromptingFailure("No available room labelspace")
     semantic_type = room_labelspace.get_category(attrs.semantic_label)
     position = get_position_string(attrs)
-    room_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position})"
+    # Get the siblings
+    sibling_node_ids = set()
+    sibling_gtsam_ids = room_node.siblings()
+    for sibling_gtsam_id in sibling_gtsam_ids:
+        sibling_node = scene_graph.get_node(sibling_gtsam_id)
+        sibling_node_ids.add(sibling_node.id.str(True))
+    if not sibling_node_ids:
+        sibling_node_ids = "none"
+    room_string = f"\n-\t(id={symbol}, type={semantic_type}, pos={position}, siblings={sibling_node_ids})"
     return room_string
 
 

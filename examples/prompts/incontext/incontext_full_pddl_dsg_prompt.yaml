@@ -37,9 +37,9 @@ Places:
 - (id=p5, siblings={'p6'}, parent_rooms={'R2'})
 - (id=p6, siblings={'p5'}, parent_rooms={'R2'})
 Rooms:
-- (id=R0, type=parking_lot, pos=(1.17,2.71,0.01))
-- (id=R1, type=dock, pos=(0.67,4.31,0.09))
-- (id=R2, type=courtyard, pos=(6.79,2.31,-0.01))
+- (id=R0, type=parking_lot, pos=(1.17,2.71,0.01), siblings=none)
+- (id=R1, type=dock, pos=(0.67,4.31,0.09), siblings=none)
+- (id=R2, type=courtyard, pos=(6.79,2.31,-0.01), siblings=none)
 </Example 3D Scene Graph>
 "
 
