@@ -17,7 +17,7 @@ from heracles_evaluation.llm_interface import (
     QuestionAnalysis,
 )
 from heracles_evaluation.pipelines.codegen_utils import (
-    execute_generated_code_timed,
+    execute_generated_code,
     load_dsg,
 )
 from heracles_evaluation.pipelines.comparisons import evaluate_answer
@@ -91,7 +91,7 @@ def feedforward_codegen(exp):
         )
 
         # TODO udpate this
-        success, code_results = execute_generated_code_timed(answer, scene_graph)
+        success, code_results = execute_generated_code(answer, scene_graph)
 
         cxt2 = AgentContext(exp.phases["refine"])
         refinement_prompt = generate_prompt(

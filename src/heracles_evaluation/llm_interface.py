@@ -347,8 +347,9 @@ class AgentContext:
             self.n_tool_calls += 1
 
             result = call_function(self.agent, message)
-
+            logger.debug(f"function_result: {result}")
             tool_response = make_tool_response(self.agent, message, result)
+            logger.debug(f"Tool response: {result}")
             executed_tool_calls.append(tool_response)
 
         return executed_tool_calls
@@ -372,6 +373,7 @@ class AgentContext:
         response = self.call_llm(self.history)
         logger.debug(f"Got response: {response}")
         update = self.handle_response(response)
+        logger.debug(f"Tool update: {update}")
         self.update_history(response)
         self.update_history(update)
         done = self.check_if_done(self.history, response, update)

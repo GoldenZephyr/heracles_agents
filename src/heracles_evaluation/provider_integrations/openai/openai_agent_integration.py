@@ -21,6 +21,8 @@ from heracles_evaluation.provider_integrations.openai.openai_client import (
     OpenaiClientConfig,
 )
 
+import logging
+logger = logging.getLogger(__name__)
 
 @dispatch
 def generate_prompt_for_agent(prompt: Prompt, agent: LlmAgent[OpenaiClientConfig]):
@@ -58,7 +60,10 @@ def call_function(
     name = tool_message.name
     args = json.loads(tool_message.arguments)
     # TODO: verify legal tool name
-    return available_tools[name].function(**args)
+    logger.debug(f"Calling function {name} {args}")
+    result = available_tools[name].function(**args)
+    logger.debug(f"Result {result}")
+    return result
 
 
 @dispatch

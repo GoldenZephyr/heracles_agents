@@ -15,9 +15,11 @@ def execute_generated_code_timed(
     python_code: str, dsg_interface: PythonDsgInterface = None
 ):
     try:
-        return run_with_timeout(
+        result = run_with_timeout(
             execute_generated_code, args=(python_code, dsg_interface), timeout=60
         )
+        logger.debug(f"code_timed result: {result}")
+        return result
     except FunctionTimeoutError:
         return "Your code timed out. In 60 seconds."
 
@@ -61,7 +63,7 @@ codegen_tool = ToolDescription(
     parameters=[
         FunctionParameter("python_code", str, "Python code to execute"),
     ],
-    function=execute_generated_code_timed,
+    function=execute_generated_code,
 )
 
 register_tool(codegen_tool)
