@@ -51,54 +51,69 @@ def generate_prompt(
 def feedforward_cypher(exp):
     analyzed_questions = []
     for question in exp.questions:
-        logger.info(f"\n=======================\nQuestion: {question.question}\n")
-        cxt = AgentContext(exp.phases["generate-cypher"])
+        try:
+            logger.info(f"\n=======================\nQuestion: {question.question}\n")
+            cxt = AgentContext(exp.phases["generate-cypher"])
 
-        prompt = generate_prompt(question, exp.phases["generate-cypher"])
+            prompt = generate_prompt(question, exp.phases["generate-cypher"])
 
-        cxt.initialize_agent(prompt)
-        success, answer = cxt.run()
-        logger.info(f"\nLLM Intermediate Answer: {answer}\n")
+            cxt.initialize_agent(prompt)
+            success, answer = cxt.run()
+            logger.info(f"\nLLM Intermediate Answer: {answer}\n")
 
-        cypher_generation_sequence = AgentSequence(
-            description="cypher-producing-agent", responses=cxt.get_agent_responses()
-        )
+            cypher_generation_sequence = AgentSequence(
+                description="cypher-producing-agent",
+                responses=cxt.get_agent_responses(),
+            )
 
-        success, query_result = query_db(exp.dsg_interface, answer)
+            success, query_result = query_db(exp.dsg_interface, answer)
 
-        cxt2 = AgentContext(exp.phases["refine"])
-        refinement_prompt = generate_prompt(
-            question,
-            exp.phases["refine"],
-            {"cypher_results": query_result, "cypher_query": answer},
-        )
+            cxt2 = AgentContext(exp.phases["refine"])
+            refinement_prompt = generate_prompt(
+                question,
+                exp.phases["refine"],
+                {"cypher_results": query_result, "cypher_query": answer},
+            )
 
-        cxt2.initialize_agent(refinement_prompt)
-        success, answer = cxt2.run()
-        logger.info(f"LLM Final Answer: {answer}")
+            cxt2.initialize_agent(refinement_prompt)
+            success, answer = cxt2.run()
+            logger.info(f"LLM Final Answer: {answer}")
 
-        valid_format, correct = evaluate_answer(
-            question.correctness_comparator, answer, question.solution
-        )
+            valid_format, correct = evaluate_answer(
+                question.correctness_comparator, answer, question.solution
+            )
 
-        logger.info(f"\n\nCorrect? {correct}\n\n")
+            logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        refinement_sequence = AgentSequence(
-            description="refinement-agent", responses=cxt2.get_agent_responses()
-        )
+            refinement_sequence = AgentSequence(
+                description="refinement-agent", responses=cxt2.get_agent_responses()
+            )
 
-        sequences = [cypher_generation_sequence, refinement_sequence]
+            sequences = [cypher_generation_sequence, refinement_sequence]
 
-        n_input_tokens = cxt.initial_input_tokens + cxt2.initial_input_tokens
-        n_output_tokens = cxt.total_output_tokens + cxt2.total_output_tokens
+            n_input_tokens = cxt.initial_input_tokens + cxt2.initial_input_tokens
+            n_output_tokens = cxt.total_output_tokens + cxt2.total_output_tokens
 
-        analysis = QuestionAnalysis(
-            correct=correct,
-            valid_answer_format=valid_format,
-            input_tokens=n_input_tokens,
-            output_tokens=n_output_tokens,
-            n_tool_calls=cxt.n_tool_calls + cxt2.n_tool_calls,  # Should be 0...
-        )
+            analysis = QuestionAnalysis(
+                correct=correct,
+                valid_answer_format=valid_format,
+                input_tokens=n_input_tokens,
+                output_tokens=n_output_tokens,
+                n_tool_calls=cxt.n_tool_calls + cxt2.n_tool_calls,  # Should be 0...
+            )
+
+        except Exception as ex:
+            print(ex)
+            logger.error("Bad Question!")
+            logger.error(str(ex))
+            analysis = QuestionAnalysis(
+                correct=False,
+                valid_answer_format=False,
+                input_tokens=0,
+                output_tokens=0,
+                n_tool_calls=0,
+            )
+
         aq = AnalyzedQuestion(
             question=question, answer=answer, sequences=sequences, analysis=analysis
         )

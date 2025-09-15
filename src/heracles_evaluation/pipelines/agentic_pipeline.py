@@ -59,33 +59,49 @@ def agentic_pipeline(exp):
         api_string = exp.dsg_interface.get_dsg_api_prompt()
 
     for question in exp.questions:
-        logger.info(f"\n=======================\nQuestion: {question.question}\n")
-        cxt = AgentContext(exp.phases["main"])
+        try:
+            logger.info(f"\n=======================\nQuestion: {question.question}\n")
+            cxt = AgentContext(exp.phases["main"])
 
-        prompt = generate_prompt(question, exp.phases["main"], api_prompt=api_string)
-        logger.info(f"\nLLM Prompt: {prompt}\n")
+            prompt = generate_prompt(
+                question, exp.phases["main"], api_prompt=api_string
+            )
+            logger.info(f"\nLLM Prompt: {prompt}\n")
 
-        cxt.initialize_agent(prompt)
-        success, answer = cxt.run()
-        logger.info(f"\nLLM Answer: {answer}\n")
+            cxt.initialize_agent(prompt)
+            success, answer = cxt.run()
+            logger.info(f"\nLLM Answer: {answer}\n")
 
-        agent_sequence = AgentSequence(
-            description="cypher-agent", responses=cxt.get_agent_responses()
-        )
+            agent_sequence = AgentSequence(
+                description="cypher-agent", responses=cxt.get_agent_responses()
+            )
 
-        valid_format, correct = evaluate_answer(
-            question.correctness_comparator, answer, question.solution
-        )
+            valid_format, correct = evaluate_answer(
+                question.correctness_comparator, answer, question.solution
+            )
 
-        logger.info(f"\n\nCorrect? {correct}\n\n")
+            logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        analysis = QuestionAnalysis(
-            correct=correct,
-            valid_answer_format=valid_format,
-            input_tokens=cxt.initial_input_tokens,
-            output_tokens=cxt.total_output_tokens,
-            n_tool_calls=cxt.n_tool_calls,
-        )
+            analysis = QuestionAnalysis(
+                correct=correct,
+                valid_answer_format=valid_format,
+                input_tokens=cxt.initial_input_tokens,
+                output_tokens=cxt.total_output_tokens,
+                n_tool_calls=cxt.n_tool_calls,
+            )
+
+        except Exception as ex:
+            print(ex)
+            logger.error("Bad Question!")
+            logger.error(str(ex))
+            analysis = QuestionAnalysis(
+                correct=False,
+                valid_answer_format=False,
+                input_tokens=0,
+                output_tokens=0,
+                n_tool_calls=0,
+            )
+
         aq = AnalyzedQuestion(
             question=question,
             answer=answer,

@@ -56,31 +56,45 @@ def generate_prompt(
 def incontext_dsg(exp):
     analyzed_questions = []
     for question in exp.questions:
-        cxt = AgentContext(exp.phases["main"])
+        try:
+            cxt = AgentContext(exp.phases["main"])
 
-        prompt = generate_prompt(exp.dsg_interface, question, exp.phases["main"])
+            prompt = generate_prompt(exp.dsg_interface, question, exp.phases["main"])
 
-        cxt.initialize_agent(prompt)
-        success, answer = cxt.run()
-        logger.info(f"\nLLM Final Answer: {answer}\n")
+            cxt.initialize_agent(prompt)
+            success, answer = cxt.run()
+            logger.info(f"\nLLM Final Answer: {answer}\n")
 
-        sequence = AgentSequence(
-            description="in-context pipeline", responses=cxt.get_agent_responses()
-        )
+            sequence = AgentSequence(
+                description="in-context pipeline", responses=cxt.get_agent_responses()
+            )
 
-        valid_format, correct = evaluate_answer(
-            question.correctness_comparator, answer, question.solution
-        )
+            valid_format, correct = evaluate_answer(
+                question.correctness_comparator, answer, question.solution
+            )
 
-        logger.info(f"\n\nCorrect? {correct}\n\n")
+            logger.info(f"\n\nCorrect? {correct}\n\n")
 
-        analysis = QuestionAnalysis(
-            correct=correct,
-            valid_answer_format=valid_format,
-            input_tokens=cxt.initial_input_tokens,
-            output_tokens=cxt.total_output_tokens,
-            n_tool_calls=cxt.n_tool_calls,
-        )
+            analysis = QuestionAnalysis(
+                correct=correct,
+                valid_answer_format=valid_format,
+                input_tokens=cxt.initial_input_tokens,
+                output_tokens=cxt.total_output_tokens,
+                n_tool_calls=cxt.n_tool_calls,
+            )
+
+        except Exception as ex:
+            print(ex)
+            logger.error("Bad Question!")
+            logger.error(str(ex))
+            analysis = QuestionAnalysis(
+                correct=False,
+                valid_answer_format=False,
+                input_tokens=0,
+                output_tokens=0,
+                n_tool_calls=0,
+            )
+
         aq = AnalyzedQuestion(
             question=question, answer=answer, sequences=[sequence], analysis=analysis
         )

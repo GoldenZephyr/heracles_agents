@@ -39,22 +39,35 @@ def load_dsg(dsg_filepath, label_path=None):
             item["label"]: item["name"] for item in labelspace["label_names"]
         }
         G.metadata.add({"labelspace": id_to_label})
-        region_ls = {
-            0: "unknown",
-            1: "road",
-            2: "field",
-            3: "shelter",
-            4: "indoor",
-            5: "stairs",
-            6: "sidewalk",
-            7: "path",
-            8: "boundary",
-            9: "shore",
-            10: "ground",
-            11: "dock",
-            12: "parking",
-            13: "footing",
-        }
+
+        if "west" in dsg_filepath:
+            logger.info("Using West Point Regions")
+            region_ls = {
+                0: "unknown",
+                1: "road",
+                2: "field",
+                3: "shelter",
+                4: "indoor",
+                5: "stairs",
+                6: "sidewalk",
+                7: "path",
+                8: "boundary",
+                9: "shore",
+                10: "ground",
+                11: "dock",
+                12: "parking",
+                13: "footing",
+            }
+        elif "b45" in dsg_filepath:
+            logger.info("Using Building 45 Regions")
+            region_ls = {
+                0: "lounge",
+                1: "hallway",
+            }
+        else:
+            logger.error(f"Unknown region mapping for path {dsg_filepath}")
+            raise NotImplementedError(f"no mapping for dsg_filepath {dsg_filepath}")
+
         G.metadata.add({"room_labelspace": region_ls})
 
         layers = {
