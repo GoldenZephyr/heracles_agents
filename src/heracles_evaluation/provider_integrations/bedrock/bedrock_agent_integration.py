@@ -1,6 +1,7 @@
 # ruff: noqa: F811, F401
 import copy
 import json
+import logging
 from typing import Callable
 
 import tiktoken
@@ -15,6 +16,8 @@ from heracles_evaluation.prompt import Prompt
 from heracles_evaluation.provider_integrations.bedrock.bedrock_client import (
     BedrockClientConfig,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dispatch
@@ -104,7 +107,8 @@ def extract_answer(
 ):
     try:
         return extractor(message["content"][0]["text"])
-    except:
+    except Exception as ex:
+        logger.error(str(ex))
         return ""
 
 

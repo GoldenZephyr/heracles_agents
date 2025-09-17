@@ -242,8 +242,9 @@ def get_summary_text(resp: dict):
             return "Tool result: " + "\n".join(
                 r["text"] for r in resp["toolResult"]["content"]
             )
-        except:
+        except Exception as ex:
             logger.error("bedrock logging format error")
+            logger.error(str(ex))
             return "Tool result: " + str(resp["toolResult"])
     elif "toolUse" in resp:
         # bedrock
