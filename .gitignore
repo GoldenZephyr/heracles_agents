@@ -10,3 +10,4 @@ graphs/
 scratch/
 *.zip
 *.log
+logs/
