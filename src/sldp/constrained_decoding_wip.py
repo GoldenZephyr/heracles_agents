@@ -2,7 +2,7 @@ import os
 
 import openai
 
-from heracles_evaluation.prompt import get_sldp_format_description
+from heracles_agents.prompt import get_sldp_format_description
 from sldp.lark_parser import get_sldp_lark_grammar
 
 key = os.getenv("DSG_OPENAI_API_KEY")

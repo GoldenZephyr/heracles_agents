@@ -33,4 +33,4 @@ configurations:
                     tool_interface: custom
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml

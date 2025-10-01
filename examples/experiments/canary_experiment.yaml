@@ -22,4 +22,4 @@ phases:
             max_iterations: 5
             tool_interface: "openai"
 
-questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml

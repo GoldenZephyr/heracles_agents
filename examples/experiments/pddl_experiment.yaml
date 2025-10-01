@@ -32,7 +32,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/pddl/pddl_test.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml
 
     cypher-feedforward-pddl:
         dsg_interface:
@@ -76,4 +76,4 @@ configurations:
                     tool_interface: openai
                     max_iterations: 1
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/pddl/pddl_test.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml

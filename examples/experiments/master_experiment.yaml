@@ -33,7 +33,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
 
 
     cypher-feedforward-qa:
@@ -79,7 +79,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 1
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
     canary:
         dsg_interface:
             dsg_interface_type: none
@@ -103,7 +103,7 @@ configurations:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "openai"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml
     canary-anthropic:
         dsg_interface:
             dsg_interface_type: none
@@ -124,4 +124,4 @@ configurations:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "anthropic"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml

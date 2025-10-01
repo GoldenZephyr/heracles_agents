@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="heracles_evaluation",
+    name="heracles_agents",
     version="0.0.1",
     url="",
     author="Aaron Ray",

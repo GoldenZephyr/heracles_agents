@@ -3,7 +3,7 @@ import logging
 
 import spark_dsg
 
-from heracles_evaluation.pipelines.codegen_utils import load_dsg
+from heracles_agents.pipelines.codegen_utils import load_dsg
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -331,11 +331,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--dsg_path",
-        default="/home/harel/code/heracles_evaluation/examples/scene_graphs/west_point_fused_map_wregions_labelspace_resaved.json",
+        default="/home/harel/code/heracles_agents/examples/scene_graphs/west_point_fused_map_wregions_labelspace_resaved.json",
     )
     parser.add_argument(
         "--labelspace_path",
-        default="/home/harel/code/heracles_evaluation/src/heracles_evaluation/resources/ade20k_mit_label_space.yaml",
+        default="/home/harel/code/heracles_agents/src/heracles_agents/resources/ade20k_mit_label_space.yaml",
     )
     args = parser.parse_args()
     main(args)

@@ -38,7 +38,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 1
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/dsg_qa/evaluation_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/dsg_qa/evaluation_questions.yaml
     canary:
         dsg_interface:
             dsg_interface_type: heracles
@@ -57,4 +57,4 @@ configurations:
                         - ask_favog
                     max_iterations: 5
                     tool_interface: "openai"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_evaluation/questions/canary/canary_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml

@@ -2,9 +2,9 @@ import logging
 
 import yaml
 
-from heracles_evaluation.experiment_definition import ExperimentDescription
-from heracles_evaluation.llm_interface import AnalyzedExperiment
-from heracles_evaluation.summarize_results import display_experiment_results
+from heracles_agents.experiment_definition import ExperimentDescription
+from heracles_agents.llm_interface import AnalyzedExperiment
+from heracles_agents.summarize_results import display_experiment_results
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, force=True)
