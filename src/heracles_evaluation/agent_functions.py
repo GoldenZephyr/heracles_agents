@@ -135,6 +135,8 @@ def count_message_tokens(agent: LlmAgent, messages: list):
 def count_message_tokens(agent: LlmAgent, message):
     enc = get_token_encoder(agent.model_info.model)
     text = get_text_body(message)
+    # Replace endoftext tokens if they exist from Ollama
+    text = text.replace("<|endoftext|>", "")
     return len(enc.encode(text))
 
 
