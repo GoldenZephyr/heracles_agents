@@ -31,7 +31,10 @@ def apply_bound_args(tool_name, bound_args):
     args_to_bind = {}
     for arg_name, fields in bound_args.items():
         arg_type = ToolRegistry.get_arg_type(tool_name, arg_name)
-        arg_instance = arg_type(**fields)
+        if arg_type is str or arg_type is int or arg_type is float:
+            arg_instance = arg_type(fields)
+        else:
+            arg_instance = arg_type(**fields)
         args_to_bind[arg_name] = arg_instance
     function = partial(ToolRegistry.tools[tool_name].function, **args_to_bind)
     return function, args_to_bind

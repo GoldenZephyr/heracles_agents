@@ -15,4 +15,5 @@ import heracles_evaluation.tools.calculator_tool
 import heracles_evaluation.tools.canary_favog_tool
 import heracles_evaluation.tools.codegen_tool
 import heracles_evaluation.tools.cypher_query_tool
+import heracles_evaluation.tools.pddl_calling_tool
 import heracles_evaluation.tools.sldp_answer_tool
