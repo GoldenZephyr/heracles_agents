@@ -7,8 +7,8 @@ import yaml
 import threading
 
 
-from heracles_evaluation.llm_agent import LlmAgent
-from heracles_evaluation.llm_interface import AgentContext
+from heracles_agents.llm_agent import LlmAgent
+from heracles_agents.llm_interface import AgentContext
 
 
 def new_user_message(text):
