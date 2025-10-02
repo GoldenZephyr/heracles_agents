@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from textual.app import App, ComposeResult
-from textual.widgets import Input, Static, RichLog, TextArea, Label, Rule, Footer
-from textual.containers import VerticalScroll
-from textual.binding import Binding
-import yaml
 import threading
 
+import yaml
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import VerticalScroll
+from textual.widgets import Footer, Input, Label, RichLog, Rule, Static, TextArea
 
 from heracles_agents.llm_agent import LlmAgent
 from heracles_agents.llm_interface import AgentContext
@@ -32,7 +32,9 @@ class MyTextArea(TextArea):
 class InputDisplayApp(App):
     def __init__(self, agent):
         self.agent = agent
-        self.messages = generate_initial_prompt(agent).to_openai_json("Now you will interact with the user:")
+        self.messages = generate_initial_prompt(agent).to_openai_json(
+            "Now you will interact with the user:"
+        )
         super().__init__()
 
     def compose(self) -> ComposeResult:
@@ -86,9 +88,9 @@ class InputDisplayApp(App):
         thread = threading.Thread(target=run_agent)
         thread.start()
 
-        #success, answer = cxt.run()
-        #responses = cxt.get_agent_responses()
-        #for r in responses[initial_length:]:
+        # success, answer = cxt.run()
+        # responses = cxt.get_agent_responses()
+        # for r in responses[initial_length:]:
         #    text_log.write(r.parsed_response)
         #    text_log.write("")
 

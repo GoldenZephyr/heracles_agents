@@ -2,7 +2,14 @@ import os
 from typing import Literal, Optional, Union
 
 import spark_dsg
-from pydantic import BaseModel, Field, PrivateAttr, SecretStr, model_validator
+from pydantic import (
+    BaseModel,
+    Field,
+    PrivateAttr,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
 from pydantic_settings import BaseSettings
 
 from .pipelines.codegen_utils import load_dsg, load_dsg_api_prompt
@@ -15,6 +22,10 @@ class HeraclesDsgInterface(BaseSettings):
     n_object_verification: Optional[int] = None
     username: SecretStr = Field(alias="HERACLES_NEO4J_USERNAME", exclude=True)
     password: SecretStr = Field(alias="HERACLES_NEO4J_PASSWORD", exclude=True)
+
+    @field_validator("uri", mode="after")
+    def db_uri_env_replacement(cls, v):
+        return os.path.expandvars(v)
 
 
 class InContextDsgInterfaceConfig(BaseModel):
