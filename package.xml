@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>heracles_agents</name>
+  <version>0.0.0</version>
+  <description>A small framework for building and evaluating agents.</description>
+  <maintainer email="aray.york@gmail.com">Aaron Ray</maintainer>
+  <license>GPL-3.0</license>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
