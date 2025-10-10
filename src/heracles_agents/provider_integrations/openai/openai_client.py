@@ -1,15 +1,30 @@
-from typing import Literal
+import os
+from typing import Literal, Optional
 
 import openai
-from pydantic import BaseModel, Field, PrivateAttr, SecretStr
+from pydantic import BaseModel, Field, PrivateAttr, SecretStr, field_validator
 from pydantic_settings import BaseSettings
 
 
 class OpenaiClientConfig(BaseSettings):
     client_type: Literal["openai"]
     timeout: int
-    auth_key: SecretStr = Field(alias="HERACLES_OPENAI_API_KEY", exclude=True)
+    auth_key: Optional[SecretStr] = Field(default=None, exclude=True)
     _client: object = PrivateAttr()
+
+    @field_validator("auth_key", mode="before")
+    def get_api_key(cls, v):
+        if v is not None:
+            return v
+
+        api_key = os.getenv("HERACLES_OPENAI_API_KEY") or os.getenv(
+            "ADT4_OPENAI_API_KEY"
+        )
+        if not api_key:
+            raise ValueError(
+                "Missing OpenAI API key: set either HERACLES_OPENAI_API_KEY or ADT4_OPENAI_API_KEY"
+            )
+        return api_key
 
     def __init__(self, **data):
         super().__init__(**data)
