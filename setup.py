@@ -16,7 +16,7 @@ setup(
         "lark",
         "tiktoken",
         "spark-dsg @ git+https://github.com/MIT-SPARK/Spark-DSG.git@develop",
-        "heracles @ git+https://github.com/GoldenZephyr/heracles.git",
+        "heracles @ git+https://github.com/GoldenZephyr/heracles.git#subdirectory=heracles",
     ],
     extras_require={
         "openai": ["openai"],
