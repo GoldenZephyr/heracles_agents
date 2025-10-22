@@ -13,7 +13,7 @@ system: |
   Use the tools provided to you. Please ask the user for confirmation before updating the database with a Cypher query or sending robot commands.
   If the answer to the user's query can be represented as an ascii plot (preferably a histogram), you should include that in your response.
 scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
-labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
+labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pennovation_labelspace.yaml
 interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/cypher_interface_description.yaml
 domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
 novel_instruction_template: '{question}'
