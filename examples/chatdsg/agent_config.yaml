@@ -20,5 +20,12 @@ agent_info:
       bound_args:
         robot_name: hilbert
         planner_topic: /hilbert/omniplanner_node/region_rearrange_objects_pddl/pddl_goal
+    - name: send_waypoint_to_quad
+      bound_args:
+        zone: 18N
+        zmq_uri: tcp://192.168.123.123:6555
+        utm_map_info:
+          local_utm_origin: [482942.36, 4421353.33]
+          map_offset: [2.31, 85.55]
   tool_interface: openai
   max_iterations: 6
