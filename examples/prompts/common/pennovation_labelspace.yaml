@@ -32,7 +32,11 @@ labelspace_description: |
   </object_labels>
   <room_labels>
     parking
-    yard
+    coutyard
+    alley
+    road
+    meadow
+    lawn
   </room_labels>
   <mesh_places_labels>
     water
