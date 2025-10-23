@@ -50,6 +50,8 @@ def send_waypoint_to_quad(
         socket.send_pyobj(cmd.model_dump())
     except Exception as ex:
         return str(ex)
+    finally:
+        socket.close()
 
     return f"Sent goal {data_to_send}"
 
