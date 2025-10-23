@@ -18,3 +18,4 @@ import heracles_agents.tools.cypher_query_tool
 import heracles_agents.tools.pddl_calling_tool
 import heracles_agents.tools.penn_integration_tool
 import heracles_agents.tools.sldp_answer_tool
+import heracles_agents.tools.visualize_objects_tool

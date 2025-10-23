@@ -15,9 +15,12 @@ agent_info:
       bound_args:
         dsgdb_conf:
           dsg_interface_type: heracles
-          uri: neo4j://$ADT4_HERACLES_IP:7686
+          uri: neo4j://$ADT4_HERACLES_IP:$ADT4_HERACLES_PORT
     - name: send_multirobot_pddl_goal
       bound_args:
         planner_topic: /hilbert/omniplanner_node/multirobot_region_rearrange_objects_pddl/pddl_goal
+    - name: visualize_objects
+      bound_args:
+        viz_topic: /viz_objects_marker_array
   tool_interface: openai
   max_iterations: 6
