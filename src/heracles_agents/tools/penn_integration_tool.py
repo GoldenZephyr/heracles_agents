@@ -37,7 +37,7 @@ def send_waypoint_to_quad(
     if zone != "18N":
         raise ValueError("Currently only waypoints in zone 18N are supported")
 
-    position_utm = np.array([northing, easting])
+    position_utm = np.array([easting, northing])
     pos_rel = position_utm - utm_map_info.local_utm_origin + utm_map_info.map_offset
 
     cmd = PennQuadCommand(x=pos_rel[0], y=pos_rel[1], timestamp=int(time.time() * 1e9))

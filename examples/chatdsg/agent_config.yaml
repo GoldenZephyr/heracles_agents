@@ -23,7 +23,7 @@ agent_info:
     - name: send_waypoint_to_quad
       bound_args:
         zone: 18N
-        zmq_uri: tcp://192.168.123.123:6555
+        zmq_uri: tcp://10.10.10.30:6555
         utm_map_info:
           local_utm_origin: [482942.36, 4421353.33]
           map_offset: [2.31, 85.55]
