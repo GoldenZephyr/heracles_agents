@@ -1,5 +1,6 @@
 import os
 import time
+
 from heracles_agents.tool_interface import FunctionParameter, ToolDescription
 from heracles_agents.tool_registry import ToolRegistry, register_tool
 
@@ -87,10 +88,24 @@ viz_objects_tool = ToolDescription(
     name="visualize_objects",
     description="An interface for visualizing scene graph objects on RViz. Use this to visualize node symbols at given locations to RViz for the user. Also use this to clear the visualization.",
     parameters=[
-        FunctionParameter("objects", str, "A comma-separated list of node symbols visualize."),
-        FunctionParameter("x", str, "A comma-separated list x-coordinates for the corresponding node symbol. The number of node symbols must match the number of x-coordinates."),
-        FunctionParameter("y", str, "A comma-separated list y-coordinates for the corresponding node symbol. The number of node symbols must match the number of y-coordinates."),
-        FunctionParameter("clear", bool, "If True, it will clear the visualization and do nothing else. If False, it will visualize the given objects."),
+        FunctionParameter(
+            "objects", str, "A comma-separated list of node symbols visualize."
+        ),
+        FunctionParameter(
+            "x",
+            str,
+            "A comma-separated list x-coordinates for the corresponding node symbol. The number of node symbols must match the number of x-coordinates.",
+        ),
+        FunctionParameter(
+            "y",
+            str,
+            "A comma-separated list y-coordinates for the corresponding node symbol. The number of node symbols must match the number of y-coordinates.",
+        ),
+        FunctionParameter(
+            "clear",
+            bool,
+            "If True, it will clear the visualization and do nothing else. If False, it will visualize the given objects.",
+        ),
     ],
     function=visualize_objects,
 )
