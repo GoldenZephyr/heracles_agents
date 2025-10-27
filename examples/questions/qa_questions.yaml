@@ -1,0 +1,59 @@
+---
+questions:
+
+- uid: 0A
+  name: Distinct objects
+  question: What kind of objects are in the scene graph?
+  solution: "<seating, storage, sign, decor, trash, box, appliance, light, food, bicycle, bed, bag>"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: []
+
+
+- uid: 12A
+  name: Signs in Lounge
+  question: Which signs are in the lounge?
+  solution: "<O283, O255, O3, O264>"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: [hierarchy]
+
+
+- uid: 17B
+  name: Region fewest objects
+  question: Tell me the two rooms with the smallest number of objects.
+  solution: "<R3, R4>"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: []
+
+- uid: 27B
+  name: Room with least neighbors
+  question: Tell me the room with fewest adjacent rooms.
+  solution: "R1"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: []
+
+
+- uid: 48B
+  name: Objects near bag
+  question: Tell me the number of objects in mesh places that are within 6 hops of the bag's mesh place, other than the bag itself.
+  solution: "28"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: [spatial]
+
+- uid: 14A
+  name: Where is trash?
+  question: Where are all the trash can positions?
+  solution: "<POINT(-18.70 -4.21 0.12), POINT(-19.22 -4.42 0.03), POINT(-20.96 -20.89 -0.02), POINT(-25.17 -22.58 -0.21)>"
+  correctness_comparator:
+      comparison_type: SLDP
+      relation: equal
+  tags: [positions]
