@@ -20,7 +20,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/pddl_agent_system_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/pddl_agent_system_prompt.yaml
                         output_type: PDDL
                     tools:
                         - name: run_cypher_query
@@ -32,7 +32,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml
+        questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml
 
     cypher-feedforward-pddl:
         dsg_interface:
@@ -53,7 +53,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/pddl_feedforward_system_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/pddl_feedforward_system_prompt.yaml
                     tools: {}
                     tool_interface: openai
                     max_iterations: 1
@@ -70,10 +70,10 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/pddl_feedforward_refinement_system_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/pddl_feedforward_refinement_system_prompt.yaml
                         output_type: PDDL
                     tools: {}
                     tool_interface: openai
                     max_iterations: 1
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml
+        questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/pddl/pddl_test.yaml

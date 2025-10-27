@@ -17,9 +17,9 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/canary_prompt.yaml
                     tools:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "custom"
-        questions: $HERACLES_EVALUATION_PATH/examples/questions/canary_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/examples/questions/canary_questions.yaml

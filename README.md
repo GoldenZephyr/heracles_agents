@@ -1,66 +1,135 @@
-# Heracles NLP<->DSG Experiments
+# Heracles Agents
 
-## Pipeline
+`heracles_agents` is a minimal agentic LLM framework. It has been developed
+with a focus on the following priorities:
 
-The evaluation pipeline assumes an initial scene graph has been loaded to
-heracles. The queries that get evaluated are defined in
-`evaluation_questions.yaml`. Each question is defined with an associated
-answer.  Then, the script `chatgpt_benchmark.py` is run to create a cypher
-query for answering each question. This results in intermediate answers
-including the output of the cypher query when run against the database.  There
-is still some ambiguity in comparing these cypher query results to the correct
-solution, so there is an "answer refinement" step run with `refine_answers.py`,
-which prompts chatgpt with the original question and the results of the cypher
-query. This script then compares the refined answer to the solution, using
-the SLDP equality language (see below) to evaluate equality. The final
-results can be summarized by running `results_table.py`.
+* Maintain conversation state to support multi-turn LLM interactions with client-side tool calls
+* Use multiple dispatch to separate the core agent loop from provider-specific implementation
+* Provide infrastructure for evaluating agentic LLM response quality across different providers, models, prompts, and evaluation strategies
+* Simple enough to easily poke and prod at any part of the stack
 
-## SLDP Equality Language
+While the agent implementation is reasonably generic, the system has been
+developed to support research in symbolic 3D spatial perception (*3D Scene
+Graphs*) and AI Planning. To that end, we provide LLM tools for
+* [Executing Cypher queries against a graph database](src/heracles_agents/tools/cypher_query_tool.py)
+* [Sending PDDL goals to robots](src/heracles_agents/tools/pddl_tool_calling.py)
+* [Sending waypoints to quadrotors](src/heracles_agents/tools/penn_integration_tool.py)
+* [Highlighting objects of interest in a 3D scene graph](src/heracles_agents/tools/visualize_objects_tool.py)
 
-In order to evaluate whether the LLM pipeline is correct, we need to define
-a sense of equality and implement a method for checking it. This is rather
-tricky, because there are different senses in which things can be equal.
+The `heracles_agents` library should be flexible enough to be directly integrated in other downstream applications. In this repository we provide two example uses:
+* An interactive agent that allows the user to query and update a 3D scene graph and send goals to robots, and
+* An experimental pipeline built to evaluate agentic LLM responses for different providers, models, prompts, and evaluation strategies.
 
-We need to be able to handle Lists, Sets, Dictionaries, and Points.
-Lists are equal if each element is equal, sets A and B are equal if A ⊆ B and
-B ⊆ A, Dictionaries are equal if the sets of their keys are equal and the value
-for each key matches between dictionaries, and two points are equal if they
-are  within some tolerance. Of course primitive numbers and strings can also
-be compared for equality. We want to support arbitrary compositions of these
-containers.
+See the Examples section below for more detail on these programs.
 
-### Syntax
 
-A `list` is written as `[element1, element2, ... elementN]`
+## Installation
 
-A `set` is written as `<element1, element2, ... elementN>`
+Note that this repo requires Python 3.12 and has only been tested on Ubuntu
+24.04. It should work on Ubuntu 22.04, as long as you don't use the ROS
+functionality.
 
-A `dict` is written as `{k1: v1, k2: v2}`
+Heracles:
+```bash
+git clone git@github.com:GoldenZephyr/heracles.git
+pip install ./heracles/heracles
+```
 
-A `point` is written as `POINT(x y z)` (note the lack of comma)
+In addition to installing `heracles`, you will need to following the [steps in
+its README](https://github.com/GoldenZephyr/heracles) for running the graph
+database and installing `spark_dsg` if you would like to use the scene graph
+functionality.
 
-### Interface
 
-There are two relevant functions for interacting with the SLDP language.  First
-is `parse_sldp`. If you call `parse_sldp` on your string, you can verify
-whether it correctly parses into the AST.  Second is `sldp_equals(s1, s2)`
-which will return true if sldp strings s1 and s2 are equal in the sense of
-sldp.
+Heracles Agents:
+```bash
+git clone git@github.com:GoldenZephyr/heracles_agents.git
+pip install heracles_agents
+```
 
-## Checking PDDL correctness
+### Heracles ROS
 
-A PDDL goal represents a set of states. Each state is a set of facts. However,
-the states are usually not fully enumerated.  Facts that don't appear in a goal
-clause are assumed to be "don't care", which means that the total number of
-distinct goal states is normally exponentially larger than the number of facts
-in the goal. As a result, we cannot simply count the precision/recall of our answer
-wrt the "ground truth" answer by enumerating all states.
+If you intend to use Heracles as part of a ROS-based system, you can put
+`heracles` and `heracles_agents` in your ROS workspace instead of
+pip-installing them manually, as long as your virtual environment was created
+with the `--system-site-packages` option (which you would want anyway).
 
-However, if we just look at the clauses in the DNF form of the goal, we can think of this
-as "factoring out" all of the don't-care facts. Then we can compute precision/recall
-wrt clauses in the DNF forms of the correct answer and the LLM answer.
+### Environment Variables
 
-For very simple goals this will clearly give reasonable results. But to make sense in general,
-we would want to understand:
-1. In which cases do the DNF forms differ while representing the same truth table? For example, A is equivalent to (A AND B) OR (A AND nB)
-If we remove all trivial cases like this, is there a canonical DNF?
+| Environment Variable Name         | Description                                                                |
+|-----------------------------------|----------------------------------------------------------------------------|
+| HERACLES\_OPENAI\_API\_KEY        | OpenAI API key to use                                                      |
+| HERACLES\_ANTHROPIC\_API\_KEY     | Anthropic API key to use                                                   |
+| AWS\_BEARER\_TOKEN\_BEDROCK       | If you want to use Bedrock                                                 |
+| HERACLES\_EVALUATION\_PATH        | Path to where this repo is cloned (only necessary for the example prompts  |
+| HERACLES\_NEO4J\_USERNAME         | Username of local Neo4j graph database                                     |
+| HERACLES\_NEO4J\_PASSWORD         | Password of local Neo4j graph database                                     |
+| HERACLES\_NEO4J\_URI              | Address for database (neo4j://IP:PORT)                                     |
+| ADT4\_HERACLES\_IP                | Same database IP as above (necessary for the LLM agent demo)               |
+| ADT4\_HERACLES\_PORT              | Same database PORT as above (necessary for the LLM agent demo)             |
+
+## Examples
+As discussed in the introduction, we provide two example applications of the
+`heracles_agents` framework.
+
+### Chatdsg
+
+[chatdsg.py](examples/chatdsg/chatdsg.py) is a simple terminal-based interface
+to a tool-enabled LLM agent. The agent can answer questions or make updates to
+a 3D scene graph if you have an instance of
+[heracles](https://github.com/GoldenZephyr/heracles) running. You can also send
+PDDL goals to an instance of
+[Omniplanner](https://github.com/MIT-SPARK/Omniplanner), or highlight scene
+graph objects of interest in Rviz. You can modify the LLM model or tools that
+are used [in the config file](examples/chatdsg/agent_config.py), or [change the
+prompt file](examples/chatdsg/agent_prompt.py).
+
+### Experiment Pipelines
+
+
+## Custom Tools
+
+Adding new tools for an LLM to use is quite straightforward. Currently, the
+function metadata presented to the LLM is explicitly annotated external to the
+function definition (as opposed to relying on inline annotation). We believe
+this encourages reuse of existing functions and code that is easier to read.
+
+Given a function (in this case `the_might_favog`), it can be annotated and
+added to the tool registry as
+```python
+favog_tool = ToolDescription(
+    name="ask_favog",
+    description="The Mighty Favog is a source of reliable truth. Ask him anything you don't know. Please categorize your query as business, sports, or personal.",
+    parameters=[
+        FunctionParameter("query", str, "Your question"),
+        FunctionParameter(
+            "category",
+            str,
+            "Category of the question",
+            True,
+            ["business", "sports", "personal"],
+        ),
+    ],
+    function=the_mighty_favog,
+)
+register_tool(favog_tool)
+```
+Full examples can be found in `src/heracles_agents/tools`
+
+## LLM Providers
+
+Currently, `heracles_agents` supports the following LLM providers:
+* openai
+* anthropic
+* ollama
+* bedrock
+
+We implement a ``hand rolled" tool call implementation (i.e., LLM's express
+their intent to call a tool as part of the normal response body, as opposed to
+a special tool response), in addition to provider-specific tool call
+interfaces. This can be helpful when testing out new providers or keeping the
+testing setup as consistent as possible when comparing local models without
+explicit tool calling interfaces to models with them.
+
+Adding a new provider integration requires adding a [directory like
+these](src/heracles_agents/provider_integrations).

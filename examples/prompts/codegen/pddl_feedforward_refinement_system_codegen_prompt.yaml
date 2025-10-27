@@ -5,15 +5,15 @@ system: |
   When producing a final answer, follow the format and be concise..
   Node symbols should NOT have parentheses or quotes.
 
-scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
-labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
+scene_graph_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/scene_graph_description.yaml
+labelspace_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/building_45_labelspace.yaml
 
-interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/python_interface_description.yaml
+interface_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/python_interface_description.yaml
 
-domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
+domain_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/pddl_domain_description.yaml
 
 in_context_examples_preamble: "The following is a set of examples of mapping instructions to PDDL goals (assuming the results of a python code execution)."
-in_context_examples: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_in_context_examples.yaml
+in_context_examples: ${HERACLES_AGENTS_PATH}/examples/prompts/common/pddl_in_context_examples.yaml
 
 novel_instruction_preamble: 'Now, generate a PDDL goal for this command:'
 novel_instruction_template: |

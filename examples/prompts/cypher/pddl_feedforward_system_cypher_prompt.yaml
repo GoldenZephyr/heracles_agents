@@ -5,10 +5,10 @@ system: |
     Given a 3D Scene Graph and an instruction, you must generate a Cypher query. You will later use those results for generate PDDL goal predicates.
     Explain your reasoning before each Cypher query.
 
-interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/cypher_interface_description.yaml
-scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
-labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
-pddl_domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
+interface_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/cypher_interface_description.yaml
+scene_graph_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/scene_graph_description.yaml
+labelspace_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/building_45_labelspace.yaml
+pddl_domain_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/pddl_domain_description.yaml
 
 
 novel_instruction_preamble: 'Now, generate a cypher query to help ground this command:'

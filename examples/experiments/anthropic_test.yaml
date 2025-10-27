@@ -20,7 +20,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/cypher/agent_system_cypher_prompt_full_info.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/cypher/agent_system_cypher_prompt_full_info.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools:
@@ -34,4 +34,4 @@ configurations:
                     tool_interface: anthropic
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/examples/questions/qa_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/examples/questions/qa_questions.yaml

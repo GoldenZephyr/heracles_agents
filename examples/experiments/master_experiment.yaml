@@ -20,7 +20,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/agent_system_prompt_full_info.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/agent_system_prompt_full_info.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools:
@@ -33,7 +33,7 @@ configurations:
                     tool_interface: openai
                     max_iterations: 6
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
 
 
     cypher-feedforward-qa:
@@ -55,7 +55,7 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_feedforward_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/dsg_feedforward_prompt.yaml
                     tools: {}
                     tool_interface: openai
                     max_iterations: 1
@@ -72,14 +72,14 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_feedforward_refinement_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/dsg_feedforward_refinement_prompt.yaml
                         output_type: SLDP
                         sldp_answer_type_hint: true
                     tools: {}
                     tool_interface: openai
                     max_iterations: 1
 
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/westpoint_practice/qa_questions.yaml
     canary:
         dsg_interface:
             dsg_interface_type: none
@@ -98,12 +98,12 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/canary_prompt.yaml
                     tools:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "openai"
-        questions: $HERACLES_EVALUATION_PATH/examples/questions/canary_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/examples/questions/canary_questions.yaml
     canary-anthropic:
         dsg_interface:
             dsg_interface_type: none
@@ -119,9 +119,9 @@ configurations:
 
                 agent_info:
                     prompt_settings:
-                        base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/canary_prompt.yaml
+                        base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/canary_prompt.yaml
                     tools:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "anthropic"
-        questions: $HERACLES_EVALUATION_PATH/examples/questions/canary_questions.yaml
+        questions: $HERACLES_AGENTS_PATH/examples/questions/canary_questions.yaml

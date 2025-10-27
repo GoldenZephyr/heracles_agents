@@ -10,9 +10,9 @@ system: |
   Node symbols should NOT have parentheses or quotes.
 
 
-scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
-labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
-interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/in_context_description.yaml
+scene_graph_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/scene_graph_description.yaml
+labelspace_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/building_45_labelspace.yaml
+interface_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/in_context_description.yaml
 
 in_context_examples_preamble: "Here are some examples of mapping from natural language instructions to grounded objects. Each example uses the 3D scene graph below. Note that this 3D scene graph is just for these examples and you should NOT use this when answering the new instruction.
 <Example 3D Scene Graph>
