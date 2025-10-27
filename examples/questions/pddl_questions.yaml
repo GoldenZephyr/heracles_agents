@@ -1,0 +1,59 @@
+---
+questions:
+
+- uid: 0A
+  name: Go to object 79.
+  question: Go to object 79.
+  solution: (visited-object O79)
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [direct-symbol]
+
+- uid: 22A
+  name: Visit furthest storage
+  question: Go to the storage unit that is farthest away
+  solution: (visited-object O75)
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [implicit-spatial-reference]
+
+- uid: 31B
+  name: Grab a trash
+  question: Grab a wastebin
+  solution: (or (holding O19) (holding O30) (holding O64) (holding O79))
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [direct-class, synonym]
+
+
+- uid: 32A
+  name: Inspect the box
+  question: Get a good look at the box that's closest to the bicycle
+  solution: (safe O59)
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [spatial-reference]
+
+
+- uid: 34B
+  name: Ordered places
+  question: First go to mesh place 59110 and then mesh place 10247
+  solution: (and (visited-place P59110) (at-place P10247))
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [ordering]
+
+
+- uid: 49B
+  name: Grab bike, avoid region, visit hallways
+  question: Grab the bicycle, or visit the hallways without going into the lounge.
+  solution: (or (holding O43) (and (visited-room R2) (visited-room R3) (visited-room R4) (visited-room R5) (not (visited-room R1))))
+  correctness_comparator:
+      comparison_type: PDDL
+      relation: equal
+  tags: [direct-class, avoid, combination]

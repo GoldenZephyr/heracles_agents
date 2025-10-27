@@ -103,7 +103,7 @@ configurations:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "openai"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/examples/questions/canary_questions.yaml
     canary-anthropic:
         dsg_interface:
             dsg_interface_type: none
@@ -124,4 +124,4 @@ configurations:
                         - name: ask_favog
                     max_iterations: 5
                     tool_interface: "anthropic"
-        questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/canary/canary_questions.yaml
+        questions: $HERACLES_EVALUATION_PATH/examples/questions/canary_questions.yaml
