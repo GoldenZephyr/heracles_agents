@@ -1,7 +1,7 @@
 ---
 client:
   client_type: openai
-    # auth key is supplied by HERACLES_OPENAI_API_KEY
+  # auth key is supplied by HERACLES_OPENAI_API_KEY
   timeout: 20
 model_info:
   model: gpt-4.1
@@ -16,17 +16,6 @@ agent_info:
         dsgdb_conf:
           dsg_interface_type: heracles
           uri: neo4j://$ADT4_HERACLES_IP:7686
-    #- name: send_pddl_goal
-    #  bound_args:
-    #    robot_name: hilbert
-    #    planner_topic: /hilbert/omniplanner_node/region_rearrange_objects_pddl/pddl_goal
-    - name: send_waypoint_to_quad
-      bound_args:
-        zone: 18N
-        zmq_uri: tcp://10.10.10.30:6555
-        utm_map_info:
-          local_utm_origin: [482942.36, 4421353.33]
-          map_offset: [2.31, 85.55]
     - name: send_multirobot_pddl_goal
       bound_args:
         planner_topic: /hilbert/omniplanner_node/multirobot_region_rearrange_objects_pddl/pddl_goal

@@ -1,5 +1,3 @@
-import time
-
 import numpy as np
 import zmq
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -40,13 +38,16 @@ def send_waypoint_to_quad(
     position_utm = np.array([easting, northing])
     pos_rel = position_utm - utm_map_info.local_utm_origin + utm_map_info.map_offset
 
-    cmd = PennQuadCommand(x=pos_rel[0], y=pos_rel[1], timestamp=int(time.time() * 1e9))
+    # timestamp = int(time.time() * 1e9) # No documentation for expected timestamp format, but apparently this is wrong
+    timestamp = 0
+    cmd = PennQuadCommand(x=pos_rel[0], y=pos_rel[1], timestamp=timestamp)
 
     data_to_send = cmd.model_dump()
     print(f"Sending cmd: {data_to_send} to penn quadrotor")
-    socket = context.socket(zmq.PUSH)  # Why is this PUSH and not PUB?
+    # NOTE: it's strange that we act as the server here, but apparently it's for historical reasons
+    socket = context.socket(zmq.PUSH)
     try:
-        socket.bind(zmq_uri)  # Why is this bind and not connect?
+        socket.bind(zmq_uri)
         socket.send_pyobj(cmd.model_dump())
     except Exception as ex:
         return str(ex)
