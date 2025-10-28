@@ -16,7 +16,9 @@ Graphs*) and AI Planning. To that end, we provide LLM tools for
 * [Sending waypoints to quadrotors](src/heracles_agents/tools/penn_integration_tool.py)
 * [Highlighting objects of interest in a 3D scene graph](src/heracles_agents/tools/visualize_objects_tool.py)
 
-The `heracles_agents` library should be flexible enough to be directly integrated in other downstream applications. In this repository we provide two example uses:
+The `heracles_agents` library should be flexible enough to be directly
+integrated in other downstream applications. In this repository we provide two
+example uses:
 * An interactive agent that allows the user to query and update a 3D scene graph and send goals to robots, and
 * An experimental pipeline built to evaluate agentic LLM responses for different providers, models, prompts, and evaluation strategies.
 
@@ -29,7 +31,11 @@ Note that this repo requires Python 3.12 and has only been tested on Ubuntu
 24.04. It should work on Ubuntu 22.04, as long as you don't use the ROS
 functionality.
 
-Heracles:
+While `heracles_agents` can be used as a standalone minimal agent framework,
+you probably want to also install `heracles`, which provides an interface
+between 3D scene graphs and a graph database.
+
+First, we'll install `heracles`:
 ```bash
 git clone git@github.com:GoldenZephyr/heracles.git
 pip install ./heracles/heracles
@@ -41,7 +47,7 @@ database and installing `spark_dsg` if you would like to use the scene graph
 functionality.
 
 
-Heracles Agents:
+Next, instead `heracles_agents`:
 ```bash
 git clone git@github.com:GoldenZephyr/heracles_agents.git
 pip install heracles_agents
@@ -85,6 +91,8 @@ are used [in the config file](examples/chatdsg/agent_config.yaml), or [change th
 prompt file](examples/chatdsg/agent_prompt.yaml).
 
 ### Experiment Pipelines
+
+TODO
 
 
 ## Custom Tools
