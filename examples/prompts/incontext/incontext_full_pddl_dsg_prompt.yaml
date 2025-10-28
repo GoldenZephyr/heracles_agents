@@ -9,11 +9,11 @@ system: |
   Explain your reasoning before giving a final answer.
   You MUST format your final answer using the defined response format {response_format}.
 
-scene_graph_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/scene_graph_description.yaml
-labelspace_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/building_45_labelspace.yaml
-interface_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/in_context_description.yaml
+scene_graph_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/scene_graph_description.yaml
+labelspace_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/building_45_labelspace.yaml
+interface_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/in_context_description.yaml
 
-domain_description: ${HERACLES_EVALUATION_PATH}/examples/prompts/common/pddl_domain_description.yaml
+domain_description: ${HERACLES_AGENTS_PATH}/examples/prompts/common/pddl_domain_description.yaml
 
 
 

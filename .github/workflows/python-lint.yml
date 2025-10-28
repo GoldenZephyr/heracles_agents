@@ -3,10 +3,8 @@ name: Python Lint
 on:
   pull_request:
     branches: [master]
-    paths: [src/**/*.py, examples/**/*.py, setup.py, .github/workflows/python-lint.yml, .pre-commit-config.yaml]
   push:
     branches: [master]
-    paths: [src/**/*.py, examples/**/*.py, setup.py, .github/workflows/python-lint.yml, .pre-commit-config.yaml]
 jobs:
   lint:
     runs-on: ubuntu-latest

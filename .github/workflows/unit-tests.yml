@@ -58,6 +58,7 @@ jobs:
           HERACLES_NEO4J_URI: ''
           HERACLES_NEO4J_USERNAME: ''
           HERACLES_NEO4J_PASSWORD: ''
+          HERACLES_AGENTS_PATH: /home/runner/work/heracles_agents/heracles_agents
       - name: Generate coverage summary
         run: |
           source venv/bin/activate

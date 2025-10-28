@@ -16,7 +16,7 @@ phases:
 
         agent_info:
             prompt_settings:
-                base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_feedforward_prompt.yaml
+                base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/dsg_feedforward_prompt.yaml
             tools: []
             tool_interface: openai
             max_iterations: 1
@@ -33,7 +33,7 @@ phases:
 
         agent_info:
             prompt_settings:
-                base_prompt: $HERACLES_EVALUATION_PATH/examples/prompts/dsg_feedforward_refinement_prompt.yaml
+                base_prompt: $HERACLES_AGENTS_PATH/examples/prompts/dsg_feedforward_refinement_prompt.yaml
                 output_type: SLDP
                 sldp_answer_type_hint: true
             tools: []
@@ -42,5 +42,5 @@ phases:
 
 
 
-#questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/dsg_qa/nina_questions.yaml
-questions: $HERACLES_EVALUATION_PATH/src/heracles_agents/questions/dsg_qa/evaluation_questions.yaml
+#questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/dsg_qa/nina_questions.yaml
+questions: $HERACLES_AGENTS_PATH/src/heracles_agents/questions/dsg_qa/evaluation_questions.yaml
