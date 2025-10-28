@@ -12,7 +12,7 @@ While the agent implementation is reasonably generic, the system has been
 developed to support research in symbolic 3D spatial perception (*3D Scene
 Graphs*) and AI Planning. To that end, we provide LLM tools for
 * [Executing Cypher queries against a graph database](src/heracles_agents/tools/cypher_query_tool.py)
-* [Sending PDDL goals to robots](src/heracles_agents/tools/pddl_tool_calling.py)
+* [Sending PDDL goals to robots](src/heracles_agents/tools/pddl_calling_tool.py)
 * [Sending waypoints to quadrotors](src/heracles_agents/tools/penn_integration_tool.py)
 * [Highlighting objects of interest in a 3D scene graph](src/heracles_agents/tools/visualize_objects_tool.py)
 
@@ -81,8 +81,8 @@ a 3D scene graph if you have an instance of
 PDDL goals to an instance of
 [Omniplanner](https://github.com/MIT-SPARK/Omniplanner), or highlight scene
 graph objects of interest in Rviz. You can modify the LLM model or tools that
-are used [in the config file](examples/chatdsg/agent_config.py), or [change the
-prompt file](examples/chatdsg/agent_prompt.py).
+are used [in the config file](examples/chatdsg/agent_config.yaml), or [change the
+prompt file](examples/chatdsg/agent_prompt.yaml).
 
 ### Experiment Pipelines
 
@@ -114,7 +114,7 @@ favog_tool = ToolDescription(
 )
 register_tool(favog_tool)
 ```
-Full examples can be found in `src/heracles_agents/tools`
+Full examples can be found in [src/heracles\_agents/tools](src/heracles_agents/tools)
 
 ## LLM Providers
 
@@ -124,7 +124,7 @@ Currently, `heracles_agents` supports the following LLM providers:
 * ollama
 * bedrock
 
-We implement a ``hand rolled" tool call implementation (i.e., LLM's express
+We implement a "hand rolled" tool call implementation (i.e., LLM's express
 their intent to call a tool as part of the normal response body, as opposed to
 a special tool response), in addition to provider-specific tool call
 interfaces. This can be helpful when testing out new providers or keeping the
