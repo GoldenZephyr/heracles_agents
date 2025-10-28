@@ -8,6 +8,15 @@ with a focus on the following priorities:
 * Provide infrastructure for evaluating agentic LLM response quality across different providers, models, prompts, and evaluation strategies
 * Simple enough to easily poke and prod at any part of the stack
 
+The `heracles_agents` library should be flexible enough to be directly
+integrated in other downstream applications. In this repository we provide two
+example uses:
+* An interactive agent that allows the user to query and update a 3D scene graph and send goals to robots, and
+* An experimental pipeline built to evaluate agentic LLM responses for different providers, models, prompts, and evaluation strategies.
+See the Examples section below for more detail on these programs.
+
+![Chat DSG](img/chatdsg_screenshot.png "ChatDSG example interaction")
+
 While the agent implementation is reasonably generic, the system has been
 developed to support research in symbolic 3D spatial perception (*3D Scene
 Graphs*) and AI Planning. To that end, we provide LLM tools for
@@ -16,13 +25,6 @@ Graphs*) and AI Planning. To that end, we provide LLM tools for
 * [Sending waypoints to quadrotors](src/heracles_agents/tools/penn_integration_tool.py)
 * [Highlighting objects of interest in a 3D scene graph](src/heracles_agents/tools/visualize_objects_tool.py)
 
-The `heracles_agents` library should be flexible enough to be directly
-integrated in other downstream applications. In this repository we provide two
-example uses:
-* An interactive agent that allows the user to query and update a 3D scene graph and send goals to robots, and
-* An experimental pipeline built to evaluate agentic LLM responses for different providers, models, prompts, and evaluation strategies.
-
-See the Examples section below for more detail on these programs.
 
 
 ## Installation
