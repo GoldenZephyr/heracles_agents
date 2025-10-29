@@ -9,7 +9,18 @@ from textual.widgets import Footer, Input, Label, RichLog, Rule, Static, TextAre
 
 from heracles_agents.llm_agent import LlmAgent
 from heracles_agents.llm_interface import AgentContext
+import sys
 
+from heracles.dsg_utils import summarize_dsg
+from heracles.utils import load_dsg_to_db
+
+import spark_dsg
+import argparse
+import os
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 def new_user_message(text):
     return [{"role": "user", "content": text}]
@@ -95,7 +106,42 @@ class InputDisplayApp(App):
         #    text_log.write("")
 
 
+
+
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser("ChatDSG agent")
+    parser.add_argument("--scene-graph", nargs='?', const=None, default=None, help="DSG Filepath to load")
+    parser.add_argument("--object-labelspace", type=str, help="Path to object labelspace")
+    parser.add_argument("--room-labelspace", type=str, help="Path to room labelspace")
+    parser.add_argument("--db_ip", type=str, help="Heracles database ip")
+    parser.add_argument("--db_port", type=int, help="Heracles database ip")
+    args = parser.parse_args()
+
+    if args.db_ip is None:
+        args.db_ip = os.getenv("ADT4_HERACLES_IP")
+
+    if args.db_port is None:
+        args.db_port = os.getenv("ADT4_HERACLES_PORT")
+    
+    if args.scene_graph:
+        dsg_filepath = sys.argv[1]
+        logger.info(f"Loading DSG into database from filepath: {dsg_filepath}")
+
+        scene_graph = spark_dsg.DynamicSceneGraph.load(dsg_filepath)
+        summarize_dsg(scene_graph)
+        neo4j_uri = f"neo4j://{args.db_ip}:{args.db_port}"
+        neo4j_creds = (os.getenv("HERACLES_NEO4J_USERNAME"), os.getenv("HERACLES_NEO4J_PASSWORD"))
+
+        load_dsg_to_db(
+            args.object_labelspace,
+            args.room_labelspace,
+            neo4j_uri,
+            neo4j_creds,
+            scene_graph,
+        )
+        logger.info("DSG loaded!")
+
     with open("agent_config.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
     agent = LlmAgent(**yml)
