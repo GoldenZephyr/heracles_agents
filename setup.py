@@ -16,6 +16,7 @@ setup(
         "lark",
         "tiktoken",
         "spark-dsg",
+        "textual",
         "heracles @ git+https://github.com/GoldenZephyr/heracles.git#subdirectory=heracles",
     ],
     extras_require={
