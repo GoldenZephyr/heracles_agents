@@ -2,7 +2,6 @@
 import argparse
 import logging
 import os
-import sys
 import threading
 
 import spark_dsg
@@ -128,7 +127,7 @@ if __name__ == "__main__":
         args.db_port = os.getenv("ADT4_HERACLES_PORT")
 
     if args.scene_graph:
-        dsg_filepath = sys.argv[1]
+        dsg_filepath = args.scene_graph
         logger.info(f"Loading DSG into database from filepath: {dsg_filepath}")
 
         scene_graph = spark_dsg.DynamicSceneGraph.load(dsg_filepath)
