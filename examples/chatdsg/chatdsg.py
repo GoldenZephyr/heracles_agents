@@ -113,9 +113,17 @@ if __name__ == "__main__":
         help="DSG Filepath to load",
     )
     parser.add_argument(
-        "--object-labelspace", type=str, help="Path to object labelspace"
+        "--object-labelspace",
+        type=str,
+        help="Path to object labelspace",
+        default="ade20k_mit_label_space.yaml",
     )
-    parser.add_argument("--room-labelspace", type=str, help="Path to room labelspace")
+    parser.add_argument(
+        "--room-labelspace",
+        type=str,
+        help="Path to room labelspace",
+        default="b45_label_space.yaml",
+    )
     parser.add_argument("--db_ip", type=str, help="Heracles database ip")
     parser.add_argument("--db_port", type=int, help="Heracles database ip")
     args = parser.parse_args()
