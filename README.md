@@ -75,6 +75,8 @@ with the `--system-site-packages` option (which you would want anyway).
 | HERACLES\_NEO4J\_URI              | Address for database (neo4j://IP:PORT)                                     |
 | ADT4\_HERACLES\_IP                | Same database IP as above (necessary for the LLM agent demo)               |
 | ADT4\_HERACLES\_PORT              | Same database PORT as above (necessary for the LLM agent demo)             |
+| HERACLES\_VENV                    | Path to your virtualenv directory (only necessary for full agent demo.)    |
+| ROS2\_WS                          | Path to your ROS2 workspace (only necessary for full agent  demo.)         |
 
 ## Examples
 As discussed in the introduction, we provide two example applications of the
@@ -91,6 +93,22 @@ PDDL goals to an instance of
 graph objects of interest in Rviz. You can modify the LLM model or tools that
 are used [in the config file](examples/chatdsg/agent_config.yaml), or [change the
 prompt file](examples/chatdsg/agent_prompt.yaml).
+
+If you want to actually visualize the 3D scene graph (and any edits you make to
+it), you will need to install ROS2 and Hydra. Please see the [ROS2
+documentation](https://docs.ros.org/en/jazzy/Installation.html) for
+instructions to install ROS, and the [Hydra
+documentation](https://github.com/MIT-SPARK/Hydra-ROS/) repository for
+instructions to install Hydra. Once you have installed ROS2 and Hydra, you can
+run the [chatdsg launch script](examples/chatdsg/chatdsg_system_example.yaml)
+with the command:
+
+```bash
+tmuxp load chatdsg_system_example.yaml
+```
+
+Refer to the table at the top of this README for the environment variables that
+must be set.
 
 ### Experiment Pipelines
 

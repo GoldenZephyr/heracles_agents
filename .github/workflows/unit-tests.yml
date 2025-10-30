@@ -3,10 +3,8 @@ name: Unit tests
 on:
   pull_request:
     branches: [master]
-    paths: [src/**, setup.py, .github/workflows/unit-tests.yml]
   push:
     branches: [master]
-    paths: [src/**, setup.py, .github/workflows/unit-tests.yml]
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
