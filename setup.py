@@ -12,7 +12,7 @@ setup(
     package_data={"": ["*.yaml", "*.pddl", "*.lark"]},
     install_requires=[
         "pydantic-settings",
-        "plum-dispatch",
+        "plum-dispatch >= v2.7.0",
         "lark",
         "tiktoken",
         "spark-dsg",

@@ -1,6 +1,6 @@
 from typing import GenericAlias
 
-from plum.parametric import CovariantMeta
+from plum import CovariantMeta
 from pydantic import BaseModel, ValidationError
 from pydantic.functional_validators import WrapValidator
 
