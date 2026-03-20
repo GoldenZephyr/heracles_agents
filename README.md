@@ -69,7 +69,7 @@ with the `--system-site-packages` option (which you would want anyway).
 | HERACLES\_OPENAI\_API\_KEY        | OpenAI API key to use                                                      |
 | HERACLES\_ANTHROPIC\_API\_KEY     | Anthropic API key to use                                                   |
 | AWS\_BEARER\_TOKEN\_BEDROCK       | If you want to use Bedrock                                                 |
-| HERACLES\_EVALUATION\_PATH        | Path to where this repo is cloned (only necessary for the example prompts  |
+| HERACLES\_AGENTS\_PATH        | Path to where this repo is cloned (only necessary for the example prompts  |
 | HERACLES\_NEO4J\_USERNAME         | Username of local Neo4j graph database                                     |
 | HERACLES\_NEO4J\_PASSWORD         | Password of local Neo4j graph database                                     |
 | HERACLES\_NEO4J\_URI              | Address for database (neo4j://IP:PORT)                                     |

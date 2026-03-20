@@ -31,3 +31,8 @@ class StructuredToolDescription(BaseModel):
         raise NotImplementedError(
             "Structured tool calling not supported for custom tools"
         )
+
+    def to_openai_completions(self):
+        raise NotImplementedError(
+            "Structured tool calling not supported for openai_completions tools"
+        )

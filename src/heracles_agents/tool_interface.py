@@ -174,6 +174,9 @@ class ToolDescription(BaseModel):
         }
         return t
 
+    def to_openai_completions(self):
+        return self.to_ollama()
+
     def to_bedrock(self):
         parameter_properties = {}
         for p in self.parameters:

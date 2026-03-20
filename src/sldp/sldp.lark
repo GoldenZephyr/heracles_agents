@@ -1,6 +1,8 @@
 ?start: expression
 ?expression: float | string | set | list | dict | point
-string: CNAME
+string: CNAME | SQUOTED | DQUOTED
+SQUOTED: "'" /[^']*/ "'"
+DQUOTED: "\"" /[^"]*/ "\""
 float: SIGNED_FLOAT | INT
 set: "<" [expression ("," expression)*] ">"
 list: "[" [expression ("," expression)*] "]"

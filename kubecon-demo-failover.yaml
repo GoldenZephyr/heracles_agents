@@ -1,0 +1,22 @@
+session_name: kubecon-demo-failover
+suppress_history: false
+environment:
+  HERACLES_OPENAI_API_KEY: "${OPENAI_API_KEY}"
+  HERACLES_NEO4J_USERNAME: "neo4j"
+  HERACLES_NEO4J_PASSWORD: "neo4j_pw"
+  ADT4_HERACLES_IP: "localhost"
+  ADT4_HERACLES_PORT: "7687"
+options:
+  default-command: /bin/zsh
+windows:
+  - window_name: main
+    shell_command_before: source ${ADT4_WS}/install/setup.zsh; export HERACLES_AGENTS_PATH="$(git rev-parse --show-toplevel)"
+    layout: main-vertical
+    panes:
+      - shell_command:
+          - source .venv/bin/activate && python3 examples/chatdsg/chatdsg.py
+        focus: true
+      - shell_command:
+          - agentgateway -f config.yaml
+      - shell_command:
+          - ollama serve

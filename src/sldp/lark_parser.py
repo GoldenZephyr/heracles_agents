@@ -14,7 +14,10 @@ class SldpTransformer(Transformer):
         return float(items[0])
 
     def string(self, s):
-        return str(s[0])
+        val = str(s[0])
+        if val and val[0] in ("'", '"'):
+            val = val[1:-1]
+        return val
 
     def point(self, coords):
         return ("point", *coords)

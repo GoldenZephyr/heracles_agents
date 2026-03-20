@@ -1,0 +1,342 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "title": "Request Rate by Backend",
+      "description": "Shows which backend is handling traffic. During failover, the OpenAI line drops and Ollama rises.",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "pointSize": 5,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(agentgateway_requests_total[30s])",
+          "legendFormat": "{{backend}} ({{status}})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Error Rate (5xx)",
+      "description": "5xx errors trigger backend eviction in the failover policy.",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 30,
+            "pointSize": 5,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(agentgateway_requests_total{status=~\"5..\"}[30s])",
+          "legendFormat": "{{backend}} 5xx",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(agentgateway_requests_total{reason=\"NoHealthyBackend\"}[30s])",
+          "legendFormat": "No Healthy Backend",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Request Duration by Model (p95)",
+      "description": "Latency comparison across models and providers.",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "pointSize": 5,
+            "showPoints": "auto",
+            "spanNulls": false
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(agentgateway_gen_ai_server_request_duration_bucket[1m]))",
+          "legendFormat": "{{gen_ai_request_model}} ({{gen_ai_system}})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Token Usage by Model",
+      "description": "Input and output token throughput per model.",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 10 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "bars",
+            "lineWidth": 1,
+            "fillOpacity": 50,
+            "pointSize": 5,
+            "showPoints": "never",
+            "stacking": { "mode": "normal" },
+            "spanNulls": false
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "rate(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\"}[1m])",
+          "legendFormat": "{{gen_ai_request_model}} input",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\"}[1m])",
+          "legendFormat": "{{gen_ai_request_model}} output",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Total Requests by Status",
+      "description": "Cumulative request counts grouped by HTTP status code.",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 24, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto",
+        "graphMode": "area",
+        "orientation": "horizontal"
+      },
+      "targets": [
+        {
+          "expr": "agentgateway_requests_total",
+          "legendFormat": "{{status}} {{backend}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Cumulative Cost by Model",
+      "description": "Running total estimated API cost per model, computed from token counters and per-model pricing. Stays visible after the test completes. Each query uses `or vector(0)` so every model row appears even when that model has not been used yet (shows $0).",
+      "type": "timeseries",
+      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "pointSize": 5,
+            "showPoints": "auto",
+            "spanNulls": true
+          },
+          "unit": "currencyUSD",
+          "decimals": 4
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gpt-4.1\"}) * 2 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gpt-4.1\"}) * 8) / 1e6) or vector(0)",
+          "legendFormat": "gpt-4.1",
+          "refId": "A"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"claude-sonnet-4-20250514\"}) * 3 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"claude-sonnet-4-20250514\"}) * 15) / 1e6) or vector(0)",
+          "legendFormat": "claude-sonnet-4",
+          "refId": "B"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"claude-opus-4-20250514\"}) * 15 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"claude-opus-4-20250514\"}) * 75) / 1e6) or vector(0)",
+          "legendFormat": "claude-opus-4",
+          "refId": "C"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gemini-2.5-flash-lite\"}) * 1.25 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gemini-2.5-flash-lite\"}) * 10) / 1e6) or vector(0)",
+          "legendFormat": "gemini-2.5-flash-lite",
+          "refId": "D"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gemini-2.5-pro\"}) * 1.25 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gemini-2.5-pro\"}) * 10) / 1e6) or vector(0)",
+          "legendFormat": "gemini-2.5-pro",
+          "refId": "E"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"us.anthropic.claude-3-5-haiku-20241022-v1:0\"}) * 0.80 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"us.anthropic.claude-3-5-haiku-20241022-v1:0\"}) * 4) / 1e6) or vector(0)",
+          "legendFormat": "bedrock-claude-haiku",
+          "refId": "F"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"llama3.1\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"llama3.1\"})) * 0) or vector(0)",
+          "legendFormat": "llama3.1 (local — free)",
+          "refId": "G"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"qwen2.5:14b\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"qwen2.5:14b\"})) * 0) or vector(0)",
+          "legendFormat": "qwen2.5:14b (local — free)",
+          "refId": "H"
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"qwen3:32b\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"qwen3:32b\"})) * 0) or vector(0)",
+          "legendFormat": "qwen3:32b (local — free)",
+          "refId": "I"
+        }
+      ]
+    },
+    {
+      "title": "Total Estimated Cost by Model",
+      "description": "Total estimated API cost since gateway start. Pricing: gpt-4.1 ($2/$8 per 1M in/out tokens), claude-sonnet-4 ($3/$15), claude-opus-4 ($15/$75), bedrock-claude-haiku ($0.80/$4), gemini-2.5-flash-lite ($1.25/$10), gemini-2.5-pro ($1.25/$10). Local Ollama models are free. Bars use fixed query order (not sorted by value); each query falls back to $0 when unused.",
+      "type": "bargauge",
+      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.01 },
+              { "color": "red", "value": 0.1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "sort": "none"
+      },
+      "targets": [
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gpt-4.1\"}) * 2 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gpt-4.1\"}) * 8) / 1e6) or vector(0)",
+          "legendFormat": "gpt-4.1",
+          "refId": "A",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"claude-sonnet-4-20250514\"}) * 3 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"claude-sonnet-4-20250514\"}) * 15) / 1e6) or vector(0)",
+          "legendFormat": "claude-sonnet-4",
+          "refId": "B",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"claude-opus-4-20250514\"}) * 15 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"claude-opus-4-20250514\"}) * 75) / 1e6) or vector(0)",
+          "legendFormat": "claude-opus-4",
+          "refId": "C",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gemini-2.5-flash-lite\"}) * 1.25 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gemini-2.5-flash-lite\"}) * 10) / 1e6) or vector(0)",
+          "legendFormat": "gemini-2.5-flash-lite",
+          "refId": "D",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"gemini-2.5-pro\"}) * 1.25 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"gemini-2.5-pro\"}) * 10) / 1e6) or vector(0)",
+          "legendFormat": "gemini-2.5-pro",
+          "refId": "E",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"us.anthropic.claude-3-5-haiku-20241022-v1:0\"}) * 0.80 + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"us.anthropic.claude-3-5-haiku-20241022-v1:0\"}) * 4) / 1e6) or vector(0)",
+          "legendFormat": "bedrock-claude-haiku",
+          "refId": "F",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"llama3.1\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"llama3.1\"})) * 0) or vector(0)",
+          "legendFormat": "llama3.1 (local — free)",
+          "refId": "G",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"qwen2.5:14b\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"qwen2.5:14b\"})) * 0) or vector(0)",
+          "legendFormat": "qwen2.5:14b (local — free)",
+          "refId": "H",
+          "instant": true
+        },
+        {
+          "expr": "((sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"input\", gen_ai_request_model=\"qwen3:32b\"}) + sum(agentgateway_gen_ai_client_token_usage_sum{gen_ai_token_type=\"output\", gen_ai_request_model=\"qwen3:32b\"})) * 0) or vector(0)",
+          "legendFormat": "qwen3:32b (local — free)",
+          "refId": "I",
+          "instant": true
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "tags": ["agentgateway", "failover", "cost"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "agentgateway - Dashboard",
+  "uid": "agw-dashboard",
+  "version": 2
+}

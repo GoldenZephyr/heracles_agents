@@ -1,6 +1,7 @@
 ---
 client:
   client_type: openai
+  base_url: "http://localhost:3000/v1"
   # auth key is supplied by HERACLES_OPENAI_API_KEY
   timeout: 20
 model_info:
