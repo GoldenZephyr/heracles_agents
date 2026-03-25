@@ -22,6 +22,7 @@ developed to support research in symbolic 3D spatial perception (*3D Scene
 Graphs*) and AI Planning. To that end, we provide LLM tools for
 * [Executing Cypher queries against a graph database](src/heracles_agents/tools/cypher_query_tool.py)
 * [Sending PDDL goals to robots](src/heracles_agents/tools/pddl_calling_tool.py)
+* [Direct navigation commands for ground robots](src/heracles_agents/tools/navigation_tools.py) (move, turn, strafe, stop, stand/sit)
 * [Sending waypoints to quadrotors](src/heracles_agents/tools/penn_integration_tool.py)
 * [Highlighting objects of interest in a 3D scene graph](src/heracles_agents/tools/visualize_objects_tool.py)
 
