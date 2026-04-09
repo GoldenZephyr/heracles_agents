@@ -1,0 +1,34 @@
+interface_description: |
+  Labels in Database:
+      - Object: a node representing an object in the world.
+          - nodeSymbol: a unique string identifier
+          - class: a string identifying the object's semantic class or type
+          - center: the 3D position of the object, as a POINT type
+      - MeshPlace: a node representing a 2D segment of space the robot might be able to move to.
+          - nodeSymbol: a unique string identifier
+          - class: a string identifying the place's semantic class or type
+          - center: the 3D position of the mesh place, as a POINT type
+      - Place: a node representing a 3D region of free space
+          - nodeSymbol: a unique string identifier
+          - center: the 3D position of the place, as a POINT type
+      - Room: a node representing a room or higher-level region
+          - nodeSymbol: a unique string identifier
+          - class: a string identifying the room's semantic class or type
+          - center: the 3D position of the room, as a POINT type
+
+  Object, MeshPlace, Place, and Room are all Cypher labels attached to nodes.
+
+  Places and Mesh Places represent a higher level of the hierarchy compared to objects, but lower level than rooms.
+
+  There are multiple kinds of existing edges. First is (a)-[:CONTAINS]->(b), which connects nodes between different layers and means that b is contained within a. Nodes in higher levels of the hierarchy may contain nodes in lower levels of the hierarchy, but nodes in the lower level of the hierarchy will not contain higher-level nodes.
+
+  Another kind of edges represent connectivity within a layer: [:OBJECT_CONNECTED], [:PLACE_CONNECTED], [:MESH_PLACE_CONNECTED], [:ROOM_CONNECTED].
+  Remember that (a)-[:CONTAINS*]->(b) will match transitive relationships.
+
+  There are two relationships representing holding and containment:
+
+  [:HOLDS] connects a Robot to an Object it is directly gripping. For example, (robot)-[:HOLDS]->(box) means the robot is carrying the box. The box's position follows the robot.
+
+  [:WITH] connects an Object to another Object that is stacked on top of it or contained within it. For example, (box)-[:WITH]->(cup) means the cup is resting on top of the box. The cup's position is updated to sit on top of the box. When a robot holds (box), it transitively holds all objects reachable via [:WITH] — (robot)-[:HOLDS]->(box)-[:WITH*]->(cup) means the robot also holds the cup. Dropping the box causes the robot to also release all transitively held objects.
+
+  Note that in the current version of cypher, `distance` has been replaced by `point.distance`. Also, do not use any apoc functions in your queries.
