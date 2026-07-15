@@ -1,0 +1,37 @@
+in_context_examples:
+  # Simple visit place
+  - user: |
+      Instruction: Go to place 5041.
+    assistant: "I'll send the robot to place p5041.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-place p5041)"
+  # Simple visit object
+  - user: |
+      Instruction: Go to object 188.
+    assistant: "I'll send the robot to object o188.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-object o188)"
+  # Visit place and object together
+  - user: |
+      Instruction: Visit place 23778 and object 188.
+    assistant: "I'll send the robot to visit both place p23778 and object o188.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(and (visited-place p23778)(visited-object o188))"
+  # Visit multiple places
+  - user: |
+      Instruction: Go to place 23778 and place 34383.
+    assistant: "I'll have the robot visit both places.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(and (visited-place p23778)(visited-place p34383))"
+  # Goal with forbidden-poi constraint
+  - user: |
+      Instruction: Go to place 23778 but avoid object 187.
+    assistant: "I'll route the robot to place p23778 while avoiding object o187.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-place p23778) and constraints_json=[[\"forbidden-poi\", \"o187\"]]"
+  # Goal with multiple constraints
+  - user: |
+      Instruction: Visit place 23778 but stay away from object 188 and object 130.
+    assistant: "I'll send the robot to p23778 while avoiding objects o188 and o130.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-place p23778) and constraints_json=[[\"forbidden-poi\", \"o188\"], [\"forbidden-poi\", \"o130\"]]"
+  # Goal with forbidden-edge constraint (unordered — one direction is enough)
+  - user: |
+      Instruction: Go to place 23778 but the path between place 1234 and place 5678 is blocked.
+    assistant: "I'll route the robot to p23778 while avoiding the blocked edge.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-place p23778) and constraints_json=[[\"forbidden-edge\", \"p1234\", \"p5678\"]]"
+  # Interrupt with new goal
+  - user: |
+      Instruction: Change the plan. Go to place 34383 instead.
+    assistant: "I'll interrupt the current plan and send the robot to p34383.\n\nUsing send_pddl_goal_with_constraints with pddl_goal_string=(visited-place p34383)"
+  # Natural language with scene graph query needed
+  - user: |
+      Instruction: Go to the nearest tree.
+    assistant: "I need to find tree objects in the scene graph first. Let me query for them.\n\nUsing run_cypher_query to find trees, then I'll send the goal with the correct object ID."

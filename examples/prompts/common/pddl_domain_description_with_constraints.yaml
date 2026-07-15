@@ -1,0 +1,49 @@
+domain_description: |
+  <PDDL Domain>
+      The PDDL domain consists of the following predicates. These predicates get parameterized by symbols from a 3D scene graph.
+      IMPORTANT: All IDs in PDDL goals and constraints must be LOWERCASE. Places use prefix "p" (e.g., p23778), objects use prefix "o" (e.g., o188).
+
+      (visited-place ?p): Robot must visit place ?p at some point. Example: (visited-place p23778)
+      (visited-object ?o): Robot must visit object ?o at some point. Example: (visited-object o188)
+      (at-place ?p): Robot must end at place ?p.
+      (at-object ?o): Robot must end at object ?o.
+      (safe ?o): Robot must inspect object ?o. Example: (safe o188)
+
+      When an instruction indicates an order, use "at-" predicates for the final destination and "visited-" predicates for intermediate stops.
+
+      You can compose goals using:
+      and: multiple predicates must be true. Example: (and (visited-place p23778)(visited-object o188))
+      or: at least one must be true. Example: (or (visited-place p23778)(visited-place p34383))
+      not: negates a predicate. Example: (not (visited-object o188))
+
+      If the user is not specific about which object or place, use "or" to let the planner decide.
+
+      To find the correct place or object IDs, use the run_cypher_query tool to query the scene graph database.
+      Example Cypher: MATCH (o:Object) WHERE o.class = 'tree' RETURN o.nodeSymbol
+      Example Cypher: MATCH (p:MeshPlace) RETURN p.nodeSymbol LIMIT 10
+  </PDDL Domain>
+
+  <Runtime Constraints>
+      In addition to goals, you can specify runtime constraints to forbid the robot from visiting certain locations or edges.
+      Constraints are passed as a JSON list via the constraints_json parameter to send_pddl_goal_with_constraints.
+
+      Constraint types:
+      - forbidden-poi: forbids the robot from visiting (or transiting through) a specific place or object.
+        Example: [["forbidden-poi", "o188"]] forbids object o188.
+        Example: [["forbidden-poi", "p23778"]] forbids place p23778.
+      - forbidden-edge: forbids the robot from traversing the edge between two points.
+        Example: [["forbidden-edge", "p1234", "p5678"]] blocks the corridor between p1234 and p5678.
+        NOTE: forbidden-edge is unordered. You only need ONE direction, not both.
+
+      ALL constraint IDs must be LOWERCASE (e.g., "o188" not "O188", "p1234" not "P1234").
+
+      When the user says:
+      - "avoid object X" or "don't go near place Y" -> use forbidden-poi
+      - "that path is blocked" or "the corridor between A and B is closed" -> use forbidden-edge (a single entry)
+
+      Constraints scoped to a single goal: pass them in constraints_json alongside the goal.
+      The user does not need to re-state existing constraints when sending a new goal.
+
+      You can also send a goal with no constraints — just pass an empty string for constraints_json
+      (or omit the parameter entirely).
+  </Runtime Constraints>
