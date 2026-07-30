@@ -18,7 +18,7 @@ agent_info:
           uri: neo4j://$ADT4_HERACLES_IP:$ADT4_HERACLES_PORT
     - name: send_multirobot_pddl_goal
       bound_args:
-        planner_topic: /hilbert/omniplanner_node/multirobot_region_rearrange_objects_pddl/pddl_goal
+        planner_topic: /${ADT4_ROBOT_NAME}/omniplanner_node/multirobot_region_rearrange_objects_pddl/pddl_goal
     - name: visualize_objects
       bound_args:
         viz_topic: /viz_objects_marker_array
