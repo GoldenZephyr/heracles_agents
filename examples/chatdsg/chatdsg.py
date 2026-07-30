@@ -7,7 +7,7 @@ import threading
 import spark_dsg
 import yaml
 from heracles.dsg_utils import summarize_dsg
-from heracles.utils import load_dsg_to_db
+from heracles.utils import extract_labelspaces_from_dsg, load_dsg_to_db
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import VerticalScroll
@@ -17,6 +17,71 @@ from heracles_agents.llm_agent import LlmAgent
 from heracles_agents.llm_interface import AgentContext
 
 logger = logging.getLogger(__name__)
+
+# Location of the backend DSG inside a saved map directory (see $ADT4_PRIOR_MAP).
+PRIOR_DSG_RELPATH = os.path.join("hydra", "backend", "dsg.json")
+
+
+def default_scene_graph_path():
+    """Path to the prior DSG implied by $ADT4_PRIOR_MAP, or None if it is unset."""
+    prior_map = os.getenv("ADT4_PRIOR_MAP")
+    if not prior_map:
+        return None
+
+    return os.path.join(os.path.expanduser(prior_map), PRIOR_DSG_RELPATH)
+
+
+def neo4j_credentials():
+    """Neo4j credentials, preferring HERACLES_* over the launch system's ADT4_*."""
+    user = os.getenv("HERACLES_NEO4J_USERNAME") or os.getenv("ADT4_NEO4J_USERNAME")
+    password = os.getenv("HERACLES_NEO4J_PASSWORD") or os.getenv("ADT4_NEO4J_PASSWORD")
+    return user, password
+
+
+def load_prior_dsg(dsg_filepath, neo4j_uri):
+    """Load a DSG from file into Neo4j using the labelspaces embedded in the graph.
+
+    Returns True if the graph was loaded, False if it was skipped.
+    """
+    if not os.path.isfile(dsg_filepath):
+        logger.warning(
+            f"No DSG at '{dsg_filepath}'; skipping load. "
+            "The database will only contain whatever the heracles publisher adds."
+        )
+        return False
+
+    neo4j_creds = neo4j_credentials()
+    if not all(neo4j_creds):
+        logger.warning(
+            "Neo4j credentials are not set (need HERACLES_NEO4J_USERNAME/PASSWORD or "
+            "ADT4_NEO4J_USERNAME/PASSWORD); skipping DSG load."
+        )
+        return False
+
+    logger.info(f"Loading DSG into database from filepath: {dsg_filepath}")
+    scene_graph = spark_dsg.DynamicSceneGraph.load(dsg_filepath)
+    summarize_dsg(scene_graph)
+
+    # load_dsg_to_db reads the labelspaces out of the graph metadata, so a graph
+    # saved without them will come back with unlabeled objects and rooms.
+    object_labelspace, room_labelspace = extract_labelspaces_from_dsg(scene_graph)
+    missing = [
+        name
+        for name, labelspace in (
+            ("object", object_labelspace),
+            ("room", room_labelspace),
+        )
+        if not labelspace
+    ]
+    if missing:
+        logger.warning(
+            f"DSG '{dsg_filepath}' has no embedded {' or '.join(missing)} labelspace; "
+            "those nodes will be loaded without semantic labels."
+        )
+
+    load_dsg_to_db(neo4j_uri, neo4j_creds, scene_graph)
+    logger.info("DSG loaded!")
+    return True
 
 
 def new_user_message(text):
@@ -104,25 +169,20 @@ class InputDisplayApp(App):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
     parser = argparse.ArgumentParser("ChatDSG agent")
     parser.add_argument(
         "--scene-graph",
         nargs="?",
         const=None,
         default=None,
-        help="DSG Filepath to load",
+        help=f"DSG filepath to load (defaults to $ADT4_PRIOR_MAP/{PRIOR_DSG_RELPATH})",
     )
     parser.add_argument(
-        "--object-labelspace",
-        type=str,
-        help="Path to object labelspace",
-        default="ade20k_mit_label_space.yaml",
-    )
-    parser.add_argument(
-        "--room-labelspace",
-        type=str,
-        help="Path to room labelspace",
-        default="b45_label_space.yaml",
+        "--no-dsg-load",
+        action="store_true",
+        help="Don't load a DSG on startup (loading clears the existing database)",
     )
     parser.add_argument("--db_ip", type=str, help="Heracles database ip")
     parser.add_argument("--db_port", type=int, help="Heracles database ip")
@@ -134,26 +194,16 @@ if __name__ == "__main__":
     if args.db_port is None:
         args.db_port = os.getenv("ADT4_HERACLES_PORT")
 
-    if args.scene_graph:
-        dsg_filepath = args.scene_graph
-        logger.info(f"Loading DSG into database from filepath: {dsg_filepath}")
-
-        scene_graph = spark_dsg.DynamicSceneGraph.load(dsg_filepath)
-        summarize_dsg(scene_graph)
-        neo4j_uri = f"neo4j://{args.db_ip}:{args.db_port}"
-        neo4j_creds = (
-            os.getenv("HERACLES_NEO4J_USERNAME"),
-            os.getenv("HERACLES_NEO4J_PASSWORD"),
+    dsg_filepath = args.scene_graph or default_scene_graph_path()
+    if args.no_dsg_load:
+        logger.info("Skipping DSG load (--no-dsg-load).")
+    elif dsg_filepath is None:
+        logger.warning(
+            "No DSG to load: pass --scene-graph or set $ADT4_PRIOR_MAP to a saved "
+            "map directory."
         )
-
-        load_dsg_to_db(
-            args.object_labelspace,
-            args.room_labelspace,
-            neo4j_uri,
-            neo4j_creds,
-            scene_graph,
-        )
-        logger.info("DSG loaded!")
+    else:
+        load_prior_dsg(dsg_filepath, f"neo4j://{args.db_ip}:{args.db_port}")
 
     with open("agent_config.yaml", "r") as fo:
         yml = yaml.safe_load(fo)
